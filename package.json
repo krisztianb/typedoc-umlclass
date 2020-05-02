@@ -1,0 +1,42 @@
+{
+    "name": "typedoc-umlclass",
+    "version": "0.1.0",
+    "description": "Plugin for TypeDoc that generates uml class diagrams",
+    "author": {
+        "name": "Krisztián Balla",
+        "url": "https://github.com/krisztianb"
+    },
+    "license": "ISC",
+    "keywords": [
+        "uml",
+        "typedoc",
+        "typedocplugin"
+    ],
+    "dependencies": {
+        "node-plantuml": "^0.9.0",
+        "pako": "^1.0.11"
+    },
+    "devDependencies": {
+        "@types/node": "^13.13.4",
+        "@types/pako": "^1.0.1",
+        "prettier": "^2.0.5",
+        "tslint": "^6.1.2",
+        "typedoc": "^0.17.6",
+        "typescript": "^3.8.3"
+    },
+    "peerDependencies": {
+        "typedoc": "^0.17.6"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/krisztianb/typedoc-umlclass.git"
+    },
+    "main": "dist/index.js",
+    "files": [
+        "/dist"
+    ],
+    "scripts": {
+        "lint": "npx tslint -p .",
+        "build": "npx tsc"
+    }
+}
