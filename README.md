@@ -28,9 +28,10 @@ The following options are added to TypeDoc when the plugin is installed:
     Specifies the image format to use.
     Default is `png`.
 -   `--umlClassDiagramType <none|simple|detailed>`<br>
-    Use this option to automatically create a class diagram for every class and interface that has a comment.
-    The class diagram includes one level of base and sub classes. Use the value `simple` to only render the name
-    of the class or interface. Use the value `detailed` to also render properties and methods.
+    You can use this option to disable the plugin by passing the value `none`. Otherwise a class diagram is generated
+    for every class and interface that is involved in inheritance and/or implementation. The class diagram includes
+    one level of base and sub classes. Use the value `simple` to only render the name of the class or interface.
+    Use the value `detailed` to also render properties and methods.
     Default is `detailed`.
 -   `--umlClassDiagramPosition <above|below>`<br>
     Use this option to specify where the class diagram should be placed.

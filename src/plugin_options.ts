@@ -66,7 +66,7 @@ export class PlantUmlPluginOptions {
     /** The image format used for generating UML diagrams. */
     private outputImageFormatOption = {
         type: ParameterType.Map,
-        name: "umlFormat",
+        name: "umlClassDiagramFormat",
         help: "png|svg",
         defaultValue: ImageFormat.PNG,
         map: new Map([
@@ -79,7 +79,7 @@ export class PlantUmlPluginOptions {
     /** The location where the generated UML diagrams should be stored. */
     private outputImageLocationOption = {
         type: ParameterType.Map,
-        name: "umlLocation",
+        name: "umlClassDiagramLocation",
         help: "local|remote",
         defaultValue: ImageLocation.Local,
         map: new Map([
@@ -94,13 +94,13 @@ export class PlantUmlPluginOptions {
         type: ParameterType.Map,
         name: "umlClassDiagramType",
         help: "none|simple|detailed",
-        defaultValue: ClassDiagramType.None,
+        defaultValue: ClassDiagramType.Detailed,
         map: new Map([
             ["none", ClassDiagramType.None],
             ["simple", ClassDiagramType.Simple],
             ["detailed", ClassDiagramType.Detailed],
         ]),
-        value: ClassDiagramType.None,
+        value: ClassDiagramType.Detailed,
     };
 
     /** Specifies where on the page the automatically created class diagram should be put. */

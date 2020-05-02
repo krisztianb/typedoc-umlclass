@@ -1,5 +1,5 @@
 import { PluginHost } from "typedoc/dist/lib/utils";
-import { PlantUmlPlugin } from "./plantuml_plugin";
+import { PlantUmlPlugin } from "./plugin";
 
 /**
  * Initializes the plugin.

@@ -13,7 +13,7 @@ import {
     ImageFormat,
     ImageLocation,
     PlantUmlPluginOptions,
-} from "./plantuml_plugin_options";
+} from "./plugin_options";
 import { PlantUmlUtils } from "./plantuml_utils";
 import { TypeDocUtils } from "./typedoc_utils";
 
