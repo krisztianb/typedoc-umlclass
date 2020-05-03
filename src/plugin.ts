@@ -1,5 +1,3 @@
-// tslint:disable-next-line:no-var-requires
-const plantuml = require("node-plantuml"); // there are no type definitions for this module :-(
 import * as fs from "fs";
 import * as path from "path";
 import { Application, DeclarationReflection, Reflection, ReflectionKind } from "typedoc";
@@ -15,6 +13,7 @@ import {
     PluginOptions,
 } from "./plugin_options";
 import { TypeDocUtils } from "./typedoc_utils";
+import { ImageGenerator } from "./image_generator";
 
 /**
  * The UML class diagram generator plugin.
@@ -30,14 +29,11 @@ import { TypeDocUtils } from "./typedoc_utils";
  * 3. The plugin adds a section with the image to the page of each class and interface.
  */
 export class Plugin {
-    /** The directory in which TypeDoc (and this plugin) is generating the images. */
-    private typeDocImageDirectory!: string;
-
-    /** Number of generated local image files. */
-    private numberOfGeneratedImages = 0;
-
     /** The options of this plugin. */
     private options = new PluginOptions();
+
+    /** Used when the class diagrams are created locally. */
+    private localImageGenerator = new ImageGenerator();
 
     /**
      * Stores the generated PlantUML code for the reflections.
@@ -327,7 +323,7 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererBegin(event: RendererEvent): void {
-        this.typeDocImageDirectory = path.join(event.outputDirectory, "assets/images/");
+        this.localImageGenerator.setOutputDirectory(path.join(event.outputDirectory, "assets/images/"));
     }
 
     /**
@@ -369,7 +365,11 @@ export class Plugin {
 
                 // decode image and write to disk if using local images
                 if (this.options.outputImageLocation === ImageLocation.Local) {
-                    src = this.writeLocalImage(event.filename, src);
+                    src = this.localImageGenerator.writeImage(
+                        event.filename,
+                        src,
+                        this.options.outputImageFormat === ImageFormat.PNG ? "png" : "svg"
+                    );
                 } else {
                     // this is the case where we have a remote file, so we don't need to write out the image but
                     // we need to add the server back into the image source since it was removed by the regex
@@ -405,30 +405,5 @@ export class Plugin {
                 event.contents = segments.join("");
             }
         }
-    }
-
-    /**
-     * Writes a class diagram as a local image to the disc.
-     * @param pageFilename The filename of the generated TypeDoc page.
-     * @param encodedPlantUml The encoded PlantUML code for the diagram.
-     * @returns The relative path to the generated image file.
-     */
-    private writeLocalImage(pageFilename: string, encodedPlantUml: string): string {
-        // setup plantuml encoder and decoder
-        const decode = plantuml.decode(encodedPlantUml);
-        const gen = plantuml.generate({ format: this.options.outputImageFormat.toString() });
-
-        // get image filename
-        const filename = "uml" + ++this.numberOfGeneratedImages + "." + this.options.outputImageFormat.toString();
-        const imagePath = path.join(this.typeDocImageDirectory, filename);
-
-        // decode and save png to assets directory
-        decode.out.pipe(gen.in);
-        gen.out.pipe(fs.createWriteStream(imagePath));
-
-        // get relative path filename
-        const currentDirectory = path.dirname(pageFilename);
-        // return the relative path
-        return path.relative(currentDirectory, imagePath);
     }
 }
