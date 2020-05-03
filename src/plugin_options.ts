@@ -62,7 +62,7 @@ export enum FontStyle {
 /**
  * Class storing the options of the plugin.
  */
-export class PlantUmlPluginOptions {
+export class PluginOptions {
     /** The image format used for generating UML diagrams. */
     private outputImageFormatOption = {
         type: ParameterType.Map,

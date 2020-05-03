@@ -5,39 +5,31 @@ import * as path from "path";
 import { Application, DeclarationReflection, Reflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
+import { PlantUmlUtils } from "./plantuml_utils";
 import {
     ClassDiagramMemberVisibilityStyle,
-    ClassDiagramPosition,
     ClassDiagramType,
     FontStyle,
     ImageFormat,
     ImageLocation,
-    PlantUmlPluginOptions,
+    PluginOptions,
 } from "./plugin_options";
-import { PlantUmlUtils } from "./plantuml_utils";
 import { TypeDocUtils } from "./typedoc_utils";
 
 /**
- * The PlantUML plugin.
+ * The UML class diagram generator plugin.
  *
  * # What does it do?
  *
- * This plugin replaces PlantUML diagrams embedded in UML tags within comments by images.
+ * This plugin generates an UML class diagram for classes and interfaces.
  *
  * # How does it do it?
  *
- * 1. If the plugin option for automatically creating UML diagrams is enabled the plugin scans through
- *    all declaration reflections' comments and injects a UML tag into them. The UML tag contains the
- *    PlantUML code that represents the class diagram for that reflection.
- *
- * 2. The plugin replaces each UML tag within a comment by markdown for an image with a URL to
- *    the official PlantUML server. The URL contains the encoded PlantUML lines from the UML tag.
- *
- * 3. If the plugin option for generating local images is enabled the plugin uses the node-plantuml
- *    module to generate image files out of the image URLs from step one and stores them as local files.
- *    The markdown for the images is updated respectively.
+ * 1. The plugin scans through the classes and interfaces and generates PlantUML code for them.
+ * 2. The plugin uses the node-plantuml module to generate image files from the PlantUML code.
+ * 3. The plugin adds a section with the image to the page of each class and interface.
  */
-export class PlantUmlPlugin {
+export class Plugin {
     /** The directory in which TypeDoc (and this plugin) is generating the images. */
     private typeDocImageDirectory!: string;
 
@@ -45,7 +37,14 @@ export class PlantUmlPlugin {
     private numberOfGeneratedImages = 0;
 
     /** The options of this plugin. */
-    private options = new PlantUmlPluginOptions();
+    private options = new PluginOptions();
+
+    /**
+     * Stores the generated PlantUML code for the reflections.
+     * KEY   = Unique ID of the reflection
+     * VALUE = The PlantUML lines of code for the reflection
+     */
+    private reflectionPlantUmlMap = new Map<number, string[]>();
 
     /**
      * Initializes the plugin.
@@ -89,22 +88,21 @@ export class PlantUmlPlugin {
 
     /**
      * Triggered when the TypeDoc converter has finished resolving a project.
-     * Replaces UML tags in comments with image links to encoded UML data.
+     * Generates the PlantUML code for every class and interface.
      * @param context Describes the current state the converter is in.
      */
     public onConverterResolveEnd(context: Context): void {
         const project = context.project;
 
-        // go through all the reflections' comments
         for (const key in project.reflections) {
             const reflection = project.reflections[key];
 
-            if (reflection && reflection.comment) {
-                if (this.shouldCreateClassDiagramForReflection(reflection)) {
-                    this.insertUmlTagWithClassDiagramIntoCommentOfReflection(reflection);
-                }
+            if (reflection && this.shouldCreateClassDiagramForReflection(reflection)) {
+                const plantUmlLines = this.getClassDiagramPlantUmlForReflection(reflection);
 
-                this.handleUmlTagsInCommentOfReflection(reflection);
+                if (plantUmlLines.length > 0) {
+                    this.reflectionPlantUmlMap.set(reflection.id, plantUmlLines);
+                }
             }
         }
     }
@@ -126,29 +124,6 @@ export class PlantUmlPlugin {
         }
 
         return false;
-    }
-
-    /**
-     * Inserts an UML tag containing the PlantUML for a class diagram into the comment of the reflection.
-     * @param reflection The reflection whoes comment should be manipulated.
-     */
-    private insertUmlTagWithClassDiagramIntoCommentOfReflection(reflection: DeclarationReflection): void {
-        if (reflection.comment) {
-            const classDiagramPlantUmlLines = this.getClassDiagramPlantUmlForReflection(reflection);
-
-            if (classDiagramPlantUmlLines.length > 0) {
-                if (this.options.autoClassDiagramPosition === ClassDiagramPosition.Above) {
-                    reflection.comment.shortText =
-                        "<uml>\n" +
-                        classDiagramPlantUmlLines.join("\n") +
-                        "\n</uml>  \n" + // the two spaces are needed to generate a line break in markdown
-                        reflection.comment.shortText;
-                } else {
-                    reflection.comment.text =
-                        reflection.comment.text + "\n<uml>\n" + classDiagramPlantUmlLines.join("\n") + "\n</uml>";
-                }
-            }
-        }
     }
 
     /**
@@ -301,17 +276,6 @@ export class PlantUmlPlugin {
     }
 
     /**
-     * Convert UML tags within the comment of the reflection into PlantUML image links.
-     * @param reflection The reflection whoes comment should be manipulated.
-     */
-    private handleUmlTagsInCommentOfReflection(reflection: Reflection): void {
-        if (reflection.comment) {
-            reflection.comment.shortText = this.handleUmlTags(reflection.comment.shortText);
-            reflection.comment.text = this.handleUmlTags(reflection.comment.text);
-        }
-    }
-
-    /**
      * Replaces UML-tags in a comment with Markdown image links.
      * @param text The text of the comment to process.
      * @returns The processed text of the comment.
@@ -446,12 +410,12 @@ export class PlantUmlPlugin {
     /**
      * Writes a class diagram as a local image to the disc.
      * @param pageFilename The filename of the generated TypeDoc page.
-     * @param src The image URL of the class diagram.
+     * @param encodedPlantUml The encoded PlantUML code for the diagram.
      * @returns The relative path to the generated image file.
      */
-    private writeLocalImage(pageFilename: string, src: string): string {
+    private writeLocalImage(pageFilename: string, encodedPlantUml: string): string {
         // setup plantuml encoder and decoder
-        const decode = plantuml.decode(src);
+        const decode = plantuml.decode(encodedPlantUml);
         const gen = plantuml.generate({ format: this.options.outputImageFormat.toString() });
 
         // get image filename
