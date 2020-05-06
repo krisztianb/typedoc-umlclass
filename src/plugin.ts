@@ -11,9 +11,11 @@ import {
     ImageFormat,
     ImageLocation,
     PluginOptions,
+    ClassDiagramPosition,
 } from "./plugin_options";
 import { TypeDocUtils } from "./typedoc_utils";
 import { ImageGenerator } from "./image_generator";
+import { PageProcessor, PageSections } from "./page_processor";
 
 /**
  * The UML class diagram generator plugin.
@@ -296,7 +298,13 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererEndPage(event: PageEvent): void {
-        if (event.contents && TypeDocUtils.isDetailPage(event.contents)) {
+        if (!event.contents) {
+            return;
+        }
+
+        const page = new PageProcessor(event.contents);
+
+        if (page.isDetailPage) {
             const reflection = event.model as Reflection;
             const reflectionPlanUmlLines = this.reflectionPlantUmlMap.get(reflection.id);
 
@@ -315,16 +323,16 @@ export class Plugin {
                           encodedPlantUml;
 
                 // Add HTML to page
-                const hierarchySectionLocationOnPage = TypeDocUtils.getHierarchySectionLocationOnDetailPage(
-                    event.contents
-                );
 
-                // TODO: Don't replace the hierarchy but insert above it :-D
                 const umlClassDiagramSection = `<section class="tsd-panel tsd-hierarchy"><h3>Hierarchy-Diagram</h3><img class="uml" src="${imagePath}" alt="UML class diagram of ${reflection.name}" /></section>`;
-                event.contents =
-                    event.contents.substring(0, hierarchySectionLocationOnPage.startIndex) +
-                    umlClassDiagramSection +
-                    event.contents.substring(hierarchySectionLocationOnPage.endIndex);
+
+                if (this.options.autoClassDiagramPosition === ClassDiagramPosition.Above) {
+                    page.insertAboveSection(PageSections.Hierarchy, umlClassDiagramSection);
+                } else {
+                    page.insertBelowSection(PageSections.Hierarchy, umlClassDiagramSection);
+                }
+
+                event.contents = page.content;
             }
         }
     }

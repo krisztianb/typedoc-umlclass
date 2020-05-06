@@ -108,12 +108,12 @@ export class PluginOptions {
         type: ParameterType.Map,
         name: "umlClassDiagramPosition",
         help: "above|below",
-        defaultValue: ClassDiagramPosition.Below,
+        defaultValue: ClassDiagramPosition.Above,
         map: new Map([
             ["above", ClassDiagramPosition.Above],
             ["below", ClassDiagramPosition.Below],
         ]),
-        value: ClassDiagramPosition.Below,
+        value: ClassDiagramPosition.Above,
     };
 
     /** Specifies whether to hide empty properties and methods in the automatically created class diagram. */

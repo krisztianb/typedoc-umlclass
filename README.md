@@ -34,9 +34,8 @@ The following options are added to TypeDoc when the plugin is installed:
     Use the value `detailed` to also render properties and methods.
     Default is `detailed`.
 -   `--umlClassDiagramPosition <above|below>`<br>
-    Use this option to specify where the class diagram should be placed.
-    The class diagram can be inserted `above` or `below` the comment's text.
-    Default is `below`.
+    Use this option to specify if the class diagram should be inserted `above` or `below` the hierarchy section.
+    Default is `above`.
 -   `--umlClassDiagramHideEmptyMembers <true|false>`<br>
     If this option is set to true properties and methods are hidden if they are empty.
     Default is `true`.
