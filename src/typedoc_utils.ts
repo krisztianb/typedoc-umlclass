@@ -240,4 +240,30 @@ export class TypeDocUtils {
 
         return newArray;
     }
+
+    /**
+     * Checks if the page is detail page for a class or reflection.
+     * @param content The content of the page.
+     * @returns True, if the page is a detail page, otherwise false.
+     */
+    public static isDetailPage(content: string): boolean {
+        return /<section class="tsd-panel tsd-hierarchy">\s*<h3>Hierarchy<\/h3>/.test(content);
+    }
+
+    /**
+     * Returns the position of the hierarchy section within the content of a detail page.
+     * @param content The content of the page.
+     * @returns An object with the start and end index of the hierarchy section.
+     *          If the section cannot be found in the content both startIndex and endIndex equal 0.
+     */
+    public static getHierarchySectionLocationOnDetailPage(content: string): { startIndex: number; endIndex: number } {
+        const regex = /<section class="tsd-panel tsd-hierarchy">\s*<h3>Hierarchy<\/h3>[^]*?<\/section>/;
+        const match = regex.exec(content);
+
+        if (match) {
+            return { startIndex: match.index, endIndex: match.index + match[0].length };
+        } else {
+            return { startIndex: 0, endIndex: 0 };
+        }
+    }
 }

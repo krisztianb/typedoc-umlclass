@@ -272,53 +272,6 @@ export class Plugin {
     }
 
     /**
-     * Replaces UML-tags in a comment with Markdown image links.
-     * @param text The text of the comment to process.
-     * @returns The processed text of the comment.
-     */
-    private handleUmlTags(text: string): string {
-        // regexp for finding UML tags
-        const umlExpression = /<uml(?:\s+alt\s*=\s*['"](.+)['"]\s*)?>([\s\S]*?)<\/uml>/gi;
-
-        // if we have comment body text look for uml blocks
-        if (text) {
-            let index = 0;
-            const segments = new Array<string>();
-
-            let match = umlExpression.exec(text);
-
-            while (match != null) {
-                segments.push(text.substring(index, match.index));
-
-                // replace the uml block with a link to plantuml.com with the encoded uml data
-                if (match[2]) {
-                    segments.push("![");
-                    if (match[1]) {
-                        // alternate text
-                        segments.push(match[1]);
-                    }
-                    segments.push(
-                        "](" + PlantUmlUtils.plantUmlServerUrl + this.options.outputImageFormat.toString() + "/"
-                    );
-                    segments.push(PlantUmlUtils.encode(match[2]));
-                    segments.push(")");
-                }
-
-                index = match.index + match[0].length;
-                match = umlExpression.exec(text);
-            }
-
-            // write modified comment back
-            if (segments.length > 0) {
-                segments.push(text.substring(index, text.length));
-                return segments.join("");
-            }
-        }
-
-        return text;
-    }
-
-    /**
      * Triggered before the renderer starts rendering a project.
      * @param event The event emitted by the renderer class.
      */
@@ -343,66 +296,35 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererEndPage(event: PageEvent): void {
-        // regexp for finding PlantUML image tags
-        const encodedUmlExpression = /<img src="http:\/\/www\.plantuml\.com\/plantuml\/(?:img|png|svg)\/([^"]*)"(?: alt="(.*)")?>/g;
+        if (event.contents && TypeDocUtils.isDetailPage(event.contents)) {
+            const reflection = event.model as Reflection;
+            const reflectionPlanUmlLines = this.reflectionPlantUmlMap.get(reflection.id);
 
-        // replace the external urls with local ones
-        // rewrite the image links to: 1) generate local images, 2) transform to <object> tag for svg, 3) add css class
-        const contents = event.contents;
+            if (reflectionPlanUmlLines) {
+                const encodedPlantUml = PlantUmlUtils.encode(reflectionPlanUmlLines.join("\n"));
+                const imagePath =
+                    this.options.outputImageLocation === ImageLocation.Local
+                        ? this.localImageGenerator.writeImage(
+                              event.filename,
+                              encodedPlantUml,
+                              this.options.outputImageFormat === ImageFormat.PNG ? "png" : "svg"
+                          )
+                        : PlantUmlUtils.plantUmlServerUrl +
+                          this.options.outputImageFormat.toString() +
+                          "/~1" +
+                          encodedPlantUml;
 
-        if (contents) {
-            let index = 0;
-            const segments = new Array<string>();
+                // Add HTML to page
+                const hierarchySectionLocationOnPage = TypeDocUtils.getHierarchySectionLocationOnDetailPage(
+                    event.contents
+                );
 
-            let match = encodedUmlExpression.exec(contents);
-
-            while (match != null) {
-                segments.push(contents.substring(index, match.index));
-
-                // get the image source
-                let src = match[1];
-                const alt = match[2];
-
-                // decode image and write to disk if using local images
-                if (this.options.outputImageLocation === ImageLocation.Local) {
-                    src = this.localImageGenerator.writeImage(
-                        event.filename,
-                        src,
-                        this.options.outputImageFormat === ImageFormat.PNG ? "png" : "svg"
-                    );
-                } else {
-                    // this is the case where we have a remote file, so we don't need to write out the image but
-                    // we need to add the server back into the image source since it was removed by the regex
-                    src = PlantUmlUtils.plantUmlServerUrl + this.options.outputImageFormat.toString() + "/" + src;
-                }
-
-                // re-write image tag
-                if (this.options.outputImageFormat === ImageFormat.PNG) {
-                    segments.push('<img class="uml" src=');
-                    // replace external path in content with path to image to assets directory
-                    segments.push('"' + src + '"');
-                    if (alt) {
-                        segments.push(' alt="' + alt + '"');
-                    }
-                    segments.push(">");
-                } else {
-                    segments.push('<object type="image/svg+xml" class="uml" data="');
-                    segments.push(src);
-                    segments.push('">');
-                    if (alt) {
-                        segments.push(alt);
-                    }
-                    segments.push("</object>");
-                }
-
-                index = match.index + match[0].length;
-                match = encodedUmlExpression.exec(contents);
-            }
-
-            // write modified contents back to page
-            if (segments.length > 0) {
-                segments.push(contents.substring(index, contents.length));
-                event.contents = segments.join("");
+                // TODO: Don't replace the hierarchy but insert above it :-D
+                const umlClassDiagramSection = `<section class="tsd-panel tsd-hierarchy"><h3>Hierarchy-Diagram</h3><img class="uml" src="${imagePath}" alt="UML class diagram of ${reflection.name}" /></section>`;
+                event.contents =
+                    event.contents.substring(0, hierarchySectionLocationOnPage.startIndex) +
+                    umlClassDiagramSection +
+                    event.contents.substring(hierarchySectionLocationOnPage.endIndex);
             }
         }
     }

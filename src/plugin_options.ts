@@ -202,9 +202,9 @@ export class PluginOptions {
         type: ParameterType.Number,
         name: "umlClassDiagramBoxBorderWidth",
         help: "The box border width in pixel used when automatically creating class diagrams.",
-        defaultValue: -1, // because 0 can be used to hide borders
+        defaultValue: 2, // because 0 can be used to hide borders
         minValue: 0,
-        value: -1,
+        value: 2,
     };
 
     /** Specifies the color used for arrows in automatically created class diagrams. */
