@@ -283,12 +283,13 @@ export class Plugin {
 
     /**
      * Triggered after the renderer has written all documents.
+     * Appends style data to the main CSS file.
      * @param event The event emitted by the renderer class.
      */
     public onRendererEnd(event: RendererEvent): void {
-        // append style to main.css
         const filename = path.join(event.outputDirectory, "assets/css/main.css");
-        const data = fs.readFileSync(filename, "utf8") + "\n.uml { max-width: 100%; }\n";
+        const data =
+            fs.readFileSync(filename, "utf8") + "\n.uml-class { max-width:100%; display:block; margin:0 auto; }\n";
         fs.writeFileSync(filename, data, "utf8");
     }
 
@@ -339,7 +340,7 @@ export class Plugin {
     private createHierarchyDiagramSection(imagePath: string, reflectionName: string): string {
         return `<section class="tsd-panel tsd-hierarchy">
                     <h3>Hierarchy-Diagram</h3>
-                    <img class="uml"
+                    <img class="uml-class"
                          src="${imagePath}"
                         alt="UML class diagram of ${reflectionName}" />
                 </section>`;
