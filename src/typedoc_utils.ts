@@ -83,7 +83,7 @@ export class TypeDocUtils {
                 // remove all implemented types that are implemented by base classes
                 for (const extendedTypeParent of extendedTypeParents) {
                     for (let j = 0; j < implementedTypes.length; ++j) {
-                        if (implementedTypes[j].name === extendedTypeParent.name) {
+                        if (implementedTypes[j].id === extendedTypeParent.id) {
                             implementedTypes.splice(j, 1);
                             --j;
                         }
@@ -127,7 +127,7 @@ export class TypeDocUtils {
             // remove all implementations that are sub classes of implementations
             for (const implementedBySubType of implementedBySubTypes) {
                 for (let j = 0; j < implementedBys.length; ++j) {
-                    if (implementedBys[j].name === implementedBySubType.name) {
+                    if (implementedBys[j].id === implementedBySubType.id) {
                         implementedBys.splice(j, 1);
                         --j;
                     }
@@ -225,17 +225,17 @@ export class TypeDocUtils {
 
         const newArray = new Array<DeclarationReflection>(); // this array is returned
 
-        // We use a map and the reflection's name as the key to remove duplicates.
-        const mapObj = new Map<string, DeclarationReflection>();
+        // We use a map and the reflection's id as the key to remove duplicates.
+        const mapObj = new Map<number, DeclarationReflection>();
 
         for (const ref of reflections) {
             if (ref) {
-                mapObj.set(ref.name, ref);
+                mapObj.set(ref.id, ref);
             }
         }
 
-        for (const name of Array.from(mapObj.keys())) {
-            newArray.push(mapObj.get(name) as DeclarationReflection);
+        for (const id of Array.from(mapObj.keys())) {
+            newArray.push(mapObj.get(id) as DeclarationReflection);
         }
 
         return newArray;
