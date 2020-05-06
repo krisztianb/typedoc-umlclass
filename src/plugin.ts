@@ -317,13 +317,12 @@ export class Plugin {
                               encodedPlantUml,
                               this.options.outputImageFormat === ImageFormat.PNG ? "png" : "svg"
                           )
-                        : PlantUmlUtils.plantUmlServerUrl +
-                          this.options.outputImageFormat.toString() +
-                          "/~1" +
-                          encodedPlantUml;
+                        : PlantUmlUtils.createPlantUmlServerUrl(
+                              encodedPlantUml,
+                              this.options.outputImageFormat.toString()
+                          );
 
                 // Add HTML to page
-
                 const umlClassDiagramSection = `<section class="tsd-panel tsd-hierarchy"><h3>Hierarchy-Diagram</h3><img class="uml" src="${imagePath}" alt="UML class diagram of ${reflection.name}" /></section>`;
 
                 if (this.options.autoClassDiagramPosition === ClassDiagramPosition.Above) {

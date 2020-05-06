@@ -54,6 +54,16 @@ export class PlantUmlUtils {
     }
 
     /**
+     * Returns the URL for a given diagram data.
+     * @param data The data of the diagram.
+     * @param imageFormat The format of the image the URL should generate. (eg.: "png" or "svg")
+     * @returns The URL for a given diagram data.
+     */
+    public static createPlantUmlServerUrl(data: string, imageFormat: string): string {
+        return PlantUmlUtils.plantUmlServerUrl + imageFormat + "/~1" + data;
+    }
+
+    /**
      * Returns the PlantUML line for generating the output for a given property.
      * @param property The property for which the PlantUML should be generated.
      * @returns The PlantUML line for the given property.
