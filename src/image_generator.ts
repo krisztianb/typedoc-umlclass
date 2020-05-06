@@ -28,9 +28,10 @@ export class ImageGenerator {
      * Writes a class diagram as a local image to the disc.
      * @param pageFilename The filename of the generated TypeDoc page.
      * @param encodedPlantUml The encoded PlantUML code for the diagram.
+     * @param imageFormat The format of the image to generate. (eg.: "png" or "svg")
      * @returns The relative path to the generated image file.
      */
-    public writeImage(pageFilename: string, encodedPlantUml: string, imageFormat: "svg" | "png"): string {
+    public writeImage(pageFilename: string, encodedPlantUml: string, imageFormat: string): string {
         // setup plantuml encoder and decoder
         const decode = plantuml.decode(encodedPlantUml);
         const gen = plantuml.generate({ format: imageFormat });

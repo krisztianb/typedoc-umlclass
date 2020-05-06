@@ -303,36 +303,45 @@ export class Plugin {
         }
 
         const page = new PageProcessor(event.contents);
-
-        if (page.isDetailPage) {
-            const reflection = event.model as Reflection;
-            const reflectionPlanUmlLines = this.reflectionPlantUmlMap.get(reflection.id);
-
-            if (reflectionPlanUmlLines) {
-                const encodedPlantUml = PlantUmlUtils.encode(reflectionPlanUmlLines.join("\n"));
-                const imagePath =
-                    this.options.outputImageLocation === ImageLocation.Local
-                        ? this.localImageGenerator.writeImage(
-                              event.filename,
-                              encodedPlantUml,
-                              this.options.outputImageFormat === ImageFormat.PNG ? "png" : "svg"
-                          )
-                        : PlantUmlUtils.createPlantUmlServerUrl(
-                              encodedPlantUml,
-                              this.options.outputImageFormat.toString()
-                          );
-
-                // Add HTML to page
-                const umlClassDiagramSection = `<section class="tsd-panel tsd-hierarchy"><h3>Hierarchy-Diagram</h3><img class="uml" src="${imagePath}" alt="UML class diagram of ${reflection.name}" /></section>`;
-
-                if (this.options.autoClassDiagramPosition === ClassDiagramPosition.Above) {
-                    page.insertAboveSection(PageSections.Hierarchy, umlClassDiagramSection);
-                } else {
-                    page.insertBelowSection(PageSections.Hierarchy, umlClassDiagramSection);
-                }
-
-                event.contents = page.content;
-            }
+        if (!page.isDetailPage) {
+            return;
         }
+
+        const reflection = event.model as Reflection;
+        const planUmlLines = this.reflectionPlantUmlMap.get(reflection.id);
+        if (!planUmlLines) {
+            return;
+        }
+
+        const encodedPlantUml = PlantUmlUtils.encode(planUmlLines.join("\n"));
+        const imagePath =
+            this.options.outputImageLocation === ImageLocation.Local
+                ? this.localImageGenerator.writeImage(event.filename, encodedPlantUml, this.options.outputImageFormat)
+                : PlantUmlUtils.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat);
+
+        const hierarchyDiagramSection = this.createHierarchyDiagramSection(imagePath, reflection.name);
+
+        if (this.options.autoClassDiagramPosition === ClassDiagramPosition.Above) {
+            page.insertAboveSection(PageSections.Hierarchy, hierarchyDiagramSection);
+        } else {
+            page.insertBelowSection(PageSections.Hierarchy, hierarchyDiagramSection);
+        }
+
+        event.contents = page.content;
+    }
+
+    /**
+     * Creates HTML for a section containing a hierarchy diagram.
+     * @param imagePath The hierarchy diagram as an image.
+     * @param reflectionName The name of the reflection for which the hierarchy diagram was generated.
+     * @returns The HTML for the section.
+     */
+    private createHierarchyDiagramSection(imagePath: string, reflectionName: string): string {
+        return `<section class="tsd-panel tsd-hierarchy">
+                    <h3>Hierarchy-Diagram</h3>
+                    <img class="uml"
+                         src="${imagePath}"
+                        alt="UML class diagram of ${reflectionName}" />
+                </section>`;
     }
 }
