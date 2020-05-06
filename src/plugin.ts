@@ -289,7 +289,8 @@ export class Plugin {
     public onRendererEnd(event: RendererEvent): void {
         const filename = path.join(event.outputDirectory, "assets/css/main.css");
         const data =
-            fs.readFileSync(filename, "utf8") + "\n.uml-class { max-width:100%; display:block; margin:0 auto; }\n";
+            fs.readFileSync(filename, "utf8") +
+            "\n.uml-class { max-width:100%; display:block; margin:0 auto; text-align:center }\n";
         fs.writeFileSync(filename, data, "utf8");
     }
 
@@ -340,9 +341,10 @@ export class Plugin {
     private createHierarchyDiagramSection(imagePath: string, reflectionName: string): string {
         return `<section class="tsd-panel tsd-hierarchy">
                     <h3>Hierarchy-Diagram</h3>
-                    <img class="uml-class"
-                         src="${imagePath}"
-                        alt="UML class diagram of ${reflectionName}" />
+                        <a class="uml-class" href="${imagePath}" title="Click to enlarge">
+                            <img src="${imagePath}"
+                                 alt="UML class diagram of ${reflectionName}" />
+                        </a>
                 </section>`;
     }
 }
