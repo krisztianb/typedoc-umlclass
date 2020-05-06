@@ -13,7 +13,7 @@ $ npm install typedoc-umlclass --save-dev
 ## Usage
 
 TypeDoc automatically detects plugins installed via npm. After installation TypeDoc can be used normally and
-this plugin is going to create a UML class diagramm for every class and interface within you project.
+this plugin is going to create a UML class diagramm for every class and interface within your project.
 
 ## Options
 
@@ -97,6 +97,12 @@ The following options are added to TypeDoc when the plugin is installed:
 -   `--umlClassDiagramClassAttributeFontColor <transparent|#RGBHEX>`<br>
     Use this option to specify the color of the class attributes within the class diagram.
     Default is the PlantUML default value for this skin parameter.
+
+## Credits
+
+This plugin was inspired by the [typedoc-plantuml](https://github.com/artifacthealth/typedoc-plantuml/) plugin created
+by [Meir Gottlieb](https://github.com/meirgottlieb) and the (unfinished) extension to that plugin created
+by [Michael K](https://github.com/0815fox).
 
 ## License
 
