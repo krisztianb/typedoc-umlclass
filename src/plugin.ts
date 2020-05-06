@@ -96,7 +96,7 @@ export class Plugin {
             const reflection = project.reflections[key];
 
             if (reflection && this.shouldCreateClassDiagramForReflection(reflection)) {
-                const plantUmlLines = this.getClassDiagramPlantUmlForReflection(reflection);
+                const plantUmlLines = this.createClassDiagramPlantUmlForReflection(reflection);
 
                 if (plantUmlLines.length > 0) {
                     this.reflectionPlantUmlMap.set(reflection.id, plantUmlLines);
@@ -130,7 +130,7 @@ export class Plugin {
      * @returns The Plant UML lines for the class diagram of the given reflection.
      *          If the given reflection is not part of an inheritance or implementation, the result is an empty array.
      */
-    private getClassDiagramPlantUmlForReflection(reflection: DeclarationReflection): string[] {
+    private createClassDiagramPlantUmlForReflection(reflection: DeclarationReflection): string[] {
         const includeChildren = this.options.autoClassDiagramType === ClassDiagramType.Detailed;
 
         let plantUmlLines = new Array<string>();
@@ -138,13 +138,13 @@ export class Plugin {
         let siblingsBelow = 0;
 
         // add class/interface
-        plantUmlLines = plantUmlLines.concat(PlantUmlUtils.getPlantUmlForReflection(reflection, includeChildren));
+        plantUmlLines = plantUmlLines.concat(PlantUmlUtils.createPlantUmlForReflection(reflection, includeChildren));
 
         // add classes/interfaces this type is extending
         const extendedTypes = TypeDocUtils.getExtendedTypesForReflection(reflection);
 
         for (const type of extendedTypes) {
-            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.getPlantUmlForReflection(type, includeChildren));
+            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.createPlantUmlForReflection(type, includeChildren));
             plantUmlLines.push(type.name + " <|-- " + reflection.name);
             ++siblingsAbove;
         }
@@ -153,7 +153,7 @@ export class Plugin {
         const implementedTypes = TypeDocUtils.getImplementedTypesForReflection(reflection);
 
         for (const type of implementedTypes) {
-            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.getPlantUmlForReflection(type, includeChildren));
+            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.createPlantUmlForReflection(type, includeChildren));
             plantUmlLines.push(type.name + " <|.. " + reflection.name);
             ++siblingsAbove;
         }
@@ -162,7 +162,7 @@ export class Plugin {
         const extendedBys = TypeDocUtils.getExtendedBysForReflection(reflection);
 
         for (const type of extendedBys) {
-            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.getPlantUmlForReflection(type, includeChildren));
+            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.createPlantUmlForReflection(type, includeChildren));
             plantUmlLines.push(reflection.name + " <|-- " + type.name);
             ++siblingsBelow;
         }
@@ -171,7 +171,7 @@ export class Plugin {
         const implementedBys = TypeDocUtils.getImplementedBysForReflection(reflection);
 
         for (const type of implementedBys) {
-            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.getPlantUmlForReflection(type, includeChildren));
+            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.createPlantUmlForReflection(type, includeChildren));
             plantUmlLines.push(reflection.name + " <|.. " + type.name);
             ++siblingsBelow;
         }

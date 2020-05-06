@@ -22,18 +22,18 @@ export class PlantUmlUtils {
      *                        the given reflection as well.
      * @returns The PlantUML lines for the given type.
      */
-    public static getPlantUmlForReflection(reflection: DeclarationReflection, includeChildren: boolean): string[] {
+    public static createPlantUmlForReflection(reflection: DeclarationReflection, includeChildren: boolean): string[] {
         const plantUmlLines = new Array<string>();
 
         if (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) {
-            plantUmlLines.push(PlantUmlUtils.getPlantUmlForClassOrInterface(reflection) + " {");
+            plantUmlLines.push(PlantUmlUtils.createPlantUmlForClassOrInterface(reflection) + " {");
 
             if (includeChildren && reflection.children) {
                 for (const children of reflection.children) {
                     if (children.kind === ReflectionKind.Property) {
-                        plantUmlLines.push(PlantUmlUtils.getPlantUmlForProperty(children));
+                        plantUmlLines.push(PlantUmlUtils.createPlantUmlForProperty(children));
                     } else if (children.kind === ReflectionKind.Method) {
-                        plantUmlLines.push(PlantUmlUtils.getPlantUmlForMethod(children));
+                        plantUmlLines.push(PlantUmlUtils.createPlantUmlForMethod(children));
                     }
                 }
             }
@@ -68,7 +68,7 @@ export class PlantUmlUtils {
      * @param property The property for which the PlantUML should be generated.
      * @returns The PlantUML line for the given property.
      */
-    protected static getPlantUmlForProperty(property: DeclarationReflection): string {
+    protected static createPlantUmlForProperty(property: DeclarationReflection): string {
         let plantUml = "";
 
         if (property.flags.isStatic) {
@@ -102,7 +102,7 @@ export class PlantUmlUtils {
      * @param methode The method for which the PlantUML should be generated.
      * @returns The PlantUML line for the given method.
      */
-    protected static getPlantUmlForMethod(method: DeclarationReflection): string {
+    protected static createPlantUmlForMethod(method: DeclarationReflection): string {
         let plantUml = "";
 
         if (method.flags.isStatic) {
@@ -144,7 +144,7 @@ export class PlantUmlUtils {
      * @param reflection The class or interface for which the PlantUML should be generated.
      * @returns The PlantUML line for the given class or interface.
      */
-    protected static getPlantUmlForClassOrInterface(reflection: DeclarationReflection): string {
+    protected static createPlantUmlForClassOrInterface(reflection: DeclarationReflection): string {
         let plantUml = "";
 
         if (reflection.flags.isStatic) {
