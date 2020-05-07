@@ -38,13 +38,6 @@ export class Plugin {
     private localImageGenerator = new ImageGenerator();
 
     /**
-     * Stores the generated PlantUML code for the reflections.
-     * KEY   = Unique ID of the reflection
-     * VALUE = The PlantUML lines of code for the reflection
-     */
-    private reflectionPlantUmlMap = new Map<number, string[]>();
-
-    /**
      * Initializes the plugin.
      * @param typedoc The TypeDoc application.
      */
@@ -96,11 +89,7 @@ export class Plugin {
             const reflection = project.reflections[key];
 
             if (reflection && this.shouldCreateClassDiagramForReflection(reflection)) {
-                const plantUmlLines = this.createClassDiagramPlantUmlForReflection(reflection);
-
-                if (plantUmlLines.length > 0) {
-                    this.reflectionPlantUmlMap.set(reflection.id, plantUmlLines);
-                }
+                // TODO: calculate number of diagrams to generate
             }
         }
     }
@@ -309,13 +298,15 @@ export class Plugin {
             return;
         }
 
-        const reflection = event.model as Reflection;
-        const planUmlLines = this.reflectionPlantUmlMap.get(reflection.id);
-        if (!planUmlLines) {
+        const reflection = event.model as DeclarationReflection;
+        const plantUmlLines = this.shouldCreateClassDiagramForReflection(reflection)
+            ? this.createClassDiagramPlantUmlForReflection(reflection)
+            : [];
+        if (plantUmlLines.length === 0) {
             return;
         }
 
-        const encodedPlantUml = PlantUmlUtils.encode(planUmlLines.join("\n"));
+        const encodedPlantUml = PlantUmlUtils.encode(plantUmlLines.join("\n"));
         const imagePath =
             this.options.outputImageLocation === ImageLocation.Local
                 ? this.localImageGenerator.writeImage(event.filename, encodedPlantUml, this.options.outputImageFormat)
