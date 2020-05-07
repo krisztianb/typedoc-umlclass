@@ -107,8 +107,8 @@ export class Plugin {
      */
     private shouldCreateClassDiagramForReflection(reflection: Reflection): reflection is DeclarationReflection {
         if (
-            (this.options.autoClassDiagramType === ClassDiagramType.Simple ||
-                this.options.autoClassDiagramType === ClassDiagramType.Detailed) &&
+            (this.options.umlClassDiagramType === ClassDiagramType.Simple ||
+                this.options.umlClassDiagramType === ClassDiagramType.Detailed) &&
             reflection instanceof DeclarationReflection &&
             (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) &&
             TypeDocUtils.reflectionIsPartOfClassHierarchy(reflection)
@@ -126,7 +126,7 @@ export class Plugin {
      *          If the given reflection is not part of an inheritance or implementation, the result is an empty array.
      */
     private createClassDiagramPlantUmlForReflection(reflection: DeclarationReflection): string[] {
-        const includeChildren = this.options.autoClassDiagramType === ClassDiagramType.Detailed;
+        const includeChildren = this.options.umlClassDiagramType === ClassDiagramType.Detailed;
 
         let plantUmlLines = new Array<string>();
         let siblingsAbove = 0;
@@ -175,92 +175,92 @@ export class Plugin {
         if (siblingsAbove + siblingsBelow === 0) {
             plantUmlLines = [];
         } else {
-            if (this.options.autoClassDiagramHideEmptyMembers) {
+            if (this.options.umlClassDiagramHideEmptyMembers) {
                 plantUmlLines.unshift("hide empty fields");
                 plantUmlLines.unshift("hide empty methods");
             }
 
-            if (this.options.autoClassDiagramHideCircledChar) {
+            if (this.options.umlClassDiagramHideCircledChar) {
                 plantUmlLines.unshift("hide circle");
             }
 
             if (
-                siblingsAbove > this.options.autoClassDiagramTopDownLayoutMaxSiblings ||
-                siblingsBelow > this.options.autoClassDiagramTopDownLayoutMaxSiblings
+                siblingsAbove > this.options.umlClassDiagramTopDownLayoutMaxSiblings ||
+                siblingsBelow > this.options.umlClassDiagramTopDownLayoutMaxSiblings
             ) {
                 plantUmlLines.unshift("left to right direction");
             }
 
-            if (this.options.autoClassDiagramMemberVisibilityStyle === ClassDiagramMemberVisibilityStyle.Text) {
+            if (this.options.umlClassDiagramMemberVisibilityStyle === ClassDiagramMemberVisibilityStyle.Text) {
                 plantUmlLines.unshift("skinparam ClassAttributeIconSize 0");
             }
 
-            if (this.options.autoClassDiagramHideShadow) {
+            if (this.options.umlClassDiagramHideShadow) {
                 plantUmlLines.unshift("skinparam Shadowing false");
             }
 
-            if (this.options.autoClassDiagramBoxBorderRadius) {
-                plantUmlLines.unshift("skinparam RoundCorner " + this.options.autoClassDiagramBoxBorderRadius);
+            if (this.options.umlClassDiagramBoxBorderRadius) {
+                plantUmlLines.unshift("skinparam RoundCorner " + this.options.umlClassDiagramBoxBorderRadius);
             }
 
-            if (this.options.autoClassDiagramBoxBackgroundColor) {
+            if (this.options.umlClassDiagramBoxBackgroundColor) {
                 plantUmlLines.unshift(
-                    "skinparam ClassBackgroundColor " + this.options.autoClassDiagramBoxBackgroundColor
+                    "skinparam ClassBackgroundColor " + this.options.umlClassDiagramBoxBackgroundColor
                 );
             }
 
-            if (this.options.autoClassDiagramBoxBorderColor) {
-                plantUmlLines.unshift("skinparam ClassBorderColor " + this.options.autoClassDiagramBoxBorderColor);
+            if (this.options.umlClassDiagramBoxBorderColor) {
+                plantUmlLines.unshift("skinparam ClassBorderColor " + this.options.umlClassDiagramBoxBorderColor);
             }
 
-            if (this.options.autoClassDiagramBoxBorderWidth >= 0) {
-                plantUmlLines.unshift("skinparam ClassBorderThickness " + this.options.autoClassDiagramBoxBorderWidth);
+            if (this.options.umlClassDiagramBoxBorderWidth >= 0) {
+                plantUmlLines.unshift("skinparam ClassBorderThickness " + this.options.umlClassDiagramBoxBorderWidth);
             }
 
-            if (this.options.autoClassDiagramArrowColor) {
-                plantUmlLines.unshift("skinparam ClassArrowColor " + this.options.autoClassDiagramArrowColor);
+            if (this.options.umlClassDiagramArrowColor) {
+                plantUmlLines.unshift("skinparam ClassArrowColor " + this.options.umlClassDiagramArrowColor);
             }
 
-            if (this.options.autoClassDiagramClassFontName) {
-                plantUmlLines.unshift("skinparam ClassFontName " + this.options.autoClassDiagramClassFontName);
+            if (this.options.umlClassDiagramClassFontName) {
+                plantUmlLines.unshift("skinparam ClassFontName " + this.options.umlClassDiagramClassFontName);
             }
 
-            if (this.options.autoClassDiagramClassFontSize) {
-                plantUmlLines.unshift("skinparam ClassFontSize " + this.options.autoClassDiagramClassFontSize);
+            if (this.options.umlClassDiagramClassFontSize) {
+                plantUmlLines.unshift("skinparam ClassFontSize " + this.options.umlClassDiagramClassFontSize);
             }
 
-            if (this.options.autoClassDiagramClassFontStyle !== FontStyle.Undefined) {
+            if (this.options.umlClassDiagramClassFontStyle !== FontStyle.Undefined) {
                 plantUmlLines.unshift(
-                    "skinparam ClassFontStyle " + this.options.autoClassDiagramClassFontStyle.toString()
+                    "skinparam ClassFontStyle " + this.options.umlClassDiagramClassFontStyle.toString()
                 );
             }
 
-            if (this.options.autoClassDiagramClassFontColor) {
-                plantUmlLines.unshift("skinparam ClassFontColor " + this.options.autoClassDiagramClassFontColor);
+            if (this.options.umlClassDiagramClassFontColor) {
+                plantUmlLines.unshift("skinparam ClassFontColor " + this.options.umlClassDiagramClassFontColor);
             }
 
-            if (this.options.autoClassDiagramClassAttributeFontName) {
+            if (this.options.umlClassDiagramClassAttributeFontName) {
                 plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontName " + this.options.autoClassDiagramClassAttributeFontName
+                    "skinparam ClassAttributeFontName " + this.options.umlClassDiagramClassAttributeFontName
                 );
             }
 
-            if (this.options.autoClassDiagramClassAttributeFontSize) {
+            if (this.options.umlClassDiagramClassAttributeFontSize) {
                 plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontSize " + this.options.autoClassDiagramClassAttributeFontSize
+                    "skinparam ClassAttributeFontSize " + this.options.umlClassDiagramClassAttributeFontSize
                 );
             }
 
-            if (this.options.autoClassDiagramClassAttributeFontStyle !== FontStyle.Undefined) {
+            if (this.options.umlClassDiagramClassAttributeFontStyle !== FontStyle.Undefined) {
                 plantUmlLines.unshift(
                     "skinparam ClassAttributeFontStyle " +
-                        this.options.autoClassDiagramClassAttributeFontStyle.toString()
+                        this.options.umlClassDiagramClassAttributeFontStyle.toString()
                 );
             }
 
-            if (this.options.autoClassDiagramClassAttributeFontColor) {
+            if (this.options.umlClassDiagramClassAttributeFontColor) {
                 plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontColor " + this.options.autoClassDiagramClassAttributeFontColor
+                    "skinparam ClassAttributeFontColor " + this.options.umlClassDiagramClassAttributeFontColor
                 );
             }
         }
@@ -315,7 +315,7 @@ export class Plugin {
 
         const hierarchyDiagramSection = this.createHierarchyDiagramSection(imagePath, reflection.name);
 
-        if (this.options.autoClassDiagramPosition === ClassDiagramPosition.Above) {
+        if (this.options.umlClassDiagramPosition === ClassDiagramPosition.Above) {
             page.insertAboveSection(PageSections.Hierarchy, hierarchyDiagramSection);
         } else {
             page.insertBelowSection(PageSections.Hierarchy, hierarchyDiagramSection);
@@ -336,7 +336,7 @@ export class Plugin {
      */
     private createHierarchyDiagramSection(imagePath: string, reflectionName: string): string {
         return `<section class="tsd-panel tsd-hierarchy">
-                    <h3>Hierarchy-Diagram</h3>
+                    <h3>${this.options.umlClassDiagramSectionTitle}</h3>
                         <a class="uml-class" href="${imagePath}" title="Click to enlarge">
                             <img src="${imagePath}"
                                  alt="UML class diagram of ${reflectionName}" />

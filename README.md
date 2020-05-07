@@ -19,6 +19,12 @@ this plugin is going to create a UML class diagramm for every class and interfac
 
 The following options are added to TypeDoc when the plugin is installed:
 
+-   `--umlClassDiagramType <none|simple|detailed>`<br>
+    You can use this option to disable the plugin by passing the value `none`. Otherwise a class diagram is generated
+    for every class and interface that is involved in inheritance and/or implementation. The class diagram includes
+    one level of base and sub classes. Use the value `simple` to only render the name of the class or interface.
+    Use the value `detailed` to also render properties and methods.
+    Default is `detailed`.
 -   `--umlClassDiagramLocation <local|remote>`<br>
     Specifies the location of the generated uml images. If `local` then local image files are created in the assets
     directory of the generated documentation. If `remote` then the image tag uses an encoded link to the
@@ -27,12 +33,9 @@ The following options are added to TypeDoc when the plugin is installed:
 -   `--umlClassDiagramFormat <png|svg>`<br>
     Specifies the image format to use.
     Default is `png`.
--   `--umlClassDiagramType <none|simple|detailed>`<br>
-    You can use this option to disable the plugin by passing the value `none`. Otherwise a class diagram is generated
-    for every class and interface that is involved in inheritance and/or implementation. The class diagram includes
-    one level of base and sub classes. Use the value `simple` to only render the name of the class or interface.
-    Use the value `detailed` to also render properties and methods.
-    Default is `detailed`.
+-   `--umlClassDiagramSectionTitle <string>`<br>
+    Use this option to specify the title of the section in which the class diagramm is shown on the page.
+    Default is `Hierarchy-Diagram`.
 -   `--umlClassDiagramPosition <above|below>`<br>
     Use this option to specify if the class diagram should be inserted `above` or `below` the hierarchy section.
     Default is `above`.
