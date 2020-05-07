@@ -34,7 +34,7 @@ The following options are added to TypeDoc when the plugin is installed:
     Specifies the image format to use.
     Default is `png`.
 -   `--umlClassDiagramSectionTitle <string>`<br>
-    Use this option to specify the title of the section in which the class diagramm is shown on the page.
+    Use this option to specify the title of the section which includes the class diagram.
     Default is `Hierarchy-Diagram`.
 -   `--umlClassDiagramPosition <above|below>`<br>
     Use this option to specify if the class diagram should be inserted `above` or `below` the hierarchy section.
