@@ -3,19 +3,19 @@ import * as path from "path";
 import { Application, DeclarationReflection, Reflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
+import { ImageGenerator } from "./image_generator";
+import { PageProcessor, PageSections } from "./page_processor";
 import { PlantUmlUtils } from "./plantuml_utils";
 import {
     ClassDiagramMemberVisibilityStyle,
+    ClassDiagramPosition,
     ClassDiagramType,
     FontStyle,
-    ImageFormat,
     ImageLocation,
     PluginOptions,
-    ClassDiagramPosition,
 } from "./plugin_options";
 import { TypeDocUtils } from "./typedoc_utils";
-import { ImageGenerator } from "./image_generator";
-import { PageProcessor, PageSections } from "./page_processor";
+import ProgressBar = require("progress");
 
 /**
  * The UML class diagram generator plugin.
@@ -36,6 +36,12 @@ export class Plugin {
 
     /** Used when the class diagrams are created locally. */
     private localImageGenerator = new ImageGenerator();
+
+    /** The number of diagrams that have to be generated. */
+    private numberOfDiagramsToGenerate = 0;
+
+    /** The progress bar used to show the progress of the plugin. */
+    private progressBar: ProgressBar | undefined;
 
     /**
      * Initializes the plugin.
@@ -64,8 +70,8 @@ export class Plugin {
         typedoc.converter.on(Converter.EVENT_RESOLVE_END, (c: Context) => this.onConverterResolveEnd(c));
 
         typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => this.onRendererBegin(e));
-        typedoc.renderer.on(RendererEvent.END, (e: RendererEvent) => this.onRendererEnd(e));
         typedoc.renderer.on(PageEvent.END, (e: PageEvent) => this.onRendererEndPage(e));
+        typedoc.renderer.on(RendererEvent.END, (e: RendererEvent) => this.onRendererEnd(e));
     }
 
     /**
@@ -79,7 +85,7 @@ export class Plugin {
 
     /**
      * Triggered when the TypeDoc converter has finished resolving a project.
-     * Generates the PlantUML code for every class and interface.
+     * Calculate how many diagrams the plugin has to generate.
      * @param context Describes the current state the converter is in.
      */
     public onConverterResolveEnd(context: Context): void {
@@ -89,7 +95,7 @@ export class Plugin {
             const reflection = project.reflections[key];
 
             if (reflection && this.shouldCreateClassDiagramForReflection(reflection)) {
-                // TODO: calculate number of diagrams to generate
+                this.numberOfDiagramsToGenerate++;
             }
         }
     }
@@ -105,7 +111,7 @@ export class Plugin {
                 this.options.autoClassDiagramType === ClassDiagramType.Detailed) &&
             reflection instanceof DeclarationReflection &&
             (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) &&
-            reflection.comment
+            TypeDocUtils.reflectionIsPartOfClassHierarchy(reflection)
         ) {
             return true;
         }
@@ -264,28 +270,23 @@ export class Plugin {
 
     /**
      * Triggered before the renderer starts rendering a project.
+     * Setup image generator output directory and progress bar.
      * @param event The event emitted by the renderer class.
      */
     public onRendererBegin(event: RendererEvent): void {
         this.localImageGenerator.setOutputDirectory(path.join(event.outputDirectory, "assets/images/"));
-    }
 
-    /**
-     * Triggered after the renderer has written all documents.
-     * Appends style data to the main CSS file.
-     * @param event The event emitted by the renderer class.
-     */
-    public onRendererEnd(event: RendererEvent): void {
-        const filename = path.join(event.outputDirectory, "assets/css/main.css");
-        const data =
-            fs.readFileSync(filename, "utf8") +
-            "\n.uml-class { max-width:100%; display:block; margin:0 auto; text-align:center }\n";
-        fs.writeFileSync(filename, data, "utf8");
+        if (this.numberOfDiagramsToGenerate > 0) {
+            this.progressBar = new ProgressBar("Generating UML class diagrams [:bar] :percent", {
+                total: this.numberOfDiagramsToGenerate,
+                width: 40,
+            });
+        }
     }
 
     /**
      * Triggered after a document has been rendered, just before it is written to disc.
-     * Generates local image files and updates the image urls in the comments.
+     * Generates a UML class diagram and adds it to the page of the reflection.
      * @param event The event emitted by the renderer class.
      */
     public onRendererEndPage(event: PageEvent): void {
@@ -321,6 +322,10 @@ export class Plugin {
         }
 
         event.contents = page.content;
+
+        if (this.progressBar) {
+            this.progressBar.tick();
+        }
     }
 
     /**
@@ -337,5 +342,18 @@ export class Plugin {
                                  alt="UML class diagram of ${reflectionName}" />
                         </a>
                 </section>`;
+    }
+
+    /**
+     * Triggered after the renderer has written all documents.
+     * Appends style data to the main CSS file.
+     * @param event The event emitted by the renderer class.
+     */
+    public onRendererEnd(event: RendererEvent): void {
+        const filename = path.join(event.outputDirectory, "assets/css/main.css");
+        const data =
+            fs.readFileSync(filename, "utf8") +
+            "\n.uml-class { max-width:100%; display:block; margin:0 auto; text-align:center }\n";
+        fs.writeFileSync(filename, data, "utf8");
     }
 }

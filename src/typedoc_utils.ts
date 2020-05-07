@@ -5,6 +5,24 @@ import { DeclarationReflection, ReferenceType } from "typedoc/dist/lib/models/in
  */
 export class TypeDocUtils {
     /**
+     * Returns if a reflection has any types above or below it in the class hierarchy.
+     * @param reflection The reflection to check.
+     * @returns True, if the reflection has any types above or below it in the class hierarchy, otherwise false.
+     */
+    public static reflectionIsPartOfClassHierarchy(reflection: DeclarationReflection): boolean {
+        if (
+            (reflection.extendedTypes && reflection.extendedTypes.length > 0) ||
+            (reflection.extendedBy && reflection.extendedBy.length > 0) ||
+            (reflection.implementedTypes && reflection.implementedTypes.length > 0) ||
+            (reflection.implementedBy && reflection.implementedBy.length > 0)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns the reflections the given reflection is extending.
      * @param reflection The reflection whoes extended types are wanted.
      * @returns The reflections the given reflection is extending.

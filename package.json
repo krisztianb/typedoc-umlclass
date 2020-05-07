@@ -14,11 +14,13 @@
     ],
     "dependencies": {
         "node-plantuml": "^0.9.0",
-        "pako": "^1.0.11"
+        "pako": "^1.0.11",
+        "progress": "^2.0.3"
     },
     "devDependencies": {
         "@types/node": "^13.13.4",
         "@types/pako": "^1.0.1",
+        "@types/progress": "^2.0.3",
         "prettier": "^2.0.5",
         "tslint": "^6.1.2",
         "typedoc": "^0.17.6",
