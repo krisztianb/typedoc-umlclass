@@ -2,9 +2,9 @@
 
 **Plugin for TypeDoc that generates uml class diagrams**
 
-## Installation (NOT YET AVAILABLE)
+## Installation
 
-The plugin can then be installed using [npm](https://www.npmjs.com/):
+The plugin can then be installed using [npm](https://www.npmjs.com/package/typedoc-umlclass):
 
 ```sh
 $ npm install typedoc-umlclass --save-dev
