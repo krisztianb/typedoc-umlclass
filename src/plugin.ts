@@ -76,6 +76,55 @@ export class Plugin {
     }
 
     /**
+     * Triggered before the renderer starts rendering a project.
+     * Setup image generator output directory and progress bar.
+     * @param event The event emitted by the renderer class.
+     */
+    public onRendererBegin(event: RendererEvent): void {
+        this.localImageGenerator.setOutputDirectory(path.join(event.outputDirectory, "assets/images/"));
+    }
+
+    /**
+     * Triggered after a document has been rendered, just before it is written to disc.
+     * Generates a UML class diagram and adds it to the page of the reflection.
+     * @param event The event emitted by the renderer class.
+     */
+    public onRendererEndPage(event: PageEvent): void {
+        if (!event.contents) {
+            return;
+        }
+
+        const page = new PageProcessor(event.contents);
+        if (!page.isDetailPage) {
+            return;
+        }
+
+        const reflection = event.model as DeclarationReflection;
+        const plantUmlLines = this.shouldCreateClassDiagramForReflection(reflection)
+            ? this.createClassDiagramPlantUmlForReflection(reflection)
+            : [];
+        if (plantUmlLines.length === 0) {
+            return;
+        }
+
+        const encodedPlantUml = PlantUmlUtils.encode(plantUmlLines.join("\n"));
+        const imagePath =
+            this.options.outputImageLocation === ImageLocation.Local
+                ? this.localImageGenerator.writeImage(event.filename, encodedPlantUml, this.options.outputImageFormat)
+                : PlantUmlUtils.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat);
+
+        const hierarchyDiagramSection = this.createHierarchyDiagramSection(imagePath, reflection.name);
+
+        if (this.options.umlClassDiagramPosition === ClassDiagramPosition.Above) {
+            page.insertAboveSection(PageSections.Hierarchy, hierarchyDiagramSection);
+        } else {
+            page.insertBelowSection(PageSections.Hierarchy, hierarchyDiagramSection);
+        }
+
+        event.contents = page.content;
+    }
+
+    /**
      * Returns if a class diagram should be generated for the given reflection.
      * @param reflection The reflection for which the question is asked.
      * @returns True, if a class diagram should be generated for the given reflection, otherwise false.
@@ -241,55 +290,6 @@ export class Plugin {
         }
 
         return plantUmlLines;
-    }
-
-    /**
-     * Triggered before the renderer starts rendering a project.
-     * Setup image generator output directory and progress bar.
-     * @param event The event emitted by the renderer class.
-     */
-    public onRendererBegin(event: RendererEvent): void {
-        this.localImageGenerator.setOutputDirectory(path.join(event.outputDirectory, "assets/images/"));
-    }
-
-    /**
-     * Triggered after a document has been rendered, just before it is written to disc.
-     * Generates a UML class diagram and adds it to the page of the reflection.
-     * @param event The event emitted by the renderer class.
-     */
-    public onRendererEndPage(event: PageEvent): void {
-        if (!event.contents) {
-            return;
-        }
-
-        const page = new PageProcessor(event.contents);
-        if (!page.isDetailPage) {
-            return;
-        }
-
-        const reflection = event.model as DeclarationReflection;
-        const plantUmlLines = this.shouldCreateClassDiagramForReflection(reflection)
-            ? this.createClassDiagramPlantUmlForReflection(reflection)
-            : [];
-        if (plantUmlLines.length === 0) {
-            return;
-        }
-
-        const encodedPlantUml = PlantUmlUtils.encode(plantUmlLines.join("\n"));
-        const imagePath =
-            this.options.outputImageLocation === ImageLocation.Local
-                ? this.localImageGenerator.writeImage(event.filename, encodedPlantUml, this.options.outputImageFormat)
-                : PlantUmlUtils.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat);
-
-        const hierarchyDiagramSection = this.createHierarchyDiagramSection(imagePath, reflection.name);
-
-        if (this.options.umlClassDiagramPosition === ClassDiagramPosition.Above) {
-            page.insertAboveSection(PageSections.Hierarchy, hierarchyDiagramSection);
-        } else {
-            page.insertBelowSection(PageSections.Hierarchy, hierarchyDiagramSection);
-        }
-
-        event.contents = page.content;
     }
 
     /**

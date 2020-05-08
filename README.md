@@ -13,7 +13,7 @@ $ npm install typedoc-umlclass --save-dev
 ## Usage
 
 TypeDoc automatically detects plugins installed via npm. After installation TypeDoc can be used normally and
-this plugin is going to create a UML class diagramm for every class and interface within your project.
+this plugin is going to create a UML class diagram for every class and interface within your project.
 
 ## Options
 
