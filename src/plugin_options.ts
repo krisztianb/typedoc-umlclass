@@ -1,9 +1,9 @@
 import {
     Application,
-    ParameterType,
-    MapDeclarationOption,
     BooleanDeclarationOption,
+    MapDeclarationOption,
     NumberDeclarationOption,
+    ParameterType,
     StringDeclarationOption,
 } from "typedoc";
 

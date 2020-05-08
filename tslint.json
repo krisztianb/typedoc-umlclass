@@ -1,10 +1,25 @@
 {
     "defaultSeverity": "error",
-    "extends": ["tslint:recommended"],
+    "extends": ["tslint:latest"],
     "rules": {
         "trailing-comma": true,
         "member-ordering": false,
         "no-bitwise": false,
-        "forin": false
+        "forin": false,
+        "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+        "object-literal-sort-keys": false,
+        "no-submodule-imports": false,
+        "no-this-assignment": false,
+        "no-invalid-this": true,
+        "typedef": [true, "call-signature", "property-declaration"],
+        "ordered-imports": [
+            true,
+            {
+                "import-sources-order": "case-insensitive",
+                "named-imports-order": "case-insensitive"
+            }
+        ],
+        "semicolon": [true, "always", "ignore-bound-class-methods"],
+        "object-literal-key-quotes": [true, "as-needed"]
     }
 }
