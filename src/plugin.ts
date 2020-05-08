@@ -15,7 +15,6 @@ import {
     PluginOptions,
 } from "./plugin_options";
 import { TypeDocUtils } from "./typedoc_utils";
-import ProgressBar = require("progress");
 
 /**
  * The UML class diagram generator plugin.
@@ -36,12 +35,6 @@ export class Plugin {
 
     /** Used when the class diagrams are created locally. */
     private localImageGenerator = new ImageGenerator();
-
-    /** The number of diagrams that have to be generated. */
-    private numberOfDiagramsToGenerate = 0;
-
-    /** The progress bar used to show the progress of the plugin. */
-    private progressBar: ProgressBar | undefined;
 
     /**
      * Initializes the plugin.
@@ -67,7 +60,6 @@ export class Plugin {
      */
     private subscribeToApplicationEvents(typedoc: Application): void {
         typedoc.converter.on(Converter.EVENT_RESOLVE_BEGIN, (c: Context) => this.onConverterResolveBegin(c));
-        typedoc.converter.on(Converter.EVENT_RESOLVE_END, (c: Context) => this.onConverterResolveEnd(c));
 
         typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => this.onRendererBegin(e));
         typedoc.renderer.on(PageEvent.END, (e: PageEvent) => this.onRendererEndPage(e));
@@ -81,23 +73,6 @@ export class Plugin {
      */
     public onConverterResolveBegin(context: Context): void {
         this.options.readValuesFromApplication(context.converter.owner.application);
-    }
-
-    /**
-     * Triggered when the TypeDoc converter has finished resolving a project.
-     * Calculate how many diagrams the plugin has to generate.
-     * @param context Describes the current state the converter is in.
-     */
-    public onConverterResolveEnd(context: Context): void {
-        const project = context.project;
-
-        for (const key in project.reflections) {
-            const reflection = project.reflections[key];
-
-            if (reflection && this.shouldCreateClassDiagramForReflection(reflection)) {
-                this.numberOfDiagramsToGenerate++;
-            }
-        }
     }
 
     /**
@@ -275,13 +250,6 @@ export class Plugin {
      */
     public onRendererBegin(event: RendererEvent): void {
         this.localImageGenerator.setOutputDirectory(path.join(event.outputDirectory, "assets/images/"));
-
-        if (this.numberOfDiagramsToGenerate > 0) {
-            this.progressBar = new ProgressBar("Generating UML class diagrams [:bar] :percent", {
-                total: this.numberOfDiagramsToGenerate,
-                width: 40,
-            });
-        }
     }
 
     /**
@@ -322,10 +290,6 @@ export class Plugin {
         }
 
         event.contents = page.content;
-
-        if (this.progressBar) {
-            this.progressBar.tick();
-        }
     }
 
     /**
