@@ -2,6 +2,19 @@
 
 **Plugin for TypeDoc that generates uml class diagrams**
 
+## Usage
+
+TypeDoc automatically detects plugins installed via npm. After installation TypeDoc can be used normally and
+this plugin is going to create a UML class diagram for every class and interface within your project.
+
+Example (default style):
+
+![Example default style](./examples/human-default-layout.png)
+
+Example (styled using plugin options):
+
+![Example styled using plugin options](./examples/human-custom-layout.png)
+
 ## Installation
 
 The plugin can then be installed using [npm](https://www.npmjs.com/package/typedoc-umlclass):
@@ -9,11 +22,6 @@ The plugin can then be installed using [npm](https://www.npmjs.com/package/typed
 ```sh
 $ npm install typedoc-umlclass --save-dev
 ```
-
-## Usage
-
-TypeDoc automatically detects plugins installed via npm. After installation TypeDoc can be used normally and
-this plugin is going to create a UML class diagram for every class and interface within your project.
 
 ## Options
 
@@ -103,9 +111,15 @@ The following options are added to TypeDoc when the plugin is installed:
 
 ## Credits
 
-This plugin was inspired by the [typedoc-plantuml](https://github.com/artifacthealth/typedoc-plantuml/) plugin created
-by [Meir Gottlieb](https://github.com/meirgottlieb) and the (unfinished) extension to that plugin created
-by [Michael K](https://github.com/0815fox).
+I would like to thank the following people that influenced this project:
+
+-   [Meir Gottlieb](https://github.com/meirgottlieb) for his
+    [typedoc-plantuml](https://github.com/artifacthealth/typedoc-plantuml/) plugin of which this plugin first was a
+    fork of.
+-   [Michael K](https://github.com/0815fox) for his (unfinished) extension/fork to that plugin which gave me some
+    insights into TypeDoc renderer events.
+-   [Gerrit Birkeland](https://github.com/Gerrit0) for his help on questions about TypeDoc.
+-   [yboujraf](https://github.com/yboujraf) for his impulse to create a separate plugin.
 
 ## License
 
