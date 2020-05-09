@@ -9,11 +9,11 @@ this plugin is going to create a UML class diagram for every class and interface
 
 Example (default style):
 
-![Example default style](./examples/human-default-layout.png)
+![Example default style](https://krisztianb.github.io/typedoc-umlclass/docs/human-default-layout.png)
 
 Example (styled using plugin options):
 
-![Example styled using plugin options](./examples/human-custom-layout.png)
+![Example styled using plugin options](https://krisztianb.github.io/typedoc-umlclass/docs/human-custom-layout.png)
 
 ## Installation
 

@@ -33,8 +33,7 @@
     },
     "main": "dist/index.js",
     "files": [
-        "/dist",
-        "/examples"
+        "/dist"
     ],
     "scripts": {
         "lint": "npx tslint -p .",
