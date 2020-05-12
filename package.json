@@ -37,6 +37,8 @@
     ],
     "scripts": {
         "lint": "npx tslint -p .",
-        "build": "npx tsc"
+        "clean": "del /S /Q dist",
+        "build": "npx tsc",
+        "clean-build": "npm run clean && npm run build"
     }
 }
