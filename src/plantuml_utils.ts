@@ -1,12 +1,4 @@
 import * as pako from "pako";
-import {
-    DeclarationReflection,
-    IntrinsicType,
-    ReferenceType,
-    ReflectionKind,
-    TypeParameterType,
-    UnknownType,
-} from "typedoc/dist/lib/models/index";
 
 /**
  * Class with utility functions regarding PlantUML code.
@@ -14,35 +6,6 @@ import {
 export class PlantUmlUtils {
     /** URL to the PlantUML web page, where one can generate UML diagrams. */
     public static readonly plantUmlServerUrl = "http://www.plantuml.com/plantuml/";
-
-    /**
-     * Returns an array of PlantUML lines for generating the box (including its properties and methods) of a given type.
-     * @param reflection The reflection for which the PlantUML should be generated.
-     * @param includeChildren Specifies whether the resulting PlantUML should include the properties and methods of
-     *                        the given reflection as well.
-     * @returns The PlantUML lines for the given type.
-     */
-    public static createPlantUmlForReflection(reflection: DeclarationReflection, includeChildren: boolean): string[] {
-        const plantUmlLines = new Array<string>();
-
-        if (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) {
-            plantUmlLines.push(PlantUmlUtils.createPlantUmlForClassOrInterface(reflection) + " {");
-
-            if (includeChildren && reflection.children) {
-                for (const children of reflection.children) {
-                    if (children.kind === ReflectionKind.Property) {
-                        plantUmlLines.push(PlantUmlUtils.createPlantUmlForProperty(children));
-                    } else if (children.kind === ReflectionKind.Method) {
-                        plantUmlLines.push(PlantUmlUtils.createPlantUmlForMethod(children));
-                    }
-                }
-            }
-
-            plantUmlLines.push("}");
-        }
-
-        return plantUmlLines;
-    }
 
     /**
      * Encodes the given string to a nearly base64 format.
@@ -61,109 +24,6 @@ export class PlantUmlUtils {
      */
     public static createPlantUmlServerUrl(data: string, imageFormat: string): string {
         return PlantUmlUtils.plantUmlServerUrl + imageFormat + "/~1" + data;
-    }
-
-    /**
-     * Returns the PlantUML line for generating the output for a given property.
-     * @param property The property for which the PlantUML should be generated.
-     * @returns The PlantUML line for the given property.
-     */
-    protected static createPlantUmlForProperty(property: DeclarationReflection): string {
-        let plantUml = "";
-
-        if (property.flags.isStatic) {
-            plantUml += "{static} ";
-        }
-
-        if (property.flags.isPrivate) {
-            plantUml += "-";
-        } else if (property.flags.isProtected) {
-            plantUml += "#";
-        } else {
-            plantUml += "+"; // default is public for JS/TS
-        }
-
-        plantUml += property.name;
-
-        if (
-            property.type instanceof IntrinsicType ||
-            property.type instanceof ReferenceType ||
-            property.type instanceof TypeParameterType ||
-            property.type instanceof UnknownType
-        ) {
-            plantUml += " : " + property.type.name;
-        }
-
-        return plantUml;
-    }
-
-    /**
-     * Returns the PlantUML line for generating the output for a given method.
-     * @param methode The method for which the PlantUML should be generated.
-     * @returns The PlantUML line for the given method.
-     */
-    protected static createPlantUmlForMethod(method: DeclarationReflection): string {
-        let plantUml = "";
-
-        if (method.flags.isStatic) {
-            plantUml += "{static} ";
-        }
-
-        if (method.flags.isAbstract) {
-            plantUml += "{abstract} ";
-        }
-
-        if (method.flags.isPrivate) {
-            plantUml += "-";
-        } else if (method.flags.isProtected) {
-            plantUml += "#";
-        } else {
-            plantUml += "+"; // public is default for JS/TS
-        }
-
-        plantUml += method.name + "()";
-
-        if (method.type) {
-            if (
-                method.type instanceof IntrinsicType ||
-                method.type instanceof ReferenceType ||
-                method.type instanceof TypeParameterType ||
-                method.type instanceof UnknownType
-            ) {
-                plantUml += " : " + method.type.name;
-            }
-        } else {
-            plantUml += " : void";
-        }
-
-        return plantUml;
-    }
-
-    /**
-     * Returns the PlantUML line for the introduction of a class or interface.
-     * @param reflection The class or interface for which the PlantUML should be generated.
-     * @returns The PlantUML line for the given class or interface.
-     */
-    protected static createPlantUmlForClassOrInterface(reflection: DeclarationReflection): string {
-        let plantUml = "";
-
-        if (reflection.flags.isStatic) {
-            plantUml += "static ";
-        }
-
-        if (reflection.flags.isAbstract) {
-            plantUml += "abstract ";
-        }
-
-        if (reflection.kind === ReflectionKind.Class) {
-            plantUml += "class ";
-        } else {
-            plantUml += "interface ";
-        }
-
-        plantUml += reflection.name;
-
-        return plantUml;
     }
 
     /**

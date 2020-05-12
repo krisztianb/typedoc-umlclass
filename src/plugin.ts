@@ -6,15 +6,9 @@ import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { ImageGenerator } from "./image_generator";
 import { PageProcessor } from "./page_processor";
 import { PageSections } from "./page_section";
+import { PlantUmlGenerator } from "./plantuml_generator";
 import { PlantUmlUtils } from "./plantuml_utils";
-import {
-    ClassDiagramMemberVisibilityStyle,
-    ClassDiagramPosition,
-    ClassDiagramType,
-    FontStyle,
-    ImageLocation,
-    PluginOptions,
-} from "./plugin_options";
+import { ClassDiagramPosition, ClassDiagramType, ImageLocation, PluginOptions } from "./plugin_options";
 import { TypeDocUtils } from "./typedoc_utils";
 
 /**
@@ -36,6 +30,9 @@ export class Plugin {
 
     /** Used when the class diagrams are created locally. */
     private localImageGenerator = new ImageGenerator();
+
+    /** Object that generates the PlantUML code. */
+    private plantUmlGenerator!: PlantUmlGenerator;
 
     /**
      * Initializes the plugin.
@@ -74,6 +71,8 @@ export class Plugin {
      */
     public onConverterResolveBegin(context: Context): void {
         this.options.readValuesFromApplication(context.converter.owner.application);
+
+        this.plantUmlGenerator = new PlantUmlGenerator(this.options);
     }
 
     /**
@@ -97,7 +96,7 @@ export class Plugin {
 
         const reflection = event.model;
         const plantUmlLines = this.shouldCreateClassDiagramForReflection(reflection)
-            ? this.createClassDiagramPlantUmlForReflection(reflection)
+            ? this.plantUmlGenerator.createClassDiagramPlantUmlForReflection(reflection)
             : [];
         if (plantUmlLines.length === 0) {
             return;
@@ -139,155 +138,6 @@ export class Plugin {
         }
 
         return false;
-    }
-
-    /**
-     * Generates the Plant UML lines for the class diagram of the given reflection.
-     * @param reflection The reflection for which to generate a class diagram.
-     * @returns The Plant UML lines for the class diagram of the given reflection.
-     *          If the given reflection is not part of an inheritance or implementation, the result is an empty array.
-     */
-    private createClassDiagramPlantUmlForReflection(reflection: DeclarationReflection): string[] {
-        const includeChildren = this.options.umlClassDiagramType === ClassDiagramType.Detailed;
-
-        let plantUmlLines = new Array<string>();
-        let siblingsAbove = 0;
-        let siblingsBelow = 0;
-
-        // add class/interface
-        plantUmlLines = plantUmlLines.concat(PlantUmlUtils.createPlantUmlForReflection(reflection, includeChildren));
-
-        // add classes/interfaces this type is extending
-        const extendedTypes = TypeDocUtils.getExtendedTypesForReflection(reflection);
-
-        for (const type of extendedTypes) {
-            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.createPlantUmlForReflection(type, includeChildren));
-            plantUmlLines.push(type.name + " <|-- " + reflection.name);
-            ++siblingsAbove;
-        }
-
-        // add classes/interfaces this type is implementing
-        const implementedTypes = TypeDocUtils.getImplementedTypesForReflection(reflection);
-
-        for (const type of implementedTypes) {
-            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.createPlantUmlForReflection(type, includeChildren));
-            plantUmlLines.push(type.name + " <|.. " + reflection.name);
-            ++siblingsAbove;
-        }
-
-        // add classes/interfaces that are extending this type
-        const extendedBys = TypeDocUtils.getExtendedBysForReflection(reflection);
-
-        for (const type of extendedBys) {
-            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.createPlantUmlForReflection(type, includeChildren));
-            plantUmlLines.push(reflection.name + " <|-- " + type.name);
-            ++siblingsBelow;
-        }
-
-        // add classes that are implementing this type
-        const implementedBys = TypeDocUtils.getImplementedBysForReflection(reflection);
-
-        for (const type of implementedBys) {
-            plantUmlLines = plantUmlLines.concat(PlantUmlUtils.createPlantUmlForReflection(type, includeChildren));
-            plantUmlLines.push(reflection.name + " <|.. " + type.name);
-            ++siblingsBelow;
-        }
-
-        // Return no UML if there is no inheritance or implementation involved
-        if (siblingsAbove + siblingsBelow === 0) {
-            plantUmlLines = [];
-        } else {
-            if (this.options.umlClassDiagramHideEmptyMembers) {
-                plantUmlLines.unshift("hide empty fields");
-                plantUmlLines.unshift("hide empty methods");
-            }
-
-            if (this.options.umlClassDiagramHideCircledChar) {
-                plantUmlLines.unshift("hide circle");
-            }
-
-            if (
-                siblingsAbove > this.options.umlClassDiagramTopDownLayoutMaxSiblings ||
-                siblingsBelow > this.options.umlClassDiagramTopDownLayoutMaxSiblings
-            ) {
-                plantUmlLines.unshift("left to right direction");
-            }
-
-            if (this.options.umlClassDiagramMemberVisibilityStyle === ClassDiagramMemberVisibilityStyle.Text) {
-                plantUmlLines.unshift("skinparam ClassAttributeIconSize 0");
-            }
-
-            if (this.options.umlClassDiagramHideShadow) {
-                plantUmlLines.unshift("skinparam Shadowing false");
-            }
-
-            if (this.options.umlClassDiagramBoxBorderRadius) {
-                plantUmlLines.unshift("skinparam RoundCorner " + this.options.umlClassDiagramBoxBorderRadius);
-            }
-
-            if (this.options.umlClassDiagramBoxBackgroundColor) {
-                plantUmlLines.unshift(
-                    "skinparam ClassBackgroundColor " + this.options.umlClassDiagramBoxBackgroundColor
-                );
-            }
-
-            if (this.options.umlClassDiagramBoxBorderColor) {
-                plantUmlLines.unshift("skinparam ClassBorderColor " + this.options.umlClassDiagramBoxBorderColor);
-            }
-
-            if (this.options.umlClassDiagramBoxBorderWidth >= 0) {
-                plantUmlLines.unshift("skinparam ClassBorderThickness " + this.options.umlClassDiagramBoxBorderWidth);
-            }
-
-            if (this.options.umlClassDiagramArrowColor) {
-                plantUmlLines.unshift("skinparam ClassArrowColor " + this.options.umlClassDiagramArrowColor);
-            }
-
-            if (this.options.umlClassDiagramClassFontName) {
-                plantUmlLines.unshift("skinparam ClassFontName " + this.options.umlClassDiagramClassFontName);
-            }
-
-            if (this.options.umlClassDiagramClassFontSize) {
-                plantUmlLines.unshift("skinparam ClassFontSize " + this.options.umlClassDiagramClassFontSize);
-            }
-
-            if (this.options.umlClassDiagramClassFontStyle !== FontStyle.Undefined) {
-                plantUmlLines.unshift(
-                    "skinparam ClassFontStyle " + this.options.umlClassDiagramClassFontStyle.toString()
-                );
-            }
-
-            if (this.options.umlClassDiagramClassFontColor) {
-                plantUmlLines.unshift("skinparam ClassFontColor " + this.options.umlClassDiagramClassFontColor);
-            }
-
-            if (this.options.umlClassDiagramClassAttributeFontName) {
-                plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontName " + this.options.umlClassDiagramClassAttributeFontName
-                );
-            }
-
-            if (this.options.umlClassDiagramClassAttributeFontSize) {
-                plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontSize " + this.options.umlClassDiagramClassAttributeFontSize
-                );
-            }
-
-            if (this.options.umlClassDiagramClassAttributeFontStyle !== FontStyle.Undefined) {
-                plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontStyle " +
-                        this.options.umlClassDiagramClassAttributeFontStyle.toString()
-                );
-            }
-
-            if (this.options.umlClassDiagramClassAttributeFontColor) {
-                plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontColor " + this.options.umlClassDiagramClassAttributeFontColor
-                );
-            }
-        }
-
-        return plantUmlLines;
     }
 
     /**
