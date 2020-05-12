@@ -42,6 +42,13 @@ export class PlantUmlGenerator {
     private options: PlantUmlGeneratorOptions;
 
     /**
+     * Caches the PlantUML generated for the reflections (= class or interface).
+     * KEY = ID of the reflection
+     * VALUE = PlantUML lines
+     */
+    private reflectionPlantUmlCache = new Map<number, string[]>();
+
+    /**
      * Creates a new PlantUmlGenerator object with the given options.
      * @param options The options for the PlantUML output.
      */
@@ -56,20 +63,20 @@ export class PlantUmlGenerator {
      *          If the given reflection is not part of an inheritance or implementation, the result is an empty array.
      */
     public createClassDiagramPlantUmlForReflection(reflection: DeclarationReflection): string[] {
-        const includeChildren = this.options.umlClassDiagramType === ClassDiagramType.Detailed;
+        const includeMembers = this.options.umlClassDiagramType === ClassDiagramType.Detailed;
 
         let plantUmlLines = new Array<string>();
         let siblingsAbove = 0;
         let siblingsBelow = 0;
 
         // add class/interface
-        plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(reflection, includeChildren));
+        plantUmlLines = plantUmlLines.concat(this.getPlantUmlForReflection(reflection, includeMembers));
 
         // add classes/interfaces this type is extending
         const extendedTypes = TypeDocUtils.getExtendedTypesForReflection(reflection);
 
         for (const type of extendedTypes) {
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeChildren));
+            plantUmlLines = plantUmlLines.concat(this.getPlantUmlForReflection(type, includeMembers));
             plantUmlLines.push(type.name + " <|-- " + reflection.name);
             ++siblingsAbove;
         }
@@ -78,7 +85,7 @@ export class PlantUmlGenerator {
         const implementedTypes = TypeDocUtils.getImplementedTypesForReflection(reflection);
 
         for (const type of implementedTypes) {
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeChildren));
+            plantUmlLines = plantUmlLines.concat(this.getPlantUmlForReflection(type, includeMembers));
             plantUmlLines.push(type.name + " <|.. " + reflection.name);
             ++siblingsAbove;
         }
@@ -87,7 +94,7 @@ export class PlantUmlGenerator {
         const extendedBys = TypeDocUtils.getExtendedBysForReflection(reflection);
 
         for (const type of extendedBys) {
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeChildren));
+            plantUmlLines = plantUmlLines.concat(this.getPlantUmlForReflection(type, includeMembers));
             plantUmlLines.push(reflection.name + " <|-- " + type.name);
             ++siblingsBelow;
         }
@@ -96,7 +103,7 @@ export class PlantUmlGenerator {
         const implementedBys = TypeDocUtils.getImplementedBysForReflection(reflection);
 
         for (const type of implementedBys) {
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeChildren));
+            plantUmlLines = plantUmlLines.concat(this.getPlantUmlForReflection(type, includeMembers));
             plantUmlLines.push(reflection.name + " <|.. " + type.name);
             ++siblingsBelow;
         }
@@ -200,18 +207,37 @@ export class PlantUmlGenerator {
 
     /**
      * Returns an array of PlantUML lines for generating the box (including its properties and methods) of a given type.
+     * Caches the result so that another call with the same reflection will be faster.
      * @param reflection The reflection for which the PlantUML should be generated.
-     * @param includeChildren Specifies whether the resulting PlantUML should include the properties and methods of
-     *                        the given reflection as well.
+     * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
+     *                       the given reflection as well.
      * @returns The PlantUML lines for the given type.
      */
-    private createPlantUmlForReflection(reflection: DeclarationReflection, includeChildren: boolean): string[] {
+    private getPlantUmlForReflection(reflection: DeclarationReflection, includeMembers: boolean): string[] {
+        if (!this.reflectionPlantUmlCache.has(reflection.id)) {
+            this.reflectionPlantUmlCache.set(
+                reflection.id,
+                this.createPlantUmlForReflection(reflection, includeMembers)
+            );
+        }
+
+        return this.reflectionPlantUmlCache.get(reflection.id) as string[];
+    }
+
+    /**
+     * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a given type.
+     * @param reflection The reflection for which the PlantUML should be generated.
+     * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
+     *                       the given reflection as well.
+     * @returns The PlantUML lines for the given type.
+     */
+    private createPlantUmlForReflection(reflection: DeclarationReflection, includeMembers: boolean): string[] {
         const plantUmlLines = new Array<string>();
 
         if (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) {
             plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection) + " {");
 
-            if (includeChildren && reflection.children) {
+            if (includeMembers && reflection.children) {
                 for (const children of reflection.children) {
                     if (children.kind === ReflectionKind.Property) {
                         plantUmlLines.push(this.createPlantUmlForProperty(children));
