@@ -4,7 +4,8 @@ import { Application, DeclarationReflection, Reflection, ReflectionKind } from "
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { ImageGenerator } from "./image_generator";
-import { PageProcessor, PageSections } from "./page_processor";
+import { PageProcessor } from "./page_processor";
+import { PageSections } from "./page_section";
 import { PlantUmlUtils } from "./plantuml_utils";
 import {
     ClassDiagramMemberVisibilityStyle,
@@ -90,16 +91,11 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererEndPage(event: PageEvent): void {
-        if (!event.contents) {
+        if (!(event.model instanceof DeclarationReflection)) {
             return;
         }
 
-        const page = new PageProcessor(event.contents);
-        if (!page.isDetailPage) {
-            return;
-        }
-
-        const reflection = event.model as DeclarationReflection;
+        const reflection = event.model;
         const plantUmlLines = this.shouldCreateClassDiagramForReflection(reflection)
             ? this.createClassDiagramPlantUmlForReflection(reflection)
             : [];
@@ -114,6 +110,8 @@ export class Plugin {
                 : PlantUmlUtils.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat);
 
         const hierarchyDiagramSection = this.createHierarchyDiagramSection(imagePath, reflection.name);
+
+        const page = new PageProcessor(event.contents);
 
         if (this.options.umlClassDiagramPosition === ClassDiagramPosition.Above) {
             page.insertAboveSection(PageSections.Hierarchy, hierarchyDiagramSection);
