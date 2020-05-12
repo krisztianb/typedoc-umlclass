@@ -3,7 +3,6 @@
         "lib": ["ES2015"],
         "module": "commonjs",
         "outDir": "dist",
-        "sourceMap": true,
         "strict": true,
         "target": "es5"
     },
