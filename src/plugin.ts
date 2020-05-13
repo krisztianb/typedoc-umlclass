@@ -90,14 +90,23 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererEndPage(event: PageEvent): void {
-        if (!(event.model instanceof DeclarationReflection)) {
+        const isPluginActive =
+            this.options.umlClassDiagramType === ClassDiagramType.Simple ||
+            this.options.umlClassDiagramType === ClassDiagramType.Detailed;
+
+        const isClassOrInterfacePage =
+            event.model instanceof DeclarationReflection &&
+            (event.model.kind === ReflectionKind.Class || event.model.kind === ReflectionKind.Interface);
+
+        if (!isPluginActive || !isClassOrInterfacePage) {
             return;
         }
 
-        const reflection = event.model;
-        const plantUmlLines = this.shouldCreateClassDiagramForReflection(reflection)
+        const reflection = event.model as DeclarationReflection;
+        const plantUmlLines = TypeDocUtils.reflectionIsPartOfClassHierarchy(reflection)
             ? this.plantUmlGenerator.createClassDiagramPlantUmlForReflection(reflection)
             : [];
+
         if (plantUmlLines.length === 0) {
             return;
         }
@@ -119,25 +128,6 @@ export class Plugin {
         }
 
         event.contents = page.content;
-    }
-
-    /**
-     * Returns if a class diagram should be generated for the given reflection.
-     * @param reflection The reflection for which the question is asked.
-     * @returns True, if a class diagram should be generated for the given reflection, otherwise false.
-     */
-    private shouldCreateClassDiagramForReflection(reflection: Reflection): reflection is DeclarationReflection {
-        if (
-            (this.options.umlClassDiagramType === ClassDiagramType.Simple ||
-                this.options.umlClassDiagramType === ClassDiagramType.Detailed) &&
-            reflection instanceof DeclarationReflection &&
-            (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) &&
-            TypeDocUtils.reflectionIsPartOfClassHierarchy(reflection)
-        ) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
