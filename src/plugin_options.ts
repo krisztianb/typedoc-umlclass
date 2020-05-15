@@ -10,7 +10,7 @@ import {
 /**
  * Supported image output formats.
  */
-export enum ImageFormat {
+export const enum ImageFormat {
     PNG = "png",
     SVG = "svg",
 }
@@ -51,7 +51,7 @@ export enum ClassDiagramMemberVisibilityStyle {
 /**
  * Font styles supported by PlantUML.
  */
-export enum FontStyle {
+export const enum FontStyle {
     Undefined = "",
     Normal = "normal",
     Plain = "plain",
