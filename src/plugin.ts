@@ -4,12 +4,12 @@ import { Application, DeclarationReflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { ImageGenerator } from "./image_generator";
-import { PageProcessor } from "./page_processor";
-import { PageSections } from "./page_section";
 import { CachingPlantUmlGenerator } from "./plantuml/caching_plantuml_generator";
 import { PlantUmlUtils } from "./plantuml/plantuml_utils";
 import { ClassDiagramPosition, ClassDiagramType, ImageLocation, PluginOptions } from "./plugin_options";
-import { TypeDocUtils } from "./typedoc_utils";
+import { PageProcessor } from "./typedoc/page_processor";
+import { PageSections } from "./typedoc/page_section";
+import { TypeDocUtils } from "./typedoc/typedoc_utils";
 
 /**
  * The UML class diagram generator plugin.

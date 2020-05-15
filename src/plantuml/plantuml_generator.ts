@@ -7,7 +7,7 @@ import {
     UnknownType,
 } from "typedoc/dist/lib/models/index";
 import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle } from "../plugin_options";
-import { TypeDocUtils } from "../typedoc_utils";
+import { TypeDocUtils } from "../typedoc/typedoc_utils";
 
 /**
  * Options for the PlantUmlGenerator.
