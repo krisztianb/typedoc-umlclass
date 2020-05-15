@@ -1,13 +1,13 @@
 import * as fs from "fs";
 import * as path from "path";
-import { Application, DeclarationReflection, Reflection, ReflectionKind } from "typedoc";
+import { Application, DeclarationReflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { ImageGenerator } from "./image_generator";
 import { PageProcessor } from "./page_processor";
 import { PageSections } from "./page_section";
-import { PlantUmlGenerator } from "./plantuml_generator";
-import { PlantUmlUtils } from "./plantuml_utils";
+import { CachingPlantUmlGenerator } from "./plantuml/caching_plantuml_generator";
+import { PlantUmlUtils } from "./plantuml/plantuml_utils";
 import { ClassDiagramPosition, ClassDiagramType, ImageLocation, PluginOptions } from "./plugin_options";
 import { TypeDocUtils } from "./typedoc_utils";
 
@@ -32,7 +32,7 @@ export class Plugin {
     private localImageGenerator = new ImageGenerator();
 
     /** Object that generates the PlantUML code. */
-    private plantUmlGenerator!: PlantUmlGenerator;
+    private plantUmlGenerator!: CachingPlantUmlGenerator;
 
     /**
      * Initializes the plugin.
@@ -72,7 +72,7 @@ export class Plugin {
     public onConverterResolveBegin(context: Context): void {
         this.options.readValuesFromApplication(context.converter.owner.application);
 
-        this.plantUmlGenerator = new PlantUmlGenerator(this.options);
+        this.plantUmlGenerator = new CachingPlantUmlGenerator(this.options);
     }
 
     /**
