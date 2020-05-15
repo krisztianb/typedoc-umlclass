@@ -25,7 +25,9 @@ $ npm install typedoc-umlclass --save-dev
 
 ## Options
 
-The following options are added to TypeDoc when the plugin is installed:
+The following options are added to TypeDoc when the plugin is installed.
+
+### Basic settings
 
 -   `--umlClassDiagramType <none|simple|detailed>`<br>
     You can use this option to disable the plugin by passing the value `none`. Otherwise a class diagram is generated
@@ -41,12 +43,19 @@ The following options are added to TypeDoc when the plugin is installed:
 -   `--umlClassDiagramFormat <png|svg>`<br>
     Specifies the image format to use.
     Default is `png`.
+
+### HTML output
+
 -   `--umlClassDiagramSectionTitle <string>`<br>
-    Use this option to specify the title of the section which includes the class diagram.
+    Use this option to specify the title of the section on the TypeDoc page which includes the class diagram.
     Default is `Hierarchy-Diagram`.
 -   `--umlClassDiagramPosition <above|below>`<br>
-    Use this option to specify if the class diagram should be inserted `above` or `below` the hierarchy section.
+    Use this option to specify if the class diagram should be inserted `above` or `below` the default hierarchy section
+    on the TypeDoc page.
     Default is `above`.
+
+### Class diagram formating
+
 -   `--umlClassDiagramHideEmptyMembers <true|false>`<br>
     If this option is set to true properties and methods are hidden if they are empty.
     Default is `true`.
@@ -119,7 +128,7 @@ I would like to thank the following people that influenced this project:
 -   [Michael K](https://github.com/0815fox) for his (unfinished) extension/fork to that plugin which gave me some
     insights into TypeDoc renderer events.
 -   [Gerrit Birkeland](https://github.com/Gerrit0) for his help on questions about TypeDoc.
--   [yboujraf](https://github.com/yboujraf) for his impulse to create a separate plugin.
+-   [yboujraf](https://github.com/yboujraf) for his impulse to create a separate plugin and help with testing it.
 
 ## License
 
