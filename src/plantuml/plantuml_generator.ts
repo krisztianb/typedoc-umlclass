@@ -63,13 +63,13 @@ export class PlantUmlGenerator {
         let siblingsBelow = 0;
 
         // add class/interface
-        plantUmlLines = plantUmlLines.concat(this.getPlantUmlForReflection(reflection, includeMembers));
+        plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(reflection, includeMembers));
 
         // add classes/interfaces this type is extending
         const extendedTypes = TypeDocUtils.getExtendedTypesForReflection(reflection);
 
         for (const type of extendedTypes) {
-            plantUmlLines = plantUmlLines.concat(this.getPlantUmlForReflection(type, includeMembers));
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeMembers));
             plantUmlLines.push(type.name + " <|-- " + reflection.name);
             ++siblingsAbove;
         }
@@ -78,7 +78,7 @@ export class PlantUmlGenerator {
         const implementedTypes = TypeDocUtils.getImplementedTypesForReflection(reflection);
 
         for (const type of implementedTypes) {
-            plantUmlLines = plantUmlLines.concat(this.getPlantUmlForReflection(type, includeMembers));
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeMembers));
             plantUmlLines.push(type.name + " <|.. " + reflection.name);
             ++siblingsAbove;
         }
@@ -87,7 +87,7 @@ export class PlantUmlGenerator {
         const extendedBys = TypeDocUtils.getExtendedBysForReflection(reflection);
 
         for (const type of extendedBys) {
-            plantUmlLines = plantUmlLines.concat(this.getPlantUmlForReflection(type, includeMembers));
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeMembers));
             plantUmlLines.push(reflection.name + " <|-- " + type.name);
             ++siblingsBelow;
         }
@@ -96,7 +96,7 @@ export class PlantUmlGenerator {
         const implementedBys = TypeDocUtils.getImplementedBysForReflection(reflection);
 
         for (const type of implementedBys) {
-            plantUmlLines = plantUmlLines.concat(this.getPlantUmlForReflection(type, includeMembers));
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeMembers));
             plantUmlLines.push(reflection.name + " <|.. " + type.name);
             ++siblingsBelow;
         }
@@ -196,17 +196,6 @@ export class PlantUmlGenerator {
         }
 
         return plantUmlLines;
-    }
-
-    /**
-     * Returns an array of PlantUML lines for generating the box (including its properties and methods) of a given type.
-     * @param reflection The reflection for which the PlantUML should be generated.
-     * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
-     *                       the given reflection as well.
-     * @returns The PlantUML lines for the given type.
-     */
-    protected getPlantUmlForReflection(reflection: DeclarationReflection, includeMembers: boolean): string[] {
-        return this.createPlantUmlForReflection(reflection, includeMembers);
     }
 
     /**

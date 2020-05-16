@@ -13,18 +13,18 @@ export class CachingPlantUmlGenerator extends PlantUmlGenerator {
     private reflectionPlantUmlCache = new Map<number, string[]>();
 
     /**
-     * Returns an array of PlantUML lines for generating the box (including its properties and methods) of a given type.
+     * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a given type.
      * Caches the result so that another call with the same reflection will be faster.
      * @param reflection The reflection for which the PlantUML should be generated.
      * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
      *                       the given reflection as well.
      * @returns The PlantUML lines for the given type.
      */
-    protected getPlantUmlForReflection(reflection: DeclarationReflection, includeMembers: boolean): string[] {
+    protected createPlantUmlForReflection(reflection: DeclarationReflection, includeMembers: boolean): string[] {
         if (!this.reflectionPlantUmlCache.has(reflection.id)) {
             this.reflectionPlantUmlCache.set(
                 reflection.id,
-                this.createPlantUmlForReflection(reflection, includeMembers)
+                super.createPlantUmlForReflection(reflection, includeMembers)
             );
         }
 
