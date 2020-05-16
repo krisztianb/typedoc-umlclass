@@ -112,12 +112,21 @@ export class Plugin {
         }
 
         const encodedPlantUml = PlantUmlUtils.encode(plantUmlLines.join("\n"));
-        const imagePath =
-            this.options.outputImageLocation === ImageLocation.Local
-                ? this.localImageGenerator.writeImage(event.filename, encodedPlantUml, this.options.outputImageFormat)
-                : PlantUmlUtils.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat);
 
-        const hierarchyDiagramSection = this.createHierarchyDiagramSection(imagePath, reflection.name);
+        let imageUrl = "";
+
+        if (this.options.outputImageLocation === ImageLocation.Local) {
+            const absoluteImagePath = this.localImageGenerator.writeImageFile(
+                encodedPlantUml,
+                reflection.name,
+                this.options.outputImageFormat
+            );
+            imageUrl = path.relative(path.dirname(event.filename), absoluteImagePath);
+        } else {
+            imageUrl = PlantUmlUtils.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat);
+        }
+
+        const hierarchyDiagramSection = this.createHierarchyDiagramSection(imageUrl, reflection.name);
 
         const page = new PageProcessor(event.contents);
 
@@ -132,15 +141,15 @@ export class Plugin {
 
     /**
      * Creates HTML for a section containing a hierarchy diagram.
-     * @param imagePath The hierarchy diagram as an image.
+     * @param imageUrl The URL to the hierarchy diagram.
      * @param reflectionName The name of the reflection for which the hierarchy diagram was generated.
      * @returns The HTML for the section.
      */
-    private createHierarchyDiagramSection(imagePath: string, reflectionName: string): string {
+    private createHierarchyDiagramSection(imageUrl: string, reflectionName: string): string {
         return `<section class="tsd-panel tsd-hierarchy">
                     <h3>${this.options.umlClassDiagramSectionTitle}</h3>
-                        <a class="uml-class" href="${imagePath}" title="Click to enlarge">
-                            <img src="${imagePath}"
+                        <a class="uml-class" href="${imageUrl}" title="Click to enlarge">
+                            <img src="${imageUrl}"
                                  alt="UML class diagram of ${reflectionName}" />
                         </a>
                 </section>`;

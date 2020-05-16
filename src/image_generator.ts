@@ -10,8 +10,8 @@ export class ImageGenerator {
     /** The path to the folder into which the files are generated.  */
     private outputDirectory!: string;
 
-    /** Prefix used for every image file. */
-    private readonly fileNamePrefix = "umlClassDiagram-";
+    /** Stamp used for every image file. */
+    private readonly fileNameStamp = "umlClassDiagram";
 
     /** Number of generated image files. */
     private numberOfGeneratedImages = 0;
@@ -26,27 +26,33 @@ export class ImageGenerator {
 
     /**
      * Writes a class diagram as a local image to the disc.
-     * @param pageFilename The filename of the generated TypeDoc page.
-     * @param encodedPlantUml The encoded PlantUML code for the diagram.
+     * @param encodedPlantUml The encoded PlantUML code for the image.
+     * @param imageName The name of the class diagram.
      * @param imageFormat The format of the image to generate. (eg.: "png" or "svg")
-     * @returns The relative path to the generated image file.
+     * @returns Absolute path to the written file.
      */
-    public writeImage(pageFilename: string, encodedPlantUml: string, imageFormat: string): string {
-        // setup plantuml encoder and decoder
+    public writeImageFile(encodedPlantUml: string, imageName: string, imageFormat: string): string {
+        const filename = this.createFilenameForNextImage(imageName, imageFormat);
+        const absoluteFilename = path.join(this.outputDirectory, filename);
+
         const decode = plantuml.decode(encodedPlantUml);
         const gen = plantuml.generate({ format: imageFormat });
 
-        // get image filename
-        const filename = this.fileNamePrefix + ++this.numberOfGeneratedImages + "." + imageFormat;
-        const imagePath = path.join(this.outputDirectory, filename);
-
-        // decode and save image to assets directory
         decode.out.pipe(gen.in);
-        gen.out.pipe(fs.createWriteStream(imagePath));
+        gen.out.pipe(fs.createWriteStream(absoluteFilename));
 
-        // get relative path filename
-        const currentDirectory = path.dirname(pageFilename);
-        // return the relative path
-        return path.relative(currentDirectory, imagePath);
+        ++this.numberOfGeneratedImages;
+
+        return absoluteFilename;
+    }
+
+    /**
+     * Creates a filename for the next image.
+     * @param imageName A name of the thing visible on the image.
+     * @param fileExtension Extension used in the filename.
+     * @returns The generated filename.
+     */
+    private createFilenameForNextImage(imageName: string, fileExtension: string): string {
+        return imageName + "-" + this.fileNameStamp + "-" + this.numberOfGeneratedImages + "." + fileExtension;
     }
 }
