@@ -42,7 +42,7 @@ The following options are added to TypeDoc when the plugin is installed.
     Default is `local`.
 -   `--umlClassDiagramFormat <png|svg>`<br>
     Specifies the image format to use.
-    Default is `png`.
+    Default is `svg`.
 
 ### HTML output
 

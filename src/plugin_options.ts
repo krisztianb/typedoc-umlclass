@@ -68,12 +68,12 @@ export class PluginOptions {
         type: ParameterType.Map,
         name: "umlClassDiagramFormat",
         help: "png|svg",
-        defaultValue: ImageFormat.PNG,
+        defaultValue: ImageFormat.SVG,
         map: new Map([
             ["png", ImageFormat.PNG],
             ["svg", ImageFormat.SVG],
         ]),
-        value: ImageFormat.PNG,
+        value: ImageFormat.SVG,
     };
 
     /** The location where the generated UML diagrams should be stored. */

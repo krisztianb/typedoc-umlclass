@@ -40,7 +40,7 @@ export class ImageGenerator {
         const filename = this.fileNamePrefix + ++this.numberOfGeneratedImages + "." + imageFormat;
         const imagePath = path.join(this.outputDirectory, filename);
 
-        // decode and save png to assets directory
+        // decode and save image to assets directory
         decode.out.pipe(gen.in);
         gen.out.pipe(fs.createWriteStream(imagePath));
 
