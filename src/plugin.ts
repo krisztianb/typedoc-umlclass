@@ -9,6 +9,7 @@ import { PlantUmlUtils } from "./plantuml/plantuml_utils";
 import { ClassDiagramPosition, ClassDiagramType, ImageLocation, PluginOptions } from "./plugin_options";
 import { PageProcessor } from "./typedoc/page_processor";
 import { PageSections } from "./typedoc/page_section";
+import { PageSectionFinder } from "./typedoc/page_section_finder";
 import { TypeDocUtils } from "./typedoc/typedoc_utils";
 
 /**
@@ -90,27 +91,49 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererEndPage(event: PageEvent): void {
+        if (this.shouldProcessPage(event.contents, event.model)) {
+            this.processPage(event);
+        }
+    }
+
+    /**
+     * Checks if the plugin should process a given page.
+     * @param pageContent The content of the page.
+     * @param pageModel The model for the page.
+     * @returns True, if the plugin should process the page, otherwise false.
+     */
+    private shouldProcessPage(pageContent: string | undefined, pageModel: unknown): boolean {
         const isPluginActive =
             this.options.umlClassDiagramType === ClassDiagramType.Simple ||
             this.options.umlClassDiagramType === ClassDiagramType.Detailed;
 
-        const isClassOrInterfacePage =
-            event.model instanceof DeclarationReflection &&
-            (event.model.kind === ReflectionKind.Class || event.model.kind === ReflectionKind.Interface);
+        if (isPluginActive && pageContent) {
+            const modelIsClassOrInterface =
+                pageModel instanceof DeclarationReflection &&
+                (pageModel.kind === ReflectionKind.Class || pageModel.kind === ReflectionKind.Interface);
 
-        if (!isPluginActive || !isClassOrInterfacePage) {
-            return;
+            if (modelIsClassOrInterface) {
+                const reflection = pageModel as DeclarationReflection;
+
+                if (
+                    TypeDocUtils.reflectionIsPartOfClassHierarchy(reflection) &&
+                    PageSectionFinder.hasSection(pageContent, PageSections.Hierarchy)
+                ) {
+                    return true;
+                }
+            }
         }
 
+        return false;
+    }
+
+    /**
+     * Processes the page by inserting a UML class diagram into it.
+     * @param event The page event with the page data.
+     */
+    private processPage(event: PageEvent): void {
         const reflection = event.model as DeclarationReflection;
-        const plantUmlLines = TypeDocUtils.reflectionIsPartOfClassHierarchy(reflection)
-            ? this.plantUmlGenerator.createClassDiagramPlantUmlForReflection(reflection)
-            : [];
-
-        if (plantUmlLines.length === 0) {
-            return;
-        }
-
+        const plantUmlLines = this.plantUmlGenerator.createClassDiagramPlantUmlForReflection(reflection);
         const encodedPlantUml = PlantUmlUtils.encode(plantUmlLines.join("\n"));
 
         let imageUrl = "";

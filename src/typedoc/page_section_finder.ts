@@ -8,16 +8,25 @@ export class PageSectionFinder {
     private static readonly pageSectionLookUpCache = new Map<PageSections, RegExp>();
 
     /**
+     * Checks if there is a given section in the content.
+     * @param content The content in which to look for the section.
+     * @param section The section that is looked for.
+     * @returns True, if the section is found in the content, otherwise false.
+     */
+    public static hasSection(content: string, section: PageSections): boolean {
+        const location = PageSectionFinder.getSectionLocation(content, section);
+
+        return location.startIndex !== location.endIndex;
+    }
+
+    /**
      * Returns the position of the section within the content.
      * @param content The content in which to look for the section.
      * @param section The section whos location is wanted.
      * @returns An object with the start and end index of the section.
      *          If the section cannot be found in the content both startIndex and endIndex equal 0.
      */
-    public static getSectionLocationInContent(
-        content: string,
-        section: PageSections
-    ): { startIndex: number; endIndex: number } {
+    public static getSectionLocation(content: string, section: PageSections): { startIndex: number; endIndex: number } {
         const regex = PageSectionFinder.getLookUpRegexpForSection(section);
         const match = regex.exec(content);
 

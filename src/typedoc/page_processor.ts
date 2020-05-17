@@ -30,7 +30,7 @@ export class PageProcessor {
      * @param newContent The content to insert.
      */
     public insertAboveSection(section: PageSections, newContent: string): void {
-        const sectionLocation = PageSectionFinder.getSectionLocationInContent(this._content, section);
+        const sectionLocation = PageSectionFinder.getSectionLocation(this._content, section);
 
         if (sectionLocation.startIndex !== sectionLocation.endIndex) {
             this._content =
@@ -46,7 +46,7 @@ export class PageProcessor {
      * @param newContent The content to insert.
      */
     public insertBelowSection(section: PageSections, newContent: string): void {
-        const sectionLocation = PageSectionFinder.getSectionLocationInContent(this._content, section);
+        const sectionLocation = PageSectionFinder.getSectionLocation(this._content, section);
 
         if (sectionLocation.startIndex !== sectionLocation.endIndex) {
             this._content =
