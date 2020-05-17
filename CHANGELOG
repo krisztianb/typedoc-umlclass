@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2020-05-17
+### Added
+- Include class name in local image filename
+### Changed
+- Default image format is now SVG
+### Fixed
+- Malformed local SVG image output
+
 ## [0.1.2] - 2020-05-13
 ### Added
 - Faster PlantUML generation with caching
@@ -14,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.3
 [0.1.2]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.2
 [0.1.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.1
