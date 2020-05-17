@@ -8,7 +8,7 @@ import { CachingPlantUmlGenerator } from "./plantuml/caching_plantuml_generator"
 import { PlantUmlUtils } from "./plantuml/plantuml_utils";
 import { ClassDiagramPosition, ClassDiagramType, ImageLocation, PluginOptions } from "./plugin_options";
 import { PageProcessor } from "./typedoc/page_processor";
-import { PageSections } from "./typedoc/page_section";
+import { PageSection, PageSections } from "./typedoc/page_section";
 import { PageSectionFinder } from "./typedoc/page_section_finder";
 import { TypeDocUtils } from "./typedoc/typedoc_utils";
 
@@ -128,10 +128,21 @@ export class Plugin {
     }
 
     /**
-     * Processes the page by inserting a UML class diagram into it.
+     * Processes the page by inserting a hierarchy diagram into it.
      * @param event The page event with the page data.
      */
     private processPage(event: PageEvent): void {
+        const imageUrl = this.createHierarchyDiagramForPage(event);
+
+        this.insertHierarchyDiagramIntoPage(event, imageUrl);
+    }
+
+    /**
+     * Creates a hierarchy diagram for the page.
+     * @param event The page event with the page data.
+     * @returns The URL to the hierarchy diagram.
+     */
+    private createHierarchyDiagramForPage(event: PageEvent): string {
         const reflection = event.model as DeclarationReflection;
         const plantUmlLines = this.plantUmlGenerator.createClassDiagramPlantUmlForReflection(reflection);
         const encodedPlantUml = PlantUmlUtils.encode(plantUmlLines.join("\n"));
@@ -149,7 +160,21 @@ export class Plugin {
             imageUrl = PlantUmlUtils.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat);
         }
 
-        const hierarchyDiagramSection = this.createHierarchyDiagramSection(imageUrl, reflection.name);
+        return imageUrl;
+    }
+
+    /**
+     * Inserts the hierarchy diagram into the page.
+     * @param event The page event with the page data.
+     * @param imageUrl The URL to the hierarchy diagram.
+     */
+    private insertHierarchyDiagramIntoPage(event: PageEvent, imageUrl: string): void {
+        const reflection = event.model as DeclarationReflection;
+        const hierarchyDiagramSection = PageSection.createForHierarchyDiagram(
+            this.options.umlClassDiagramSectionTitle,
+            imageUrl,
+            reflection.name
+        );
 
         const page = new PageProcessor(event.contents);
 
@@ -160,22 +185,6 @@ export class Plugin {
         }
 
         event.contents = page.content;
-    }
-
-    /**
-     * Creates HTML for a section containing a hierarchy diagram.
-     * @param imageUrl The URL to the hierarchy diagram.
-     * @param reflectionName The name of the reflection for which the hierarchy diagram was generated.
-     * @returns The HTML for the section.
-     */
-    private createHierarchyDiagramSection(imageUrl: string, reflectionName: string): string {
-        return `<section class="tsd-panel tsd-hierarchy">
-                    <h3>${this.options.umlClassDiagramSectionTitle}</h3>
-                        <a class="uml-class" href="${imageUrl}" title="Click to enlarge">
-                            <img src="${imageUrl}"
-                                 alt="UML class diagram of ${reflectionName}" />
-                        </a>
-                </section>`;
     }
 
     /**
