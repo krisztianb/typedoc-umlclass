@@ -2,6 +2,8 @@
 
 **Plugin for TypeDoc that generates uml class diagrams**
 
+[![NPM Version](https://badge.fury.io/js/typedoc-umlclass.svg)](https://badge.fury.io/js/typedoc-umlclass)
+
 ## Usage
 
 TypeDoc automatically detects plugins installed via npm. After installation TypeDoc can be used normally and
