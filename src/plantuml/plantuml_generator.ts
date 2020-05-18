@@ -1,11 +1,4 @@
-import {
-    DeclarationReflection,
-    IntrinsicType,
-    ReferenceType,
-    ReflectionKind,
-    TypeParameterType,
-    UnknownType,
-} from "typedoc/dist/lib/models/index";
+import { DeclarationReflection, ReflectionKind } from "typedoc/dist/lib/models/index";
 import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle } from "../plugin_options";
 import { TypeDocUtils } from "../typedoc/typedoc_utils";
 
@@ -247,16 +240,7 @@ export class PlantUmlGenerator {
             plantUml += "+"; // default is public for JS/TS
         }
 
-        plantUml += property.name;
-
-        if (
-            property.type instanceof IntrinsicType ||
-            property.type instanceof ReferenceType ||
-            property.type instanceof TypeParameterType ||
-            property.type instanceof UnknownType
-        ) {
-            plantUml += " : " + property.type.name;
-        }
+        plantUml += property.name + " : " + TypeDocUtils.createNameForType(property.type);
 
         return plantUml;
     }
@@ -288,14 +272,7 @@ export class PlantUmlGenerator {
         plantUml += method.name + "()";
 
         if (method.type) {
-            if (
-                method.type instanceof IntrinsicType ||
-                method.type instanceof ReferenceType ||
-                method.type instanceof TypeParameterType ||
-                method.type instanceof UnknownType
-            ) {
-                plantUml += " : " + method.type.name;
-            }
+            plantUml += " : " + TypeDocUtils.createNameForType(method.type);
         } else {
             plantUml += " : void";
         }

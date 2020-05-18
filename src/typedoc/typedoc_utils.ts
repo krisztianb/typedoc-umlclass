@@ -1,9 +1,90 @@
-import { DeclarationReflection, ReferenceType } from "typedoc/dist/lib/models/index";
+import {
+    ArrayType,
+    ConditionalType,
+    DeclarationReflection,
+    IndexedAccessType,
+    InferredType,
+    IntersectionType,
+    IntrinsicType,
+    PredicateType,
+    ReferenceType,
+    ReflectionKind,
+    ReflectionType,
+    StringLiteralType,
+    TupleType,
+    Type,
+    TypeOperatorType,
+    TypeParameterType,
+    UnionType,
+    UnknownType,
+} from "typedoc/dist/lib/models/index";
 
 /**
  * Class with utility functions regarding TypeDoc reflections.
  */
 export class TypeDocUtils {
+    /**
+     * Returns the name of the given type.
+     * @param type The type whos name is wanted.
+     * @returns The name of the type.
+     */
+    public static createNameForType(type?: Type): string {
+        if (!type || type instanceof UnknownType) {
+            return "unknown";
+        }
+
+        if (type instanceof ArrayType) {
+            return this.createNameForType(type.elementType) + "[]";
+        } else if (type instanceof ConditionalType) {
+            return (
+                this.createNameForType(type.checkType) +
+                " extends " +
+                this.createNameForType(type.extendsType) +
+                " ? " +
+                this.createNameForType(type.trueType) +
+                " : " +
+                this.createNameForType(type.falseType)
+            );
+        } else if (type instanceof IndexedAccessType) {
+        } else if (type instanceof InferredType) {
+            return "infer " + type.name;
+        } else if (type instanceof IntersectionType) {
+            return type.types.map((t) => this.createNameForType(t)).join(" & ");
+        } else if (type instanceof IntrinsicType) {
+            return type.name;
+        } else if (type instanceof PredicateType) {
+            return (type.asserts ? "asserts " : "") + type.name + " is " + this.createNameForType(type.targetType);
+        } else if (type instanceof ReferenceType) {
+            const typeArgumentNames = type.typeArguments
+                ? type.typeArguments.map((ta) => this.createNameForType(ta))
+                : [];
+
+            return type.name + (typeArgumentNames.length > 0 ? "<" + typeArgumentNames.join(", ") + ">" : "");
+        } else if (type instanceof ReflectionType) {
+            const properties = new Array<string>();
+
+            if (type.declaration.children) {
+                for (const children of type.declaration.children) {
+                    if (children.kind === ReflectionKind.Variable) {
+                        properties.push(children.name + ": " + this.createNameForType(children.type));
+                    }
+                }
+            }
+
+            return properties.length > 0 ? "{ " + properties.join("; ") + " }" : "object";
+        } else if (type instanceof StringLiteralType) {
+            return '"' + type.value + '"';
+        } else if (type instanceof TupleType) {
+        } else if (type instanceof TypeOperatorType) {
+        } else if (type instanceof TypeParameterType) {
+            return type.name;
+        } else if (type instanceof UnionType) {
+            return type.types.map((t) => this.createNameForType(t)).join(" | ");
+        }
+
+        return "NYI";
+    }
+
     /**
      * Returns if a reflection has any types above or below it in the class hierarchy.
      * @param reflection The reflection to check.
