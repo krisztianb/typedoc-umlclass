@@ -1,4 +1,4 @@
-import { DeclarationReflection, ReflectionKind } from "typedoc/dist/lib/models/index";
+import { DeclarationReflection, ReflectionKind, SignatureReflection } from "typedoc/dist/lib/models/index";
 import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle } from "../plugin_options";
 import { TypeDocUtils } from "../typedoc/typedoc_utils";
 
@@ -208,8 +208,8 @@ export class PlantUmlGenerator {
                 for (const children of reflection.children) {
                     if (children.kind === ReflectionKind.Property) {
                         plantUmlLines.push(this.createPlantUmlForProperty(children));
-                    } else if (children.kind === ReflectionKind.Method) {
-                        plantUmlLines.push(this.createPlantUmlForMethod(children));
+                    } else if (children.kind === ReflectionKind.Method && children.signatures) {
+                        plantUmlLines.push(this.createPlantUmlForMethod(children.signatures[0]));
                     }
                 }
             }
@@ -240,7 +240,7 @@ export class PlantUmlGenerator {
             plantUml += "+"; // default is public for JS/TS
         }
 
-        plantUml += property.name + " : " + TypeDocUtils.createNameForType(property.type);
+        plantUml += property.name + " : " + (property.type ? property.type.toString() : "unknown");
 
         return plantUml;
     }
@@ -250,7 +250,7 @@ export class PlantUmlGenerator {
      * @param methode The method for which the PlantUML should be generated.
      * @returns The PlantUML line for the given method.
      */
-    private createPlantUmlForMethod(method: DeclarationReflection): string {
+    private createPlantUmlForMethod(method: SignatureReflection): string {
         let plantUml = "";
 
         if (method.flags.isStatic) {
@@ -269,10 +269,18 @@ export class PlantUmlGenerator {
             plantUml += "+"; // public is default for JS/TS
         }
 
-        plantUml += method.name + "()";
+        plantUml += method.name + "(";
+
+        if (method.parameters) {
+            plantUml += method.parameters
+                .map((p) => p.name + ": " + (p.type ? p.type.toString() : "unknown"))
+                .join(", ");
+        }
+
+        plantUml += ")";
 
         if (method.type) {
-            plantUml += " : " + TypeDocUtils.createNameForType(method.type);
+            plantUml += " : " + method.type.toString();
         } else {
             plantUml += " : void";
         }
