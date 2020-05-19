@@ -6,7 +6,7 @@ import {
     ParameterType,
     StringDeclarationOption,
 } from "typedoc";
-import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle } from "./enumerations";
+import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle, MethodParameterOutput } from "./enumerations";
 
 /**
  * Supported image output formats.
@@ -25,7 +25,7 @@ export enum ImageLocation {
 }
 
 /**
- * Supported class diagram positions when automatically generating class diagrams.
+ * Supported class diagram positions.
  */
 export enum ClassDiagramPosition {
     Above = 1,
@@ -36,33 +36,7 @@ export enum ClassDiagramPosition {
  * Class storing the options of the plugin.
  */
 export class PluginOptions {
-    /** The image format used for generating UML diagrams. */
-    private outputImageFormatOption = {
-        type: ParameterType.Map,
-        name: "umlClassDiagramFormat",
-        help: "png|svg",
-        defaultValue: ImageFormat.SVG,
-        map: new Map([
-            ["png", ImageFormat.PNG],
-            ["svg", ImageFormat.SVG],
-        ]),
-        value: ImageFormat.SVG,
-    };
-
-    /** The location where the generated UML diagrams should be stored. */
-    private outputImageLocationOption = {
-        type: ParameterType.Map,
-        name: "umlClassDiagramLocation",
-        help: "local|remote",
-        defaultValue: ImageLocation.Local,
-        map: new Map([
-            ["local", ImageLocation.Local],
-            ["remote", ImageLocation.Remote],
-        ]),
-        value: ImageLocation.Local,
-    };
-
-    /** Specifies whether UML class diagrams should be created automatically. */
+    /** Specifies how detailed the class diagrams should be. */
     private umlClassDiagramTypeOption = {
         type: ParameterType.Map,
         name: "umlClassDiagramType",
@@ -76,7 +50,48 @@ export class PluginOptions {
         value: ClassDiagramType.Detailed,
     };
 
-    /** Specifies the background color used for boxes in automatically created class diagrams. */
+    /** The location where the class diagrams should be stored. */
+    private outputImageLocationOption = {
+        type: ParameterType.Map,
+        name: "umlClassDiagramLocation",
+        help: "local|remote",
+        defaultValue: ImageLocation.Local,
+        map: new Map([
+            ["local", ImageLocation.Local],
+            ["remote", ImageLocation.Remote],
+        ]),
+        value: ImageLocation.Local,
+    };
+
+    /** The image format used for the class diagrams. */
+    private outputImageFormatOption = {
+        type: ParameterType.Map,
+        name: "umlClassDiagramFormat",
+        help: "png|svg",
+        defaultValue: ImageFormat.SVG,
+        map: new Map([
+            ["png", ImageFormat.PNG],
+            ["svg", ImageFormat.SVG],
+        ]),
+        value: ImageFormat.SVG,
+    };
+
+    /** Specifies how method parameters should be output in the class diagrams. */
+    private umlClassDiagramMethodParameterOutputOption = {
+        type: ParameterType.Map,
+        name: "umlClassDiagramMethodParameterOutput",
+        help: "none|only-names|only-types|complete",
+        defaultValue: MethodParameterOutput.Complete,
+        map: new Map([
+            ["none", MethodParameterOutput.None],
+            ["only-names", MethodParameterOutput.OnlyNames],
+            ["only-types", MethodParameterOutput.OnlyTypes],
+            ["complete", MethodParameterOutput.Complete],
+        ]),
+        value: MethodParameterOutput.Complete,
+    };
+
+    /** Specifies the background color used for boxes in the class diagrams. */
     private umlClassDiagramSectionTitleOption = {
         type: ParameterType.String,
         name: "umlClassDiagramSectionTitle",
@@ -85,7 +100,7 @@ export class PluginOptions {
         value: "Hierarchy-Diagram",
     };
 
-    /** Specifies where on the page the automatically created class diagram should be put. */
+    /** Specifies where on the page the class diagram should be put. */
     private umlClassDiagramPositionOption = {
         type: ParameterType.Map,
         name: "umlClassDiagramPosition",
@@ -98,7 +113,7 @@ export class PluginOptions {
         value: ClassDiagramPosition.Above,
     };
 
-    /** Specifies whether to hide empty properties and methods in the automatically created class diagram. */
+    /** Specifies whether to hide empty properties and methods in the class diagrams. */
     private umlClassDiagramHideEmptyMembersOption = {
         type: ParameterType.Boolean,
         name: "umlClassDiagramHideEmptyMembers",
@@ -117,7 +132,7 @@ export class PluginOptions {
         value: 6,
     };
 
-    /** Specifies whether UML class diagrams should be created automatically. */
+    /** Specifies how the visibility of members should be displayed in the class diagrams. */
     private umlClassDiagramMemberVisibilityStyleOption = {
         type: ParameterType.Map,
         name: "umlClassDiagramMemberVisibilityStyle",
@@ -131,8 +146,7 @@ export class PluginOptions {
     };
 
     /**
-     * Specifies whether to hide the circled character in front of class names
-     * in the automatically created class diagram.
+     * Specifies whether to hide the circled character in front of class names in the class diagrams.
      */
     private umlClassDiagramHideCircledCharOption = {
         type: ParameterType.Boolean,
@@ -142,7 +156,7 @@ export class PluginOptions {
         value: false,
     };
 
-    /** Specifies whether to hide the shadowing in the automatically created class diagrams */
+    /** Specifies whether to hide the shadowing in the class diagrams. */
     private umlClassDiagramHideShadowOption = {
         type: ParameterType.Boolean,
         name: "umlClassDiagramHideShadow",
@@ -151,7 +165,7 @@ export class PluginOptions {
         value: false,
     };
 
-    /** Specifies the background color used for boxes in automatically created class diagrams. */
+    /** Specifies the background color used for boxes in the class diagrams. */
     private umlClassDiagramBoxBackgroundColorOption = {
         type: ParameterType.String,
         name: "umlClassDiagramBoxBackgroundColor",
@@ -160,7 +174,7 @@ export class PluginOptions {
         value: "",
     };
 
-    /** Specifies the border color used for boxes in automatically created class diagrams. */
+    /** Specifies the border color used for boxes in the class diagrams. */
     private umlClassDiagramBoxBorderColorOption = {
         type: ParameterType.String,
         name: "umlClassDiagramBoxBorderColor",
@@ -169,27 +183,27 @@ export class PluginOptions {
         value: "",
     };
 
-    /** Specifies the border radius used for boxes in automatically created class diagrams. */
+    /** Specifies the border radius used for boxes in the class diagrams. */
     private umlClassDiagramBoxBorderRadiusOption = {
         type: ParameterType.Number,
         name: "umlClassDiagramBoxBorderRadius",
-        help: "The box border radius in pixel used when automatically creating class diagrams.",
+        help: "The box border radius in pixel used for the class diagrams.",
         defaultValue: 0,
         minValue: 0,
         value: 0,
     };
 
-    /** Specifies the border width used for boxes in automatically created class diagrams. */
+    /** Specifies the border width used for boxes in the class diagrams. */
     private umlClassDiagramBoxBorderWidthOption = {
         type: ParameterType.Number,
         name: "umlClassDiagramBoxBorderWidth",
-        help: "The box border width in pixel used when automatically creating class diagrams.",
+        help: "The box border width in pixel used for the class diagrams.",
         defaultValue: -1, // because 0 can be used to hide borders
         minValue: 0,
         value: -1,
     };
 
-    /** Specifies the color used for arrows in automatically created class diagrams. */
+    /** Specifies the color used for arrows in the class diagrams. */
     private umlClassDiagramArrowColorOption = {
         type: ParameterType.String,
         name: "umlClassDiagramArrowColor",
@@ -198,26 +212,26 @@ export class PluginOptions {
         value: "",
     };
 
-    /** Specifies the name of the font used for the class name in automatically created class diagrams. */
+    /** Specifies the name of the font used for the class name in the class diagrams. */
     private umlClassDiagramClassFontNameOption = {
         type: ParameterType.String,
         name: "umlClassDiagramClassFontName",
-        help: "The name of the font used for the class name when automatically creating class diagrams.",
+        help: "The name of the font used for the class name in the class diagrams.",
         defaultValue: "",
         value: "",
     };
 
-    /** Specifies the font size for the class name in automatically created class diagrams. */
+    /** Specifies the font size for the class name in the class diagrams. */
     private umlClassDiagramClassFontSizeOption = {
         type: ParameterType.Number,
         name: "umlClassDiagramClassFontSize",
-        help: "The font size in pixel used for the class name when automatically creating class diagrams.",
+        help: "The font size in pixel used for the class name in the class diagrams.",
         defaultValue: 0,
         minValue: 0,
         value: 0,
     };
 
-    /** Specifies the font style for the class name in automatically created class diagrams. */
+    /** Specifies the font style for the class name in the class diagrams. */
     private umlClassDiagramClassFontStyleOption = {
         type: ParameterType.Map,
         name: "umlClassDiagramClassFontStyle",
@@ -232,7 +246,7 @@ export class PluginOptions {
         value: FontStyle.Undefined,
     };
 
-    /** Specifies the font color for the class name in automatically created class diagrams. */
+    /** Specifies the font color for the class name in the class diagrams. */
     private umlClassDiagramClassFontColorOption = {
         type: ParameterType.String,
         name: "umlClassDiagramClassFontColor",
@@ -241,26 +255,26 @@ export class PluginOptions {
         value: "",
     };
 
-    /** Specifies the name of the font used for the class attributes in automatically created class diagrams. */
+    /** Specifies the name of the font used for the class attributes in the class diagrams. */
     private umlClassDiagramClassAttributeFontNameOption = {
         type: ParameterType.String,
         name: "umlClassDiagramClassAttributeFontName",
-        help: "The name of the font used for the class attributes when automatically creating class diagrams.",
+        help: "The name of the font used for the class attributes in the class diagrams.",
         defaultValue: "",
         value: "",
     };
 
-    /** Specifies the font size for the class attributes in automatically created class diagrams. */
+    /** Specifies the font size for the class attributes in the class diagrams. */
     private umlClassDiagramClassAttributeFontSizeOption = {
         type: ParameterType.Number,
         name: "umlClassDiagramClassAttributeFontSize",
-        help: "The font size in pixel used for the class attributes when automatically creating class diagrams.",
+        help: "The font size in pixel used for the class attributes in the class diagrams.",
         defaultValue: 0,
         minValue: 0,
         value: 0,
     };
 
-    /** Specifies the font style for the class attributes in automatically created class diagrams. */
+    /** Specifies the font style for the class attributes in the class diagrams. */
     private umlClassDiagramClassAttributeFontStyleOption = {
         type: ParameterType.Map,
         name: "umlClassDiagramClassAttributeFontStyle",
@@ -275,7 +289,7 @@ export class PluginOptions {
         value: FontStyle.Undefined,
     };
 
-    /** Specifies the font color for the class attributes in automatically created class diagrams. */
+    /** Specifies the font color for the class attributes in the class diagrams. */
     private umlClassDiagramClassAttributeFontColorOption = {
         type: ParameterType.String,
         name: "umlClassDiagramClassAttributeFontColor",
@@ -290,9 +304,10 @@ export class PluginOptions {
      */
     // prettier-ignore
     public addToApplication(typedoc: Application): void {
-        typedoc.options.addDeclaration(this.outputImageFormatOption as MapDeclarationOption<ImageFormat>);
-        typedoc.options.addDeclaration(this.outputImageLocationOption as MapDeclarationOption<ImageLocation>);
         typedoc.options.addDeclaration(this.umlClassDiagramTypeOption as MapDeclarationOption<ClassDiagramType>);
+        typedoc.options.addDeclaration(this.outputImageLocationOption as MapDeclarationOption<ImageLocation>);
+        typedoc.options.addDeclaration(this.outputImageFormatOption as MapDeclarationOption<ImageFormat>);
+        typedoc.options.addDeclaration(this.umlClassDiagramMethodParameterOutputOption as MapDeclarationOption<MethodParameterOutput>);
         typedoc.options.addDeclaration(this.umlClassDiagramSectionTitleOption as StringDeclarationOption);
         typedoc.options.addDeclaration(this.umlClassDiagramPositionOption as MapDeclarationOption<ClassDiagramPosition>);
         typedoc.options.addDeclaration(this.umlClassDiagramHideEmptyMembersOption as BooleanDeclarationOption);
@@ -321,9 +336,10 @@ export class PluginOptions {
      */
     // prettier-ignore
     public readValuesFromApplication(typedoc: Application): void {
-        this.outputImageFormatOption.value = typedoc.options.getValue(this.outputImageFormatOption.name) as ImageFormat;
-        this.outputImageLocationOption.value = typedoc.options.getValue(this.outputImageLocationOption.name) as ImageLocation;
         this.umlClassDiagramTypeOption.value = typedoc.options.getValue(this.umlClassDiagramTypeOption.name) as ClassDiagramType;
+        this.outputImageLocationOption.value = typedoc.options.getValue(this.outputImageLocationOption.name) as ImageLocation;
+        this.outputImageFormatOption.value = typedoc.options.getValue(this.outputImageFormatOption.name) as ImageFormat;
+        this.umlClassDiagramMethodParameterOutputOption.value = typedoc.options.getValue(this.umlClassDiagramMethodParameterOutputOption.name) as MethodParameterOutput;
         this.umlClassDiagramSectionTitleOption.value = typedoc.options.getValue(this.umlClassDiagramSectionTitleOption.name) as string;
         this.umlClassDiagramPositionOption.value = typedoc.options.getValue(this.umlClassDiagramPositionOption.name) as ClassDiagramPosition;
         this.umlClassDiagramHideEmptyMembersOption.value = typedoc.options.getValue(this.umlClassDiagramHideEmptyMembersOption.name) as boolean;
@@ -347,48 +363,56 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the image format used for generating UML diagrams.
-     * @returns The image format used for generating UML diagrams.
-     */
-    get outputImageFormat(): ImageFormat {
-        return this.outputImageFormatOption.value;
-    }
-
-    /**
-     * Returns the location where the generated UML diagrams should be stored.
-     * @returns The location where the generated UML diagrams should be stored.
-     */
-    get outputImageLocation(): ImageLocation {
-        return this.outputImageLocationOption.value;
-    }
-
-    /**
-     * Returns whether UML class diagrams should be created automatically.
-     * @returns Whether UML class diagrams should be created automatically.
+     * Returns how detailed the generated class diagrams should be.
+     * @returns How detailed the generated class diagrams should be.
      */
     get umlClassDiagramType(): ClassDiagramType {
         return this.umlClassDiagramTypeOption.value;
     }
 
     /**
-     * Returns where on the page the automatically created class diagram should be put.
-     * @returns Where on the page the automatically created class diagram should be put.
+     * Returns the location where the class diagrams should be stored.
+     * @returns The location where the class diagrams should be stored.
+     */
+    get outputImageLocation(): ImageLocation {
+        return this.outputImageLocationOption.value;
+    }
+
+    /**
+     * Returns the image format used for the class diagrams.
+     * @returns The image format used for the class diagrams.
+     */
+    get outputImageFormat(): ImageFormat {
+        return this.outputImageFormatOption.value;
+    }
+
+    /**
+     * Returns how method parameters should be output in the class diagrams.
+     * @returns How method parameters should be output in the class diagrams.
+     */
+    get umlClassDiagramMethodParameterOutput(): MethodParameterOutput {
+        return this.umlClassDiagramMethodParameterOutputOption.value;
+    }
+
+    /**
+     * Returns the title that should be used for the section that contains the class diagrams.
+     * @returns The title that should be used for the section that contains the class diagrams.
      */
     get umlClassDiagramSectionTitle(): string {
         return this.umlClassDiagramSectionTitleOption.value;
     }
 
     /**
-     * Returns where on the page the automatically created class diagram should be put.
-     * @returns Where on the page the automatically created class diagram should be put.
+     * Returns where on the page the class diagrams should be put.
+     * @returns Where on the page the class diagrams should be put.
      */
     get umlClassDiagramPosition(): ClassDiagramPosition {
         return this.umlClassDiagramPositionOption.value;
     }
 
     /**
-     * Returns whether to hide empty properties and methods in the automatically created class diagram.
-     * @returns Whether to hide empty properties and methods in the automatically created class diagram.
+     * Returns whether to hide empty properties and methods in the class diagrams.
+     * @returns Whether to hide empty properties and methods in the class diagrams.
      */
     get umlClassDiagramHideEmptyMembers(): boolean {
         return this.umlClassDiagramHideEmptyMembersOption.value;
@@ -403,8 +427,8 @@ export class PluginOptions {
     }
 
     /**
-     * Returns how the member visibility is rendered in the automatically created class diagram.
-     * @returns How the member visibility is rendered in the automatically created class diagram.
+     * Returns how the member visibility is rendered in the class diagrams.
+     * @returns How the member visibility is rendered in the class diagrams.
      */
     get umlClassDiagramMemberVisibilityStyle(): ClassDiagramMemberVisibilityStyle {
         return this.umlClassDiagramMemberVisibilityStyleOption.value;
@@ -419,16 +443,16 @@ export class PluginOptions {
     }
 
     /**
-     * Returns whether to hide the shadows in the automatically created class diagram.
-     * @returns Whether to hide the shadows in the automatically created class diagram.
+     * Returns whether to hide the shadows in the class diagrams.
+     * @returns Whether to hide the shadows in the class diagrams.
      */
     get umlClassDiagramHideShadow(): boolean {
         return this.umlClassDiagramHideShadowOption.value;
     }
 
     /**
-     * Returns the background color that should be used for boxes in automatically created class diagrams.
-     * @returns The background color that should be used for boxes in automatically created class diagrams.
+     * Returns the background color that should be used for boxes in the class diagrams.
+     * @returns The background color that should be used for boxes in the class diagrams.
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
@@ -437,8 +461,8 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the border color that should be used for boxes in automatically created class diagrams.
-     * @returns The border color that should be used for boxes in automatically created class diagrams.
+     * Returns the border color that should be used for boxes in the class diagrams.
+     * @returns The border color that should be used for boxes in the class diagrams.
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
@@ -447,16 +471,16 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the border radius that should be used for boxes in automatically created class diagrams.
-     * @returns The border radius that should be used for boxes in automatically created class diagrams.
+     * Returns the border radius that should be used for boxes in the class diagrams.
+     * @returns The border radius that should be used for boxes in the class diagrams.
      */
     get umlClassDiagramBoxBorderRadius(): number {
         return this.umlClassDiagramBoxBorderRadiusOption.value;
     }
 
     /**
-     * Returns the border width that should be used for boxes in automatically created class diagrams.
-     * @returns The border width that should be used for boxes in automatically created class diagrams.
+     * Returns the border width that should be used for boxes in the class diagrams.
+     * @returns The border width that should be used for boxes in the class diagrams.
      *          The value -1 if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
@@ -465,8 +489,8 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the color that should be used for arrows in automatically created class diagrams.
-     * @returns The color that should be used for arrows in automatically created class diagrams.
+     * Returns the color that should be used for arrows in the class diagrams.
+     * @returns The color that should be used for arrows in the class diagrams.
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
@@ -475,8 +499,8 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the name of the font that should be used for the class name in automatically created class diagrams.
-     * @returns The name of the font that should be used for the class name in automatically created class diagrams.
+     * Returns the name of the font that should be used for the class name in the class diagrams.
+     * @returns The name of the font that should be used for the class name in the class diagrams.
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
@@ -485,8 +509,8 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the font size that should be used for class names in automatically created class diagrams.
-     * @returns The font size that should be used for class names in automatically created class diagrams.
+     * Returns the font size that should be used for class names in the class diagrams.
+     * @returns The font size that should be used for class names in the class diagrams.
      *          The value 0 if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
@@ -495,16 +519,16 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the font style that should be used for the class name in automatically created class diagrams.
-     * @returns The font style that should be used for the class name in automatically created class diagrams.
+     * Returns the font style that should be used for the class name in the class diagrams.
+     * @returns The font style that should be used for the class name in the class diagrams.
      */
     get umlClassDiagramClassFontStyle(): FontStyle {
         return this.umlClassDiagramClassFontStyleOption.value;
     }
 
     /**
-     * Returns the font color that should be used for the class name in automatically created class diagrams.
-     * @returns The font color that should be used for the class name in automatically created class diagrams.
+     * Returns the font color that should be used for the class name in the class diagrams.
+     * @returns The font color that should be used for the class name in the class diagrams.
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
@@ -513,8 +537,8 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the name of the font that should be used for class attributes in automatically created class diagrams.
-     * @returns The name of the font that should be used for class attributes in automatically created class diagrams.
+     * Returns the name of the font that should be used for class attributes in the class diagrams.
+     * @returns The name of the font that should be used for class attributes in the class diagrams.
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
@@ -523,8 +547,8 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the font size that should be used for class attributes in automatically created class diagrams.
-     * @returns The font size that should be used for class attributes in automatically created class diagrams.
+     * Returns the font size that should be used for class attributes in the class diagrams.
+     * @returns The font size that should be used for class attributes in the class diagrams.
      *          The value 0 if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
@@ -533,16 +557,16 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the font style that should be used for the class attributes in automatically created class diagrams.
-     * @returns The font style that should be used for the class attributes in automatically created class diagrams.
+     * Returns the font style that should be used for the class attributes in the class diagrams.
+     * @returns The font style that should be used for the class attributes in the class diagrams.
      */
     get umlClassDiagramClassAttributeFontStyle(): FontStyle {
         return this.umlClassDiagramClassAttributeFontStyleOption.value;
     }
 
     /**
-     * Returns the font color that should be used for the class attributes in automatically created class diagrams.
-     * @returns The font color that should be used for the class attributes in automatically created class diagrams.
+     * Returns the font color that should be used for the class attributes in the class diagrams.
+     * @returns The font color that should be used for the class attributes in the class diagrams.
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */

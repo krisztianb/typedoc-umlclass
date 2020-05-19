@@ -1,5 +1,5 @@
 import { DeclarationReflection, ReflectionKind, SignatureReflection } from "typedoc/dist/lib/models/index";
-import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle } from "../enumerations";
+import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle, MethodParameterOutput } from "../enumerations";
 import { TypeDocUtils } from "../typedoc/typedoc_utils";
 import { PlantUmlGeneratorOptions } from "./plantuml_generator_options";
 
@@ -250,9 +250,15 @@ export class PlantUmlGenerator {
         plantUml += method.name + "(";
 
         if (method.parameters) {
-            plantUml += method.parameters
-                .map((p) => p.name + ": " + (p.type ? p.type.toString() : "unknown"))
-                .join(", ");
+            if (this.options.umlClassDiagramMethodParameterOutput === MethodParameterOutput.OnlyNames) {
+                plantUml += method.parameters.map((p) => p.name).join(", ");
+            } else if (this.options.umlClassDiagramMethodParameterOutput === MethodParameterOutput.OnlyTypes) {
+                plantUml += method.parameters.map((p) => (p.type ? p.type.toString() : "unknown")).join(", ");
+            } else if (this.options.umlClassDiagramMethodParameterOutput === MethodParameterOutput.Complete) {
+                plantUml += method.parameters
+                    .map((p) => p.name + ": " + (p.type ? p.type.toString() : "unknown"))
+                    .join(", ");
+            }
         }
 
         plantUml += ")";

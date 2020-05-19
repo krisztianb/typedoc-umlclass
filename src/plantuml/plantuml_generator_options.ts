@@ -1,10 +1,11 @@
-import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle } from "../enumerations";
+import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle, MethodParameterOutput } from "../enumerations";
 
 /**
  * Options for the PlantUmlGenerator.
  */
 export interface PlantUmlGeneratorOptions {
     umlClassDiagramType: ClassDiagramType;
+    umlClassDiagramMethodParameterOutput: MethodParameterOutput;
     umlClassDiagramHideEmptyMembers: boolean;
     umlClassDiagramTopDownLayoutMaxSiblings: number;
     umlClassDiagramMemberVisibilityStyle: ClassDiagramMemberVisibilityStyle;

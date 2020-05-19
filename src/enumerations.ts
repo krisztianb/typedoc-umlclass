@@ -1,5 +1,5 @@
 /**
- * Supported class diagram types when automatically generating class diagrams.
+ * Supported class diagram types.
  */
 export enum ClassDiagramType {
     None = 1,
@@ -8,7 +8,7 @@ export enum ClassDiagramType {
 }
 
 /**
- * Supported visibility styles for members when automatically generating class diagrams.
+ * Supported visibility styles for members in the class diagram.
  */
 export enum ClassDiagramMemberVisibilityStyle {
     Text = 1,
@@ -24,4 +24,14 @@ export const enum FontStyle {
     Plain = "plain",
     Italic = "italic",
     Bold = "bold",
+}
+
+/**
+ * Possible ways to output method parameters in the class diagram.
+ */
+export enum MethodParameterOutput {
+    None = 0,
+    OnlyNames = 1,
+    OnlyTypes = 2,
+    Complete = 3,
 }

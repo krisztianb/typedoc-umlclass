@@ -45,6 +45,11 @@ The following options are added to TypeDoc when the plugin is installed.
 -   `--umlClassDiagramFormat <png|svg>`<br>
     Specifies the image format to use.
     Default is `svg`.
+-   `--umlClassDiagramMethodParameterOutput <none|only-names|only-types|complete>`<br>
+    Specifies how method parameters should be included in the class diagram. Use `none` to completely omit parameters,
+    `only-names` to include only parameter names, `only-types` to include only parameter types and `complete` to include
+    names and types.
+    Default is `complete`.
 
 ### HTML output
 
