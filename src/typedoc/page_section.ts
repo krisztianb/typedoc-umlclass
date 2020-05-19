@@ -14,7 +14,7 @@ export class PageSection {
      * @returns The HTML for the section.
      */
     public static createForHierarchyDiagram(title: string, imageUrl: string, reflectionName: string): string {
-        return `<section class="tsd-panel">
+        return `<section class="tsd-panel tsd-hierarchy-diagram">
                     <h3>${title}</h3>
                     <a class="uml-class" href="${imageUrl}" title="Click to enlarge">
                         <img src="${imageUrl}"
