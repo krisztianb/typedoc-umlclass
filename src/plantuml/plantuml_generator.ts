@@ -209,7 +209,9 @@ export class PlantUmlGenerator {
                     if (children.kind === ReflectionKind.Property) {
                         plantUmlLines.push(this.createPlantUmlForProperty(children));
                     } else if (children.kind === ReflectionKind.Method && children.signatures) {
-                        plantUmlLines.push(this.createPlantUmlForMethod(children.signatures[0]));
+                        for (const signature of children.signatures) {
+                            plantUmlLines.push(this.createPlantUmlForMethod(signature));
+                        }
                     }
                 }
             }
