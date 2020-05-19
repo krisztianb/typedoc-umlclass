@@ -1,31 +1,7 @@
 import { DeclarationReflection, ReflectionKind, SignatureReflection } from "typedoc/dist/lib/models/index";
-import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle } from "../plugin_options";
+import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle } from "../enumerations";
 import { TypeDocUtils } from "../typedoc/typedoc_utils";
-
-/**
- * Options for the PlantUmlGenerator.
- */
-export interface PlantUmlGeneratorOptions {
-    umlClassDiagramType: ClassDiagramType;
-    umlClassDiagramHideEmptyMembers: boolean;
-    umlClassDiagramTopDownLayoutMaxSiblings: number;
-    umlClassDiagramMemberVisibilityStyle: ClassDiagramMemberVisibilityStyle;
-    umlClassDiagramHideCircledChar: boolean;
-    umlClassDiagramHideShadow: boolean;
-    umlClassDiagramBoxBackgroundColor: string;
-    umlClassDiagramBoxBorderColor: string;
-    umlClassDiagramBoxBorderRadius: number;
-    umlClassDiagramBoxBorderWidth: number;
-    umlClassDiagramArrowColor: string;
-    umlClassDiagramClassFontName: string;
-    umlClassDiagramClassFontSize: number;
-    umlClassDiagramClassFontStyle: FontStyle;
-    umlClassDiagramClassFontColor: string;
-    umlClassDiagramClassAttributeFontName: string;
-    umlClassDiagramClassAttributeFontSize: number;
-    umlClassDiagramClassAttributeFontStyle: FontStyle;
-    umlClassDiagramClassAttributeFontColor: string;
-}
+import { PlantUmlGeneratorOptions } from "./plantuml_generator_options";
 
 /**
  * Class that generates PlantUML code.
