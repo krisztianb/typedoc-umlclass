@@ -26,19 +26,16 @@ export class ImageGenerator {
 
     /**
      * Writes a class diagram as a local image to the disc.
-     * @param encodedPlantUml The encoded PlantUML code for the image.
+     * @param plantUml The PlantUML code for the image.
      * @param imageName The name of the class diagram.
      * @param imageFormat The format of the image to generate. (eg.: "png" or "svg")
      * @returns Absolute path to the written file.
      */
-    public writeImageFile(encodedPlantUml: string, imageName: string, imageFormat: string): string {
+    public writeImageFile(plantUml: string, imageName: string, imageFormat: string): string {
         const filename = this.createFilenameForNextImage(imageName, imageFormat);
         const absoluteFilename = path.join(this.outputDirectory, filename);
 
-        const decode = plantuml.decode(encodedPlantUml);
-        const gen = plantuml.generate({ format: imageFormat });
-
-        decode.out.pipe(gen.in);
+        const gen = plantuml.generate(plantUml, { format: imageFormat });
         gen.out.pipe(fs.createWriteStream(absoluteFilename));
 
         ++this.numberOfGeneratedImages;

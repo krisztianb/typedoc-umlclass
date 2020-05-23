@@ -1,5 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
+// @ts-ignore: there are no type definitions for the "plantuml-encoder" module :-(
+import plantUmlEncoder = require("plantuml-encoder");
 import { Application, DeclarationReflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
@@ -146,18 +148,18 @@ export class Plugin {
     private createHierarchyDiagramForPage(event: PageEvent): string {
         const reflection = event.model as DeclarationReflection;
         const plantUmlLines = this.plantUmlGenerator.createClassDiagramPlantUmlForReflection(reflection);
-        const encodedPlantUml = PlantUmlUtils.encode(plantUmlLines.join("\n"));
 
         let imageUrl = "";
 
         if (this.options.outputImageLocation === ImageLocation.Local) {
             const absoluteImagePath = this.localImageGenerator.writeImageFile(
-                encodedPlantUml,
+                plantUmlLines.join("\n"),
                 reflection.name,
                 this.options.outputImageFormat
             );
             imageUrl = path.relative(path.dirname(event.filename), absoluteImagePath);
         } else {
+            const encodedPlantUml = plantUmlEncoder.encode(plantUmlLines.join("\n"));
             imageUrl = PlantUmlUtils.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat);
         }
 
