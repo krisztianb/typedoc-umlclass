@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2020-05-24
+### Added
+- Embed diagrams into HTML output
+### Fixed
+- Don't encode and decode PlantUML code when generating local image files
+
 ## [0.1.4] - 2020-05-19
 ### Added
 - Include method parameters in the class diagram
@@ -30,7 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.1.4...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.5
 [0.1.4]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.4
 [0.1.3]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.3
 [0.1.2]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.2
