@@ -11,6 +11,7 @@
         "no-submodule-imports": false,
         "no-this-assignment": false,
         "no-invalid-this": true,
+        "no-console": false,
         "typedef": [true, "call-signature", "property-declaration"],
         "ordered-imports": [
             true,

@@ -17,9 +17,8 @@ export class PageSection {
         return `<section class="tsd-panel tsd-hierarchy-diagram">
                     <h3>${title}</h3>
                     <a class="uml-class" href="${imageUrl}" title="Click to enlarge">
-                        <img src="${imageUrl}"
-                             alt="UML class diagram of ${reflectionName}" />
+                        <img src="${imageUrl}" alt="UML class diagram of ${reflectionName}" />
                     </a>
-                </section>`;
+                </section>\n`;
     }
 }

@@ -22,6 +22,7 @@ export const enum ImageFormat {
 export enum ImageLocation {
     Local = 1,
     Remote = 2,
+    Embed = 3,
 }
 
 /**
@@ -54,11 +55,12 @@ export class PluginOptions {
     private outputImageLocationOption = {
         type: ParameterType.Map,
         name: "umlClassDiagramLocation",
-        help: "local|remote",
+        help: "local|remote|embed",
         defaultValue: ImageLocation.Local,
         map: new Map([
             ["local", ImageLocation.Local],
             ["remote", ImageLocation.Remote],
+            ["embed", ImageLocation.Embed],
         ]),
         value: ImageLocation.Local,
     };

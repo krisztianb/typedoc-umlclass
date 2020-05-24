@@ -37,10 +37,11 @@ The following options are added to TypeDoc when the plugin is installed.
     one level of base and sub classes. Use the value `simple` to only render the name of the class or interface.
     Use the value `detailed` to also render properties and methods.
     Default is `detailed`.
--   `--umlClassDiagramLocation <local|remote>`<br>
+-   `--umlClassDiagramLocation <local|remote|embed>`<br>
     Specifies the location of the generated uml images. If `local` then local image files are created in the assets
     directory of the generated documentation. If `remote` then the image tag uses an encoded link to the
-    [plantuml server](http://www.plantuml.com/plantuml/).
+    [plantuml server](http://www.plantuml.com/plantuml/). If `embed` then the image is directly embedded into the HTML
+    as a base64 encoded string.
     Default is `local`.
 -   `--umlClassDiagramFormat <png|svg>`<br>
     Specifies the image format to use.

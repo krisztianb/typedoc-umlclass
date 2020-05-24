@@ -8,8 +8,7 @@ import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { ClassDiagramType } from "./enumerations";
 import { ImageGenerator } from "./image_generator";
 import { CachingPlantUmlGenerator } from "./plantuml/caching_plantuml_generator";
-import { PlantUmlUtils } from "./plantuml/plantuml_utils";
-import { ClassDiagramPosition, ImageLocation, PluginOptions } from "./plugin_options";
+import { ClassDiagramPosition, ImageFormat, ImageLocation, PluginOptions } from "./plugin_options";
 import { PageProcessor } from "./typedoc/page_processor";
 import { PageSection, PageSections } from "./typedoc/page_section";
 import { PageSectionFinder } from "./typedoc/page_section_finder";
@@ -33,7 +32,7 @@ export class Plugin {
     private options = new PluginOptions();
 
     /** Used when the class diagrams are created locally. */
-    private localImageGenerator = new ImageGenerator();
+    private imageGenerator = new ImageGenerator();
 
     /** Object that generates the PlantUML code. */
     private plantUmlGenerator!: CachingPlantUmlGenerator;
@@ -85,7 +84,7 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererBegin(event: RendererEvent): void {
-        this.localImageGenerator.setOutputDirectory(path.join(event.outputDirectory, "assets/images/"));
+        this.imageGenerator.setOutputDirectory(path.join(event.outputDirectory, "assets/images/"));
     }
 
     /**
@@ -135,35 +134,36 @@ export class Plugin {
      * @param event The page event with the page data.
      */
     private processPage(event: PageEvent): void {
-        const imageUrl = this.createHierarchyDiagramForPage(event);
-
-        this.insertHierarchyDiagramIntoPage(event, imageUrl);
-    }
-
-    /**
-     * Creates a hierarchy diagram for the page.
-     * @param event The page event with the page data.
-     * @returns The URL to the hierarchy diagram.
-     */
-    private createHierarchyDiagramForPage(event: PageEvent): string {
         const reflection = event.model as DeclarationReflection;
         const plantUmlLines = this.plantUmlGenerator.createClassDiagramPlantUmlForReflection(reflection);
 
-        let imageUrl = "";
-
         if (this.options.outputImageLocation === ImageLocation.Local) {
-            const absoluteImagePath = this.localImageGenerator.writeImageFile(
+            const absoluteImagePath = this.imageGenerator.writeImageToFile(
                 plantUmlLines.join("\n"),
                 reflection.name,
                 this.options.outputImageFormat
             );
-            imageUrl = path.relative(path.dirname(event.filename), absoluteImagePath);
-        } else {
+            const imagePath = path.relative(path.dirname(event.filename), absoluteImagePath);
+            this.insertHierarchyDiagramIntoPage(event, imagePath);
+        } else if (this.options.outputImageLocation === ImageLocation.Remote) {
             const encodedPlantUml = plantUmlEncoder.encode(plantUmlLines.join("\n"));
-            imageUrl = PlantUmlUtils.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat);
+            const imageUrl = this.imageGenerator.createPlantUmlServerUrl(
+                encodedPlantUml,
+                this.options.outputImageFormat
+            );
+            this.insertHierarchyDiagramIntoPage(event, imageUrl);
+        } else {
+            this.imageGenerator
+                .writeImageToBuffer(plantUmlLines.join("\n"), this.options.outputImageFormat)
+                .then((result: Buffer) => {
+                    const mimeType = this.options.outputImageFormat === ImageFormat.PNG ? "image/png" : "image/svg+xml";
+                    const imageUrl = "data:" + mimeType + ";base64," + result.toString("base64");
+                    this.insertHierarchyDiagramIntoFile(event.filename, reflection.name, imageUrl);
+                })
+                .catch((e: Error) => {
+                    console.error("Error embeding diagram into file", event.filename, e.message);
+                });
         }
-
-        return imageUrl;
     }
 
     /**
@@ -173,13 +173,43 @@ export class Plugin {
      */
     private insertHierarchyDiagramIntoPage(event: PageEvent, imageUrl: string): void {
         const reflection = event.model as DeclarationReflection;
+        const pageContent = event.contents as string;
+
+        event.contents = this.insertHierarchyDiagramIntoContent(pageContent, reflection.name, imageUrl);
+    }
+
+    /**
+     * Inserts the hierarchy diagram into the page file.
+     * @param filePath Absolute path to the page file.
+     * @param reflectionName The name of the reflection for which the diagram was generated.
+     * @param imageUrl The URL to the image of the diagram.
+     */
+    private insertHierarchyDiagramIntoFile(filePath: string, reflectionName: string, imageUrl: string): void {
+        let fileContent = fs.readFileSync(filePath, "utf8");
+
+        fileContent = this.insertHierarchyDiagramIntoContent(fileContent, reflectionName, imageUrl);
+        fs.writeFileSync(filePath, fileContent, "utf8");
+    }
+
+    /**
+     * Inserts the hierarchy diagram into the content string.
+     * @param originalContent The content string into which the diagram is inserted.
+     * @param reflectionName The name of the reflection for which the diagram was generated.
+     * @param imageUrl The URL to the image of the diagram.
+     * @returns The updated content string with the diagram inserted into it.
+     */
+    private insertHierarchyDiagramIntoContent(
+        originalContent: string,
+        reflectionName: string,
+        imageUrl: string
+    ): string {
+        const page = new PageProcessor(originalContent);
+
         const hierarchyDiagramSection = PageSection.createForHierarchyDiagram(
             this.options.umlClassDiagramSectionTitle,
             imageUrl,
-            reflection.name
+            reflectionName
         );
-
-        const page = new PageProcessor(event.contents);
 
         if (this.options.umlClassDiagramPosition === ClassDiagramPosition.Above) {
             page.insertAboveSection(PageSections.Hierarchy, hierarchyDiagramSection);
@@ -187,7 +217,7 @@ export class Plugin {
             page.insertBelowSection(PageSections.Hierarchy, hierarchyDiagramSection);
         }
 
-        event.contents = page.content;
+        return page.content;
     }
 
     /**

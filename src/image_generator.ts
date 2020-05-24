@@ -31,7 +31,7 @@ export class ImageGenerator {
      * @param imageFormat The format of the image to generate. (eg.: "png" or "svg")
      * @returns Absolute path to the written file.
      */
-    public writeImageFile(plantUml: string, imageName: string, imageFormat: string): string {
+    public writeImageToFile(plantUml: string, imageName: string, imageFormat: string): string {
         const filename = this.createFilenameForNextImage(imageName, imageFormat);
         const absoluteFilename = path.join(this.outputDirectory, filename);
 
@@ -41,6 +41,33 @@ export class ImageGenerator {
         ++this.numberOfGeneratedImages;
 
         return absoluteFilename;
+    }
+
+    /**
+     * Promises to write a class diagram as an image into a buffer.
+     * @param plantUml The PlantUML code for the image.
+     * @param imageFormat The format of the image to generate. (eg.: "png" or "svg")
+     * @returns The promise of a buffer including the image of the class diagram.
+     */
+    public writeImageToBuffer(plantUml: string, imageFormat: string): Promise<Buffer> {
+        return new Promise((resolve, reject) => {
+            const chunks = new Array<Buffer>();
+            const gen = plantuml.generate(plantUml, { format: imageFormat });
+
+            gen.out.on("data", (chunk: Buffer) => chunks.push(chunk));
+            gen.out.on("error", (e: Error) => reject(e));
+            gen.out.on("end", () => resolve(Buffer.concat(chunks)));
+        });
+    }
+
+    /**
+     * Returns the PlantUML website URL that generates a UML diagram.
+     * @param encodedPlantUml The encoded PlantUML for the diagram.
+     * @param imageFormat The format of the image the URL should generate. (eg.: "png" or "svg")
+     * @returns The URL that generates the diagram.
+     */
+    public createPlantUmlServerUrl(encodedPlantUml: string, imageFormat: string): string {
+        return "http://www.plantuml.com/plantuml/" + imageFormat + "/" + encodedPlantUml;
     }
 
     /**
