@@ -2,7 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 // @ts-ignore: there are no type definitions for the "plantuml-encoder" module :-(
 import plantUmlEncoder = require("plantuml-encoder");
-import { Application, DeclarationReflection, ReflectionKind } from "typedoc";
+import * as ProgressBar from "progress";
+import { Application, DeclarationReflection, ProjectReflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { ClassDiagramType } from "./enumerations";
@@ -41,6 +42,20 @@ export class Plugin {
     /** Object that generates the PlantUML diagrams. */
     private plantUmlDiagramGenerator = new PlantUmlDiagramGenerator();
 
+    /** Progress bar shown when generating the diagrams. */
+    private progressBar!: ProgressBar;
+
+    /**
+     * Checks if the plugin is active and should generate output.
+     * @returns True if the plugin is active, otherwise false.
+     */
+    get isActive(): boolean {
+        return (
+            this.options.umlClassDiagramType === ClassDiagramType.Simple ||
+            this.options.umlClassDiagramType === ClassDiagramType.Detailed
+        );
+    }
+
     /**
      * Initializes the plugin.
      * @param typedoc The TypeDoc application.
@@ -65,6 +80,7 @@ export class Plugin {
      */
     private subscribeToApplicationEvents(typedoc: Application): void {
         typedoc.converter.on(Converter.EVENT_RESOLVE_BEGIN, (c: Context) => this.onConverterResolveBegin(c));
+        typedoc.converter.on(Converter.EVENT_RESOLVE_END, (c: Context) => this.onConverterResolveEnd(c));
 
         typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => this.onRendererBegin(e));
         typedoc.renderer.on(PageEvent.END, (e: PageEvent) => this.onRendererEndPage(e));
@@ -73,13 +89,50 @@ export class Plugin {
 
     /**
      * Triggered when the TypeDoc converter begins resolving a project.
-     * Reads plugin parameter values.
+     * Reads plugin parameter values and init members.
      * @param context Describes the current state the converter is in.
      */
     public onConverterResolveBegin(context: Context): void {
         this.options.readValuesFromApplication(context.converter.owner.application);
 
-        this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
+        if (this.isActive) {
+            this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
+        }
+    }
+
+    /**
+     * Triggered when the TypeDoc converter has finished resolving a project.
+     * Setup progress bar.
+     * @param context Describes the current state the converter is in.
+     */
+    public onConverterResolveEnd(context: Context): void {
+        if (this.isActive) {
+            const numberOfDiagramsToGenerate = this.computeDiagramCount(context.project);
+
+            this.progressBar = new ProgressBar(`Adding ${numberOfDiagramsToGenerate} class diagrams [:bar] :percent`, {
+                total: numberOfDiagramsToGenerate,
+                width: 40,
+            });
+        }
+    }
+
+    /**
+     * Computes how many diagrams the plugin must generate.
+     * @param project The project containing the reflections for which the diagrams are generated.
+     * @returns The number of diagrams to generate.
+     */
+    private computeDiagramCount(project: ProjectReflection): number {
+        let count = 0;
+
+        for (const key in project.reflections) {
+            const reflection = project.reflections[key];
+
+            if (reflection && this.shouldProcessReflection(reflection)) {
+                ++count;
+            }
+        }
+
+        return count;
     }
 
     /**
@@ -88,7 +141,9 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererBegin(event: RendererEvent): void {
-        this.imageGenerator.setOutputDirectory(path.join(event.outputDirectory, "assets/images/"));
+        if (this.isActive) {
+            this.imageGenerator.setOutputDirectory(path.join(event.outputDirectory, "assets/images/"));
+        }
     }
 
     /**
@@ -97,7 +152,7 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererEndPage(event: PageEvent): void {
-        if (this.shouldProcessPage(event.contents, event.model)) {
+        if (this.isActive && this.shouldProcessPage(event.contents, event.model)) {
             this.processPage(event);
         }
     }
@@ -109,25 +164,29 @@ export class Plugin {
      * @returns True, if the plugin should process the page, otherwise false.
      */
     private shouldProcessPage(pageContent: string | undefined, pageModel: unknown): boolean {
-        const isPluginActive =
-            this.options.umlClassDiagramType === ClassDiagramType.Simple ||
-            this.options.umlClassDiagramType === ClassDiagramType.Detailed;
+        if (
+            pageContent &&
+            this.shouldProcessReflection(pageModel) &&
+            PageSectionFinder.hasSection(pageContent, PageSections.Hierarchy)
+        ) {
+            return true;
+        }
 
-        if (isPluginActive && pageContent) {
-            const modelIsClassOrInterface =
-                pageModel instanceof DeclarationReflection &&
-                (pageModel.kind === ReflectionKind.Class || pageModel.kind === ReflectionKind.Interface);
+        return false;
+    }
 
-            if (modelIsClassOrInterface) {
-                const reflection = pageModel as DeclarationReflection;
-
-                if (
-                    TypeDocUtils.reflectionIsPartOfClassHierarchy(reflection) &&
-                    PageSectionFinder.hasSection(pageContent, PageSections.Hierarchy)
-                ) {
-                    return true;
-                }
-            }
+    /**
+     * Checks if the plugin should process a given reflection.
+     * @param reflection The reflection in question.
+     * @returns True, if the plugin should process the reflection, otherwise false.
+     */
+    private shouldProcessReflection(reflection: unknown): boolean {
+        if (
+            reflection instanceof DeclarationReflection &&
+            (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) &&
+            TypeDocUtils.reflectionIsPartOfClassHierarchy(reflection)
+        ) {
+            return true;
         }
 
         return false;
@@ -171,6 +230,7 @@ export class Plugin {
         imageUrlPromise
             .then((imageUrl: string) => {
                 this.insertHierarchyDiagramIntoFile(event.filename, reflection.name, imageUrl);
+                this.progressBar.tick();
             })
             .catch((e: Error) => {
                 console.error("Error adding diagram into file", event.filename, e.message);
@@ -225,10 +285,12 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererEnd(event: RendererEvent): void {
-        const filename = path.join(event.outputDirectory, "assets/css/main.css");
-        const data =
-            fs.readFileSync(filename, "utf8") +
-            "\n.uml-class { max-width:100%; display:block; margin:0 auto; text-align:center }\n";
-        fs.writeFileSync(filename, data, "utf8");
+        if (this.isActive) {
+            const filename = path.join(event.outputDirectory, "assets/css/main.css");
+            const data =
+                fs.readFileSync(filename, "utf8") +
+                "\n.uml-class { max-width:100%; display:block; margin:0 auto; text-align:center }\n";
+            fs.writeFileSync(filename, data, "utf8");
+        }
     }
 }
