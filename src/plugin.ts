@@ -7,7 +7,8 @@ import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { ClassDiagramType } from "./enumerations";
 import { ImageGenerator } from "./image_generator";
-import { CachingPlantUmlGenerator } from "./plantuml/caching_plantuml_generator";
+import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
+import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator";
 import { ClassDiagramPosition, ImageFormat, ImageLocation, PluginOptions } from "./plugin_options";
 import { PageProcessor } from "./typedoc/page_processor";
 import { PageSection, PageSections } from "./typedoc/page_section";
@@ -35,7 +36,10 @@ export class Plugin {
     private imageGenerator = new ImageGenerator();
 
     /** Object that generates the PlantUML code. */
-    private plantUmlGenerator!: CachingPlantUmlGenerator;
+    private plantUmlCodeGenerator!: CachingPlantUmlCodeGenerator;
+
+    /** Object that generates the PlantUML diagrams. */
+    private plantUmlDiagramGenerator = new PlantUmlDiagramGenerator();
 
     /**
      * Initializes the plugin.
@@ -75,7 +79,7 @@ export class Plugin {
     public onConverterResolveBegin(context: Context): void {
         this.options.readValuesFromApplication(context.converter.owner.application);
 
-        this.plantUmlGenerator = new CachingPlantUmlGenerator(this.options);
+        this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
     }
 
     /**
@@ -135,47 +139,36 @@ export class Plugin {
      */
     private processPage(event: PageEvent): void {
         const reflection = event.model as DeclarationReflection;
-        const plantUmlLines = this.plantUmlGenerator.createClassDiagramPlantUmlForReflection(reflection);
+        const plantUmlLines = this.plantUmlCodeGenerator.createClassDiagramPlantUmlForReflection(reflection);
 
-        if (this.options.outputImageLocation === ImageLocation.Local) {
-            const absoluteImagePath = this.imageGenerator.writeImageToFile(
-                plantUmlLines.join("\n"),
-                reflection.name,
-                this.options.outputImageFormat
-            );
-            const imagePath = path.relative(path.dirname(event.filename), absoluteImagePath);
-            this.insertHierarchyDiagramIntoPage(event, imagePath);
-        } else if (this.options.outputImageLocation === ImageLocation.Remote) {
-            const encodedPlantUml = plantUmlEncoder.encode(plantUmlLines.join("\n"));
-            const imageUrl = this.imageGenerator.createPlantUmlServerUrl(
-                encodedPlantUml,
-                this.options.outputImageFormat
-            );
-            this.insertHierarchyDiagramIntoPage(event, imageUrl);
-        } else {
-            this.imageGenerator
-                .writeImageToBuffer(plantUmlLines.join("\n"), this.options.outputImageFormat)
-                .then((result: Buffer) => {
+        this.plantUmlDiagramGenerator
+            .generateFromCode(plantUmlLines.join("\n"), this.options.outputImageFormat)
+            .then((result: Buffer) => {
+                let imageUrl = "";
+
+                if (this.options.outputImageLocation === ImageLocation.Local) {
+                    const absoluteImagePath = this.imageGenerator.writeImageToFile(
+                        result,
+                        reflection.name,
+                        this.options.outputImageFormat
+                    );
+                    imageUrl = path.relative(path.dirname(event.filename), absoluteImagePath);
+                } else if (this.options.outputImageLocation === ImageLocation.Remote) {
+                    const encodedPlantUml = plantUmlEncoder.encode(plantUmlLines.join("\n"));
+                    imageUrl = this.imageGenerator.createPlantUmlServerUrl(
+                        encodedPlantUml,
+                        this.options.outputImageFormat
+                    );
+                } else {
                     const mimeType = this.options.outputImageFormat === ImageFormat.PNG ? "image/png" : "image/svg+xml";
-                    const imageUrl = "data:" + mimeType + ";base64," + result.toString("base64");
-                    this.insertHierarchyDiagramIntoFile(event.filename, reflection.name, imageUrl);
-                })
-                .catch((e: Error) => {
-                    console.error("Error embeding diagram into file", event.filename, e.message);
-                });
-        }
-    }
+                    imageUrl = "data:" + mimeType + ";base64," + result.toString("base64");
+                }
 
-    /**
-     * Inserts the hierarchy diagram into the page.
-     * @param event The page event with the page data.
-     * @param imageUrl The URL to the hierarchy diagram.
-     */
-    private insertHierarchyDiagramIntoPage(event: PageEvent, imageUrl: string): void {
-        const reflection = event.model as DeclarationReflection;
-        const pageContent = event.contents as string;
-
-        event.contents = this.insertHierarchyDiagramIntoContent(pageContent, reflection.name, imageUrl);
+                this.insertHierarchyDiagramIntoFile(event.filename, reflection.name, imageUrl);
+            })
+            .catch((e: Error) => {
+                console.error("Error adding diagram into file", event.filename, e.message);
+            });
     }
 
     /**

@@ -3,7 +3,7 @@ import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle, MethodP
 /**
  * Options for the PlantUmlGenerator.
  */
-export interface PlantUmlGeneratorOptions {
+export interface PlantUmlCodeGeneratorOptions {
     umlClassDiagramType: ClassDiagramType;
     umlClassDiagramMethodParameterOutput: MethodParameterOutput;
     umlClassDiagramHideEmptyMembers: boolean;

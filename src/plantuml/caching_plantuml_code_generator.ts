@@ -1,10 +1,10 @@
 import { DeclarationReflection } from "typedoc";
-import { PlantUmlGenerator } from "./plantuml_generator";
+import { PlantUmlCodeGenerator } from "./plantuml_code_generator";
 
 /**
  * Class that generates PlantUML code and caches results internally.
  */
-export class CachingPlantUmlGenerator extends PlantUmlGenerator {
+export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
     /**
      * Caches the PlantUML generated for the reflections (= class or interface).
      * KEY = ID of the reflection

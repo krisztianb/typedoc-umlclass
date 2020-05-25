@@ -1,20 +1,20 @@
 import { DeclarationReflection, ReflectionKind, SignatureReflection } from "typedoc/dist/lib/models/index";
 import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle, MethodParameterOutput } from "../enumerations";
 import { TypeDocUtils } from "../typedoc/typedoc_utils";
-import { PlantUmlGeneratorOptions } from "./plantuml_generator_options";
+import { PlantUmlCodeGeneratorOptions } from "./plantuml_code_generator_options";
 
 /**
  * Class that generates PlantUML code.
  */
-export class PlantUmlGenerator {
+export class PlantUmlCodeGenerator {
     /** The options for the PlantUML output. */
-    private options: PlantUmlGeneratorOptions;
+    private options: PlantUmlCodeGeneratorOptions;
 
     /**
      * Creates a new PlantUmlGenerator object with the given options.
      * @param options The options for the PlantUML output.
      */
-    constructor(options: PlantUmlGeneratorOptions) {
+    constructor(options: PlantUmlCodeGeneratorOptions) {
         this.options = options;
     }
 

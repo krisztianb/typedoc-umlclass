@@ -1,5 +1,3 @@
-// tslint:disable-next-line:no-var-requires
-const plantuml = require("node-plantuml"); // there are no type definitions for this module :-(
 import * as fs from "fs";
 import * as path from "path";
 
@@ -25,39 +23,21 @@ export class ImageGenerator {
     }
 
     /**
-     * Writes a class diagram as a local image to the disc.
-     * @param plantUml The PlantUML code for the image.
+     * Writes a buffer of image data as a local file to the disc.
+     * @param imageData The image data buffer.
      * @param imageName The name of the class diagram.
      * @param imageFormat The format of the image to generate. (eg.: "png" or "svg")
      * @returns Absolute path to the written file.
      */
-    public writeImageToFile(plantUml: string, imageName: string, imageFormat: string): string {
+    public writeImageToFile(imageData: Buffer, imageName: string, imageFormat: string): string {
         const filename = this.createFilenameForNextImage(imageName, imageFormat);
         const absoluteFilename = path.join(this.outputDirectory, filename);
 
-        const gen = plantuml.generate(plantUml, { format: imageFormat });
-        gen.out.pipe(fs.createWriteStream(absoluteFilename));
+        fs.writeFileSync(absoluteFilename, imageData);
 
         ++this.numberOfGeneratedImages;
 
         return absoluteFilename;
-    }
-
-    /**
-     * Promises to write a class diagram as an image into a buffer.
-     * @param plantUml The PlantUML code for the image.
-     * @param imageFormat The format of the image to generate. (eg.: "png" or "svg")
-     * @returns The promise of a buffer including the image of the class diagram.
-     */
-    public writeImageToBuffer(plantUml: string, imageFormat: string): Promise<Buffer> {
-        return new Promise((resolve, reject) => {
-            const chunks = new Array<Buffer>();
-            const gen = plantuml.generate(plantUml, { format: imageFormat });
-
-            gen.out.on("data", (chunk: Buffer) => chunks.push(chunk));
-            gen.out.on("error", (e: Error) => reject(e));
-            gen.out.on("end", () => resolve(Buffer.concat(chunks)));
-        });
     }
 
     /**
