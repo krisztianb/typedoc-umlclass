@@ -141,29 +141,35 @@ export class Plugin {
         const reflection = event.model as DeclarationReflection;
         const plantUmlLines = this.plantUmlCodeGenerator.createClassDiagramPlantUmlForReflection(reflection);
 
-        this.plantUmlDiagramGenerator
-            .generateFromCode(plantUmlLines.join("\n"), this.options.outputImageFormat)
-            .then((result: Buffer) => {
-                let imageUrl = "";
+        let imageUrlPromise: Promise<string>;
 
-                if (this.options.outputImageLocation === ImageLocation.Local) {
+        if (this.options.outputImageLocation === ImageLocation.Local) {
+            imageUrlPromise = this.plantUmlDiagramGenerator
+                .generateFromCode(plantUmlLines.join("\n"), this.options.outputImageFormat)
+                .then((result: Buffer) => {
                     const absoluteImagePath = this.imageGenerator.writeImageToFile(
                         result,
                         reflection.name,
                         this.options.outputImageFormat
                     );
-                    imageUrl = path.relative(path.dirname(event.filename), absoluteImagePath);
-                } else if (this.options.outputImageLocation === ImageLocation.Remote) {
-                    const encodedPlantUml = plantUmlEncoder.encode(plantUmlLines.join("\n"));
-                    imageUrl = this.imageGenerator.createPlantUmlServerUrl(
-                        encodedPlantUml,
-                        this.options.outputImageFormat
-                    );
-                } else {
+                    return path.relative(path.dirname(event.filename), absoluteImagePath);
+                });
+        } else if (this.options.outputImageLocation === ImageLocation.Embed) {
+            imageUrlPromise = this.plantUmlDiagramGenerator
+                .generateFromCode(plantUmlLines.join("\n"), this.options.outputImageFormat)
+                .then((result: Buffer) => {
                     const mimeType = this.options.outputImageFormat === ImageFormat.PNG ? "image/png" : "image/svg+xml";
-                    imageUrl = "data:" + mimeType + ";base64," + result.toString("base64");
-                }
+                    return "data:" + mimeType + ";base64," + result.toString("base64");
+                });
+        } else {
+            imageUrlPromise = new Promise<string>((resolve) => {
+                const encodedPlantUml = plantUmlEncoder.encode(plantUmlLines.join("\n"));
+                resolve(this.imageGenerator.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat));
+            });
+        }
 
+        imageUrlPromise
+            .then((imageUrl: string) => {
                 this.insertHierarchyDiagramIntoFile(event.filename, reflection.name, imageUrl);
             })
             .catch((e: Error) => {
