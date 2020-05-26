@@ -106,7 +106,7 @@ export class Plugin {
      * @param context Describes the current state the converter is in.
      */
     public onConverterResolveEnd(context: Context): void {
-        if (this.isActive) {
+        if (this.isActive && !this.options.hideProgressBar) {
             const numberOfDiagramsToGenerate = this.computeDiagramCount(context.project);
 
             this.progressBar = new ProgressBar(`Adding ${numberOfDiagramsToGenerate} class diagrams [:bar] :percent`, {
@@ -230,7 +230,7 @@ export class Plugin {
         imageUrlPromise
             .then((imageUrl: string) => {
                 this.insertHierarchyDiagramIntoFile(event.filename, reflection.name, imageUrl);
-                this.progressBar.tick();
+                this.progressBar?.tick();
             })
             .catch((e: Error) => {
                 console.error("Error adding diagram into file", event.filename, e.message);

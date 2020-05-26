@@ -37,6 +37,11 @@ The following options are added to TypeDoc when the plugin is installed.
     one level of base and sub classes. Use the value `simple` to only render the name of the class or interface.
     Use the value `detailed` to also render properties and methods.
     Default is `detailed`.
+-   `--umlClassDiagramHideProgressBar <true|false>`<br>
+    Since generating many diagrams can take several minutes the plugin displays a progress bar. However if other
+    plugins also output information to the console then the progress bar can mess that output up. If this is the case
+    you can disable the progress bar of this plugin using the value `true`.
+    Default is `false`.
 -   `--umlClassDiagramLocation <local|remote|embed>`<br>
     Specifies the location of the generated uml images. If `local` then local image files are created in the assets
     directory of the generated documentation. If `remote` then the image tag uses an encoded link to the

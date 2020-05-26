@@ -51,6 +51,15 @@ export class PluginOptions {
         value: ClassDiagramType.Detailed,
     };
 
+    /** Specifies whether to hide the progress bar while generating diagrams. */
+    private hideProgressBarOption = {
+        type: ParameterType.Boolean,
+        name: "umlClassDiagramHideProgressBar",
+        help: "true|false",
+        defaultValue: false,
+        value: false,
+    };
+
     /** The location where the class diagrams should be stored. */
     private outputImageLocationOption = {
         type: ParameterType.Map,
@@ -307,6 +316,7 @@ export class PluginOptions {
     // prettier-ignore
     public addToApplication(typedoc: Application): void {
         typedoc.options.addDeclaration(this.umlClassDiagramTypeOption as MapDeclarationOption<ClassDiagramType>);
+        typedoc.options.addDeclaration(this.hideProgressBarOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.outputImageLocationOption as MapDeclarationOption<ImageLocation>);
         typedoc.options.addDeclaration(this.outputImageFormatOption as MapDeclarationOption<ImageFormat>);
         typedoc.options.addDeclaration(this.umlClassDiagramMethodParameterOutputOption as MapDeclarationOption<MethodParameterOutput>);
@@ -339,6 +349,7 @@ export class PluginOptions {
     // prettier-ignore
     public readValuesFromApplication(typedoc: Application): void {
         this.umlClassDiagramTypeOption.value = typedoc.options.getValue(this.umlClassDiagramTypeOption.name) as ClassDiagramType;
+        this.hideProgressBarOption.value = typedoc.options.getValue(this.hideProgressBarOption.name) as boolean;
         this.outputImageLocationOption.value = typedoc.options.getValue(this.outputImageLocationOption.name) as ImageLocation;
         this.outputImageFormatOption.value = typedoc.options.getValue(this.outputImageFormatOption.name) as ImageFormat;
         this.umlClassDiagramMethodParameterOutputOption.value = typedoc.options.getValue(this.umlClassDiagramMethodParameterOutputOption.name) as MethodParameterOutput;
@@ -370,6 +381,14 @@ export class PluginOptions {
      */
     get umlClassDiagramType(): ClassDiagramType {
         return this.umlClassDiagramTypeOption.value;
+    }
+
+    /**
+     * Returns whether to hide the progress bar while generating the class diagrams.
+     * @returns True, if the progress bar should not be displayed while generating the class diagrams, otherwise false.
+     */
+    get hideProgressBar(): boolean {
+        return this.hideProgressBarOption.value;
     }
 
     /**
