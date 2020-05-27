@@ -25,7 +25,7 @@ export class PlantUmlCodeGenerator {
      *          If the given reflection is not part of an inheritance or implementation, the result is an empty array.
      */
     public createClassDiagramPlantUmlForReflection(reflection: DeclarationReflection): string[] {
-        const includeMembers = this.options.umlClassDiagramType === ClassDiagramType.Detailed;
+        const includeMembers = this.options.classDiagramType === ClassDiagramType.Detailed;
 
         let plantUmlLines = new Array<string>();
         let siblingsAbove = 0;
@@ -74,92 +74,87 @@ export class PlantUmlCodeGenerator {
         if (siblingsAbove + siblingsBelow === 0) {
             plantUmlLines = [];
         } else {
-            if (this.options.umlClassDiagramHideEmptyMembers) {
+            if (this.options.classDiagramHideEmptyMembers) {
                 plantUmlLines.unshift("hide empty fields");
                 plantUmlLines.unshift("hide empty methods");
             }
 
-            if (this.options.umlClassDiagramHideCircledChar) {
+            if (this.options.classDiagramHideCircledChar) {
                 plantUmlLines.unshift("hide circle");
             }
 
             if (
-                siblingsAbove > this.options.umlClassDiagramTopDownLayoutMaxSiblings ||
-                siblingsBelow > this.options.umlClassDiagramTopDownLayoutMaxSiblings
+                siblingsAbove > this.options.classDiagramTopDownLayoutMaxSiblings ||
+                siblingsBelow > this.options.classDiagramTopDownLayoutMaxSiblings
             ) {
                 plantUmlLines.unshift("left to right direction");
             }
 
-            if (this.options.umlClassDiagramMemberVisibilityStyle === ClassDiagramMemberVisibilityStyle.Text) {
+            if (this.options.classDiagramMemberVisibilityStyle === ClassDiagramMemberVisibilityStyle.Text) {
                 plantUmlLines.unshift("skinparam ClassAttributeIconSize 0");
             }
 
-            if (this.options.umlClassDiagramHideShadow) {
+            if (this.options.classDiagramHideShadow) {
                 plantUmlLines.unshift("skinparam Shadowing false");
             }
 
-            if (this.options.umlClassDiagramBoxBorderRadius) {
-                plantUmlLines.unshift("skinparam RoundCorner " + this.options.umlClassDiagramBoxBorderRadius);
+            if (this.options.classDiagramBoxBorderRadius) {
+                plantUmlLines.unshift("skinparam RoundCorner " + this.options.classDiagramBoxBorderRadius);
             }
 
-            if (this.options.umlClassDiagramBoxBackgroundColor) {
+            if (this.options.classDiagramBoxBackgroundColor) {
+                plantUmlLines.unshift("skinparam ClassBackgroundColor " + this.options.classDiagramBoxBackgroundColor);
+            }
+
+            if (this.options.classDiagramBoxBorderColor) {
+                plantUmlLines.unshift("skinparam ClassBorderColor " + this.options.classDiagramBoxBorderColor);
+            }
+
+            if (this.options.classDiagramBoxBorderWidth >= 0) {
+                plantUmlLines.unshift("skinparam ClassBorderThickness " + this.options.classDiagramBoxBorderWidth);
+            }
+
+            if (this.options.classDiagramArrowColor) {
+                plantUmlLines.unshift("skinparam ClassArrowColor " + this.options.classDiagramArrowColor);
+            }
+
+            if (this.options.classDiagramClassFontName) {
+                plantUmlLines.unshift("skinparam ClassFontName " + this.options.classDiagramClassFontName);
+            }
+
+            if (this.options.classDiagramClassFontSize) {
+                plantUmlLines.unshift("skinparam ClassFontSize " + this.options.classDiagramClassFontSize);
+            }
+
+            if (this.options.classDiagramClassFontStyle !== FontStyle.Undefined) {
+                plantUmlLines.unshift("skinparam ClassFontStyle " + this.options.classDiagramClassFontStyle.toString());
+            }
+
+            if (this.options.classDiagramClassFontColor) {
+                plantUmlLines.unshift("skinparam ClassFontColor " + this.options.classDiagramClassFontColor);
+            }
+
+            if (this.options.classDiagramClassAttributeFontName) {
                 plantUmlLines.unshift(
-                    "skinparam ClassBackgroundColor " + this.options.umlClassDiagramBoxBackgroundColor
+                    "skinparam ClassAttributeFontName " + this.options.classDiagramClassAttributeFontName
                 );
             }
 
-            if (this.options.umlClassDiagramBoxBorderColor) {
-                plantUmlLines.unshift("skinparam ClassBorderColor " + this.options.umlClassDiagramBoxBorderColor);
-            }
-
-            if (this.options.umlClassDiagramBoxBorderWidth >= 0) {
-                plantUmlLines.unshift("skinparam ClassBorderThickness " + this.options.umlClassDiagramBoxBorderWidth);
-            }
-
-            if (this.options.umlClassDiagramArrowColor) {
-                plantUmlLines.unshift("skinparam ClassArrowColor " + this.options.umlClassDiagramArrowColor);
-            }
-
-            if (this.options.umlClassDiagramClassFontName) {
-                plantUmlLines.unshift("skinparam ClassFontName " + this.options.umlClassDiagramClassFontName);
-            }
-
-            if (this.options.umlClassDiagramClassFontSize) {
-                plantUmlLines.unshift("skinparam ClassFontSize " + this.options.umlClassDiagramClassFontSize);
-            }
-
-            if (this.options.umlClassDiagramClassFontStyle !== FontStyle.Undefined) {
+            if (this.options.classDiagramClassAttributeFontSize) {
                 plantUmlLines.unshift(
-                    "skinparam ClassFontStyle " + this.options.umlClassDiagramClassFontStyle.toString()
+                    "skinparam ClassAttributeFontSize " + this.options.classDiagramClassAttributeFontSize
                 );
             }
 
-            if (this.options.umlClassDiagramClassFontColor) {
-                plantUmlLines.unshift("skinparam ClassFontColor " + this.options.umlClassDiagramClassFontColor);
-            }
-
-            if (this.options.umlClassDiagramClassAttributeFontName) {
+            if (this.options.classDiagramClassAttributeFontStyle !== FontStyle.Undefined) {
                 plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontName " + this.options.umlClassDiagramClassAttributeFontName
+                    "skinparam ClassAttributeFontStyle " + this.options.classDiagramClassAttributeFontStyle.toString()
                 );
             }
 
-            if (this.options.umlClassDiagramClassAttributeFontSize) {
+            if (this.options.classDiagramClassAttributeFontColor) {
                 plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontSize " + this.options.umlClassDiagramClassAttributeFontSize
-                );
-            }
-
-            if (this.options.umlClassDiagramClassAttributeFontStyle !== FontStyle.Undefined) {
-                plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontStyle " +
-                        this.options.umlClassDiagramClassAttributeFontStyle.toString()
-                );
-            }
-
-            if (this.options.umlClassDiagramClassAttributeFontColor) {
-                plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontColor " + this.options.umlClassDiagramClassAttributeFontColor
+                    "skinparam ClassAttributeFontColor " + this.options.classDiagramClassAttributeFontColor
                 );
             }
         }
@@ -250,11 +245,11 @@ export class PlantUmlCodeGenerator {
         plantUml += method.name + "(";
 
         if (method.parameters) {
-            if (this.options.umlClassDiagramMethodParameterOutput === MethodParameterOutput.OnlyNames) {
+            if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyNames) {
                 plantUml += method.parameters.map((p) => p.name).join(", ");
-            } else if (this.options.umlClassDiagramMethodParameterOutput === MethodParameterOutput.OnlyTypes) {
+            } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyTypes) {
                 plantUml += method.parameters.map((p) => (p.type ? p.type.toString() : "unknown")).join(", ");
-            } else if (this.options.umlClassDiagramMethodParameterOutput === MethodParameterOutput.Complete) {
+            } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.Complete) {
                 plantUml += method.parameters
                     .map((p) => p.name + ": " + (p.type ? p.type.toString() : "unknown"))
                     .join(", ");

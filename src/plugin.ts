@@ -54,8 +54,8 @@ export class Plugin {
      */
     get isActive(): boolean {
         return (
-            this.options.umlClassDiagramType === ClassDiagramType.Simple ||
-            this.options.umlClassDiagramType === ClassDiagramType.Detailed
+            this.options.classDiagramType === ClassDiagramType.Simple ||
+            this.options.classDiagramType === ClassDiagramType.Detailed
         );
     }
 
@@ -284,12 +284,12 @@ export class Plugin {
         const page = new PageProcessor(originalContent);
 
         const hierarchyDiagramSection = PageSection.createForHierarchyDiagram(
-            this.options.umlClassDiagramSectionTitle,
+            this.options.sectionTitle,
             imageUrl,
             reflectionName
         );
 
-        if (this.options.umlClassDiagramPosition === ClassDiagramPosition.Above) {
+        if (this.options.classDiagramPosition === ClassDiagramPosition.Above) {
             page.insertAboveSection(PageSections.Hierarchy, hierarchyDiagramSection);
         } else {
             page.insertBelowSection(PageSections.Hierarchy, hierarchyDiagramSection);
