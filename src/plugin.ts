@@ -33,6 +33,9 @@ export class Plugin {
     /** The options of this plugin. */
     private options = new PluginOptions();
 
+    /** The directory in which the plugin generates files. */
+    private outputDirectory!: string;
+
     /** Used when the class diagrams are created locally. */
     private imageGenerator = new ImageGenerator();
 
@@ -142,7 +145,8 @@ export class Plugin {
      */
     public onRendererBegin(event: RendererEvent): void {
         if (this.isActive) {
-            this.imageGenerator.setOutputDirectory(path.join(event.outputDirectory, "assets/images/"));
+            this.outputDirectory = path.join(event.outputDirectory, "assets/images/");
+            this.imageGenerator.setOutputDirectory(this.outputDirectory);
         }
     }
 
@@ -200,6 +204,11 @@ export class Plugin {
         const reflection = event.model as DeclarationReflection;
         const plantUmlLines = this.plantUmlCodeGenerator.createClassDiagramPlantUmlForReflection(reflection);
 
+        if (this.options.createPlantUmlFiles) {
+            const filename = reflection.name + "-umlClassDiagram-" + reflection.id + ".puml";
+            this.createPlantUmlFile(path.join(this.outputDirectory, filename), plantUmlLines);
+        }
+
         let imageUrlPromise: Promise<string>;
 
         if (this.options.outputImageLocation === ImageLocation.Local) {
@@ -235,6 +244,16 @@ export class Plugin {
             .catch((e: Error) => {
                 console.error("Error adding diagram into file", event.filename, e.message);
             });
+    }
+
+    /**
+     * Creates a file containing the PlantUML code.
+     * @param filePath Absolute path to the file to generate.
+     * @param plantUmlLines The PlantUML code that should be written into the file.
+     */
+    private createPlantUmlFile(filePath: string, plantUmlLines: string[]): void {
+        const fileContent = ["@startuml", ...plantUmlLines, "@enduml"];
+        fs.writeFileSync(filePath, fileContent.join("\n"), "utf8");
     }
 
     /**

@@ -102,6 +102,15 @@ export class PluginOptions {
         value: MethodParameterOutput.Complete,
     };
 
+    /** Specifies whether to create files containing the PlantUML code of the class diagrams. */
+    private createPlantUmlFilesOption = {
+        type: ParameterType.Boolean,
+        name: "umlClassDiagramCreatePlantUmlFiles",
+        help: "true|false",
+        defaultValue: false,
+        value: false,
+    };
+
     /** Specifies the background color used for boxes in the class diagrams. */
     private umlClassDiagramSectionTitleOption = {
         type: ParameterType.String,
@@ -320,6 +329,7 @@ export class PluginOptions {
         typedoc.options.addDeclaration(this.outputImageLocationOption as MapDeclarationOption<ImageLocation>);
         typedoc.options.addDeclaration(this.outputImageFormatOption as MapDeclarationOption<ImageFormat>);
         typedoc.options.addDeclaration(this.umlClassDiagramMethodParameterOutputOption as MapDeclarationOption<MethodParameterOutput>);
+        typedoc.options.addDeclaration(this.createPlantUmlFilesOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.umlClassDiagramSectionTitleOption as StringDeclarationOption);
         typedoc.options.addDeclaration(this.umlClassDiagramPositionOption as MapDeclarationOption<ClassDiagramPosition>);
         typedoc.options.addDeclaration(this.umlClassDiagramHideEmptyMembersOption as BooleanDeclarationOption);
@@ -353,6 +363,7 @@ export class PluginOptions {
         this.outputImageLocationOption.value = typedoc.options.getValue(this.outputImageLocationOption.name) as ImageLocation;
         this.outputImageFormatOption.value = typedoc.options.getValue(this.outputImageFormatOption.name) as ImageFormat;
         this.umlClassDiagramMethodParameterOutputOption.value = typedoc.options.getValue(this.umlClassDiagramMethodParameterOutputOption.name) as MethodParameterOutput;
+        this.createPlantUmlFilesOption.value = typedoc.options.getValue(this.createPlantUmlFilesOption.name) as boolean;
         this.umlClassDiagramSectionTitleOption.value = typedoc.options.getValue(this.umlClassDiagramSectionTitleOption.name) as string;
         this.umlClassDiagramPositionOption.value = typedoc.options.getValue(this.umlClassDiagramPositionOption.name) as ClassDiagramPosition;
         this.umlClassDiagramHideEmptyMembersOption.value = typedoc.options.getValue(this.umlClassDiagramHideEmptyMembersOption.name) as boolean;
@@ -413,6 +424,14 @@ export class PluginOptions {
      */
     get umlClassDiagramMethodParameterOutput(): MethodParameterOutput {
         return this.umlClassDiagramMethodParameterOutputOption.value;
+    }
+
+    /**
+     * Returns whether to create files containing the PlantUML code for the class diagrams.
+     * @returns True, if files with the PlantUML code should be created, otherwise false.
+     */
+    get createPlantUmlFiles(): boolean {
+        return this.createPlantUmlFilesOption.value;
     }
 
     /**

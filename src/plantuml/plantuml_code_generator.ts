@@ -204,7 +204,7 @@ export class PlantUmlCodeGenerator {
      * @returns The PlantUML line for the given property.
      */
     private createPlantUmlForProperty(property: DeclarationReflection): string {
-        let plantUml = "";
+        let plantUml = "    "; // indent
 
         if (property.flags.isStatic) {
             plantUml += "{static} ";
@@ -229,7 +229,7 @@ export class PlantUmlCodeGenerator {
      * @returns The PlantUML line for the given method.
      */
     private createPlantUmlForMethod(method: SignatureReflection): string {
-        let plantUml = "";
+        let plantUml = "    "; // indent
 
         if (method.flags.isStatic) {
             plantUml += "{static} ";

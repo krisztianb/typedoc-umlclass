@@ -56,6 +56,11 @@ The following options are added to TypeDoc when the plugin is installed.
     `only-names` to include only parameter names, `only-types` to include only parameter types and `complete` to include
     names and types.
     Default is `complete`.
+-   `--umlClassDiagramCreatePlantUmlFiles <true|false>`<br>
+    If this option is set to `true` the plugin creates a text file for every class or interface for which a class
+    diagram is generated. The file contains the PlantUML code that was used to create the diagram. The files are stored
+    in the assets directory of the generated documentation.
+    Default is `false`.
 
 ### HTML output
 
