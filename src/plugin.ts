@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-// @ts-ignore: there are no type definitions for the "plantuml-encoder" module :-(
-import plantUmlEncoder = require("plantuml-encoder");
+import * as plantUmlEncoder from "plantuml-encoder";
 import * as ProgressBar from "progress";
 import { Application, DeclarationReflection, ProjectReflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
