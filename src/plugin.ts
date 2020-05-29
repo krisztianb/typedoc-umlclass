@@ -1,15 +1,14 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as plantUmlEncoder from "plantuml-encoder";
 import * as ProgressBar from "progress";
 import { Application, DeclarationReflection, ProjectReflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { ClassDiagramType } from "./enumerations";
-import { ImageGenerator } from "./image_generator";
+import { ImageUrlGenerator } from "./image_url_generator";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
 import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator";
-import { ClassDiagramPosition, ImageFormat, ImageLocation, PluginOptions } from "./plugin_options";
+import { ClassDiagramPosition, ImageLocation, PluginOptions } from "./plugin_options";
 import { PageProcessor } from "./typedoc/page_processor";
 import { PageSection, PageSections } from "./typedoc/page_section";
 import { PageSectionFinder } from "./typedoc/page_section_finder";
@@ -35,14 +34,14 @@ export class Plugin {
     /** The directory in which the plugin generates files. */
     private outputDirectory!: string;
 
-    /** Used when the class diagrams are created locally. */
-    private imageGenerator = new ImageGenerator();
-
-    /** Object that generates the PlantUML code. */
+    /** Object that uses TypeDoc reflection data to generate PlantUML code. */
     private plantUmlCodeGenerator!: CachingPlantUmlCodeGenerator;
 
-    /** Object that generates the PlantUML diagrams. */
+    /** Object that uses PlantUML code to generate PlantUML diagrams. */
     private plantUmlDiagramGenerator = new PlantUmlDiagramGenerator();
+
+    /** Objet that generates URLs for PlantUML diagrams.  */
+    private imageUrlGenerator = new ImageUrlGenerator();
 
     /** Progress bar shown when generating the diagrams. */
     private progressBar!: ProgressBar;
@@ -145,7 +144,6 @@ export class Plugin {
     public onRendererBegin(event: RendererEvent): void {
         if (this.isActive) {
             this.outputDirectory = path.join(event.outputDirectory, "assets/images/");
-            this.imageGenerator.setOutputDirectory(this.outputDirectory);
         }
     }
 
@@ -201,37 +199,30 @@ export class Plugin {
      */
     private processPage(event: PageEvent): void {
         const reflection = event.model as DeclarationReflection;
-        const plantUmlLines = this.plantUmlCodeGenerator.createClassDiagramPlantUmlForReflection(reflection);
+        const plantUml = this.plantUmlCodeGenerator.createClassDiagramPlantUmlForReflection(reflection).join("\n");
 
         if (this.options.createPlantUmlFiles) {
-            const filename = reflection.name + "-umlClassDiagram-" + reflection.id + ".puml";
-            this.createPlantUmlFile(path.join(this.outputDirectory, filename), plantUmlLines);
+            this.writePlantUmlFileForReflection(plantUml, reflection);
         }
 
         let imageUrlPromise: Promise<string>;
 
         if (this.options.outputImageLocation === ImageLocation.Local) {
             imageUrlPromise = this.plantUmlDiagramGenerator
-                .generateFromCode(plantUmlLines.join("\n"), this.options.outputImageFormat)
+                .generateFromCode(plantUml, this.options.outputImageFormat)
                 .then((result: Buffer) => {
-                    const absoluteImagePath = this.imageGenerator.writeImageToFile(
-                        result,
-                        reflection.name,
-                        this.options.outputImageFormat
-                    );
-                    return path.relative(path.dirname(event.filename), absoluteImagePath);
+                    const absoluteImageFilePath = this.writeLocalImageFileForReflection(result, reflection);
+                    return this.imageUrlGenerator.createLocalImageFileUrl(event.filename, absoluteImageFilePath);
                 });
         } else if (this.options.outputImageLocation === ImageLocation.Embed) {
             imageUrlPromise = this.plantUmlDiagramGenerator
-                .generateFromCode(plantUmlLines.join("\n"), this.options.outputImageFormat)
+                .generateFromCode(plantUml, this.options.outputImageFormat)
                 .then((result: Buffer) => {
-                    const mimeType = this.options.outputImageFormat === ImageFormat.PNG ? "image/png" : "image/svg+xml";
-                    return "data:" + mimeType + ";base64," + result.toString("base64");
+                    return this.imageUrlGenerator.createEmbeddedImageUrl(result, this.options.outputImageFormat);
                 });
         } else {
             imageUrlPromise = new Promise<string>((resolve) => {
-                const encodedPlantUml = plantUmlEncoder.encode(plantUmlLines.join("\n"));
-                resolve(this.imageGenerator.createPlantUmlServerUrl(encodedPlantUml, this.options.outputImageFormat));
+                resolve(this.imageUrlGenerator.createPlantUmlServerUrl(plantUml, this.options.outputImageFormat));
             });
         }
 
@@ -246,13 +237,30 @@ export class Plugin {
     }
 
     /**
-     * Creates a file containing the PlantUML code.
-     * @param filePath Absolute path to the file to generate.
-     * @param plantUmlLines The PlantUML code that should be written into the file.
+     * Creates a local file with the class diagram of a reflection.
+     * @param imageData The image data of the class diagram.
+     * @param reflection The reflection for which the file is written.
+     * @returns The absolute path to the file that was created.
      */
-    private createPlantUmlFile(filePath: string, plantUmlLines: string[]): void {
-        const fileContent = ["@startuml", ...plantUmlLines, "@enduml"];
-        fs.writeFileSync(filePath, fileContent.join("\n"), "utf8");
+    private writeLocalImageFileForReflection(imageData: Buffer, reflection: DeclarationReflection): string {
+        const filename = reflection.name + "-umlClassDiagram-" + reflection.id + "." + this.options.outputImageFormat;
+        const absoluteFilePath = path.join(this.outputDirectory, filename);
+
+        fs.writeFileSync(absoluteFilePath, imageData);
+        return absoluteFilePath;
+    }
+
+    /**
+     * Creates a file containing the PlantUML code.
+     * @param plantUml The PlantUML code that should be written into the file.
+     * @param reflection The reflection for which the file is written.
+     */
+    private writePlantUmlFileForReflection(plantUml: string, reflection: DeclarationReflection): void {
+        const filename = reflection.name + "-umlClassDiagram-" + reflection.id + ".puml";
+        const absoluteFilePath = path.join(this.outputDirectory, filename);
+
+        const fileContent = "@startuml\n" + plantUml + "\n@enduml";
+        fs.writeFileSync(absoluteFilePath, fileContent, "utf8");
     }
 
     /**
