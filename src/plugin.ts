@@ -6,6 +6,7 @@ import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { ClassDiagramType } from "./enumerations";
 import { ImageUrlGenerator } from "./image_url_generator";
+import { Logger } from "./logger";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
 import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator";
 import { ClassDiagramPosition, ImageLocation, PluginOptions } from "./plugin_options";
@@ -44,7 +45,10 @@ export class Plugin {
     private imageUrlGenerator = new ImageUrlGenerator();
 
     /** Progress bar shown when generating the diagrams. */
-    private progressBar!: ProgressBar;
+    private progressBar: ProgressBar | undefined;
+
+    /** Logger for verbose output in debug mode. */
+    private log: Logger | undefined;
 
     /**
      * Checks if the plugin is active and should generate output.
@@ -98,6 +102,10 @@ export class Plugin {
 
         if (this.isActive) {
             this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
+
+            if (this.options.createVerboseOutput) {
+                this.log = new Logger();
+            }
         }
     }
 
@@ -108,8 +116,10 @@ export class Plugin {
      */
     public onConverterResolveEnd(context: Context): void {
         if (this.isActive && !this.options.hideProgressBar) {
+            this.log?.info("Caculating number of diagrams to generate ...");
             const numberOfDiagramsToGenerate = this.computeDiagramCount(context.project);
 
+            this.log?.info("Setting up progress bar ...");
             this.progressBar = new ProgressBar(`Adding ${numberOfDiagramsToGenerate} class diagrams [:bar] :percent`, {
                 total: numberOfDiagramsToGenerate,
                 width: 40,
@@ -154,7 +164,10 @@ export class Plugin {
      */
     public onRendererEndPage(event: PageEvent): void {
         if (this.isActive && this.shouldProcessPage(event.contents, event.model)) {
+            this.log?.info(`Processing page for reflection ${event.model?.name} ...`);
             this.processPage(event);
+        } else {
+            this.log?.info(`Skipping page for reflection ${event.model?.name} ...`);
         }
     }
 
@@ -199,9 +212,12 @@ export class Plugin {
      */
     private processPage(event: PageEvent): void {
         const reflection = event.model as DeclarationReflection;
+
+        this.log?.info(`Generating PlantUML code for reflection ${reflection.name} ...`);
         const plantUml = this.plantUmlCodeGenerator.createClassDiagramPlantUmlForReflection(reflection).join("\n");
 
         if (this.options.createPlantUmlFiles) {
+            this.log?.info(`Writing PlantUML file for reflection ${reflection.name} ...`);
             this.writePlantUmlFileForReflection(plantUml, reflection);
         }
 
@@ -211,28 +227,33 @@ export class Plugin {
             imageUrlPromise = this.plantUmlDiagramGenerator
                 .generateFromCode(plantUml, this.options.outputImageFormat)
                 .then((result: Buffer) => {
+                    this.log?.info(`Writing local image file for reflection ${reflection.name} ...`);
                     const absoluteImageFilePath = this.writeLocalImageFileForReflection(result, reflection);
+                    this.log?.info(`Creating local image URL for reflection ${reflection.name} ...`);
                     return this.imageUrlGenerator.createLocalImageFileUrl(event.filename, absoluteImageFilePath);
                 });
         } else if (this.options.outputImageLocation === ImageLocation.Embed) {
             imageUrlPromise = this.plantUmlDiagramGenerator
                 .generateFromCode(plantUml, this.options.outputImageFormat)
                 .then((result: Buffer) => {
+                    this.log?.info(`Creating embedded image URL for reflection ${reflection.name} ...`);
                     return this.imageUrlGenerator.createEmbeddedImageUrl(result, this.options.outputImageFormat);
                 });
         } else {
             imageUrlPromise = new Promise<string>((resolve) => {
+                this.log?.info(`Creating remote image URL for reflection ${reflection.name} ...`);
                 resolve(this.imageUrlGenerator.createPlantUmlServerUrl(plantUml, this.options.outputImageFormat));
             });
         }
 
         imageUrlPromise
             .then((imageUrl: string) => {
+                this.log?.info(`Inserting diagram into page for reflection ${reflection.name} ...`);
                 this.insertHierarchyDiagramIntoFile(event.filename, reflection.name, imageUrl);
                 this.progressBar?.tick();
             })
             .catch((e: Error) => {
-                console.error("Error adding diagram into file", event.filename, e.message);
+                this.log?.error(`Failed inserting diagram into page for reflection ${reflection.name}: ${e.message}`);
             });
     }
 
@@ -312,11 +333,15 @@ export class Plugin {
      */
     public onRendererEnd(event: RendererEvent): void {
         if (this.isActive) {
+            this.log?.info("Attaching content to main.css file ...");
+
             const filename = path.join(event.outputDirectory, "assets/css/main.css");
             const data =
                 fs.readFileSync(filename, "utf8") +
                 "\n.uml-class { max-width:100%; display:block; margin:0 auto; text-align:center }\n";
             fs.writeFileSync(filename, data, "utf8");
+
+            this.log?.info("DONE");
         }
     }
 }

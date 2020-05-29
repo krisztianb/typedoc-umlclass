@@ -37,11 +37,6 @@ The following options are added to TypeDoc when the plugin is installed.
     one level of base and sub classes. Use the value `simple` to only render the name of the class or interface.
     Use the value `detailed` to also render properties and methods.
     Default is `detailed`.
--   `--umlClassDiagramHideProgressBar <true|false>`<br>
-    Since generating many diagrams can take several minutes the plugin displays a progress bar. However if other
-    plugins also output information to the console then the progress bar can mess that output up. If this is the case
-    you can disable the progress bar of this plugin using the value `true`.
-    Default is `false`.
 -   `--umlClassDiagramLocation <local|remote|embed>`<br>
     Specifies the location of the generated uml images. If `local` then local image files are created in the assets
     directory of the generated documentation. If `remote` then the image tag uses an encoded link to the
@@ -51,16 +46,6 @@ The following options are added to TypeDoc when the plugin is installed.
 -   `--umlClassDiagramFormat <png|svg>`<br>
     Specifies the image format to use.
     Default is `svg`.
--   `--umlClassDiagramMethodParameterOutput <none|only-names|only-types|complete>`<br>
-    Specifies how method parameters should be included in the class diagram. Use `none` to completely omit parameters,
-    `only-names` to include only parameter names, `only-types` to include only parameter types and `complete` to include
-    names and types.
-    Default is `complete`.
--   `--umlClassDiagramCreatePlantUmlFiles <true|false>`<br>
-    If this option is set to `true` the plugin creates a text file for every class or interface for which a class
-    diagram is generated. The file contains the PlantUML code that was used to create the diagram. The files are stored
-    in the assets directory of the generated documentation.
-    Default is `false`.
 
 ### HTML output
 
@@ -74,6 +59,11 @@ The following options are added to TypeDoc when the plugin is installed.
 
 ### Class diagram formating
 
+-   `--umlClassDiagramMethodParameterOutput <none|only-names|only-types|complete>`<br>
+    Specifies how method parameters should be included in the class diagram. Use `none` to completely omit parameters,
+    `only-names` to include only parameter names, `only-types` to include only parameter types and `complete` to include
+    names and types.
+    Default is `complete`.
 -   `--umlClassDiagramHideEmptyMembers <true|false>`<br>
     If this option is set to true properties and methods are hidden if they are empty.
     Default is `true`.
@@ -136,6 +126,23 @@ The following options are added to TypeDoc when the plugin is installed.
     Use this option to specify the color of the class attributes within the class diagram.
     Default is the PlantUML default value for this skin parameter.
 
+### Other settings
+
+-   `--umlClassDiagramHideProgressBar <true|false>`<br>
+    Since generating many diagrams can take several minutes the plugin displays a progress bar. However if other
+    plugins also output information to the console then the progress bar can mess that output up. If this is the case
+    you can disable the progress bar of this plugin using the value `true`.
+    Default is `false`.
+-   `--umlClassDiagramCreatePlantUmlFiles <true|false>`<br>
+    If this option is set to `true` the plugin creates a text file for every class or interface for which a class
+    diagram is generated. The file contains the PlantUML code that was used to create the diagram. The files are stored
+    in the assets directory of the generated documentation.
+    Default is `false`.
+-   `--umlClassDiagramVerboseOutput <true|false>`<br>
+    If this option is set to `true` the plugin outputs messages to the console during its work. Use this option to
+    debug possible plugin issues.
+    Default is `false`.
+
 ## Credits
 
 I would like to thank the following people that influenced this project:
@@ -146,7 +153,7 @@ I would like to thank the following people that influenced this project:
 -   [Michael K](https://github.com/0815fox) for his (unfinished) extension/fork to that plugin which gave me some
     insights into TypeDoc renderer events.
 -   [Gerrit Birkeland](https://github.com/Gerrit0) for his help on questions about TypeDoc.
--   [yboujraf](https://github.com/yboujraf) for his impulse to create a separate plugin and help with testing it.
+-   [Youssef Boujraf](https://github.com/yboujraf) for his impulse to create a separate plugin and help with testing it.
 
 ## License
 

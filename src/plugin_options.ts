@@ -51,15 +51,6 @@ export class PluginOptions {
         value: ClassDiagramType.Detailed,
     };
 
-    /** Specifies whether to hide the progress bar while generating diagrams. */
-    private hideProgressBarOption = {
-        type: ParameterType.Boolean,
-        name: "umlClassDiagramHideProgressBar",
-        help: "true|false",
-        defaultValue: false,
-        value: false,
-    };
-
     /** The location where the class diagrams should be stored. */
     private outputImageLocationOption = {
         type: ParameterType.Map,
@@ -87,30 +78,6 @@ export class PluginOptions {
         value: ImageFormat.SVG,
     };
 
-    /** Specifies how method parameters should be output in the class diagrams. */
-    private classDiagramMethodParameterOutputOption = {
-        type: ParameterType.Map,
-        name: "umlClassDiagramMethodParameterOutput",
-        help: "none|only-names|only-types|complete",
-        defaultValue: MethodParameterOutput.Complete,
-        map: new Map([
-            ["none", MethodParameterOutput.None],
-            ["only-names", MethodParameterOutput.OnlyNames],
-            ["only-types", MethodParameterOutput.OnlyTypes],
-            ["complete", MethodParameterOutput.Complete],
-        ]),
-        value: MethodParameterOutput.Complete,
-    };
-
-    /** Specifies whether to create files containing the PlantUML code of the class diagrams. */
-    private createPlantUmlFilesOption = {
-        type: ParameterType.Boolean,
-        name: "umlClassDiagramCreatePlantUmlFiles",
-        help: "true|false",
-        defaultValue: false,
-        value: false,
-    };
-
     /** Specifies the background color used for boxes in the class diagrams. */
     private sectionTitleOption = {
         type: ParameterType.String,
@@ -131,6 +98,21 @@ export class PluginOptions {
             ["below", ClassDiagramPosition.Below],
         ]),
         value: ClassDiagramPosition.Above,
+    };
+
+    /** Specifies how method parameters should be output in the class diagrams. */
+    private classDiagramMethodParameterOutputOption = {
+        type: ParameterType.Map,
+        name: "umlClassDiagramMethodParameterOutput",
+        help: "none|only-names|only-types|complete",
+        defaultValue: MethodParameterOutput.Complete,
+        map: new Map([
+            ["none", MethodParameterOutput.None],
+            ["only-names", MethodParameterOutput.OnlyNames],
+            ["only-types", MethodParameterOutput.OnlyTypes],
+            ["complete", MethodParameterOutput.Complete],
+        ]),
+        value: MethodParameterOutput.Complete,
     };
 
     /** Specifies whether to hide empty properties and methods in the class diagrams. */
@@ -318,6 +300,33 @@ export class PluginOptions {
         value: "",
     };
 
+    /** Specifies whether to hide the progress bar while generating diagrams. */
+    private hideProgressBarOption = {
+        type: ParameterType.Boolean,
+        name: "umlClassDiagramHideProgressBar",
+        help: "true|false",
+        defaultValue: false,
+        value: false,
+    };
+
+    /** Specifies whether to create files containing the PlantUML code of the class diagrams. */
+    private createPlantUmlFilesOption = {
+        type: ParameterType.Boolean,
+        name: "umlClassDiagramCreatePlantUmlFiles",
+        help: "true|false",
+        defaultValue: false,
+        value: false,
+    };
+
+    /** Specifies whether the plugin should output verbose info during its work. */
+    private createVerboseOutputOption = {
+        type: ParameterType.Boolean,
+        name: "umlClassDiagramVerboseOutput",
+        help: "true|false",
+        defaultValue: false,
+        value: false,
+    };
+
     /**
      * Adds the command line options of the plugin to the TypeDoc application.
      * @param typedoc The TypeDoc application.
@@ -325,13 +334,11 @@ export class PluginOptions {
     // prettier-ignore
     public addToApplication(typedoc: Application): void {
         typedoc.options.addDeclaration(this.classDiagramTypeOption as MapDeclarationOption<ClassDiagramType>);
-        typedoc.options.addDeclaration(this.hideProgressBarOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.outputImageLocationOption as MapDeclarationOption<ImageLocation>);
         typedoc.options.addDeclaration(this.outputImageFormatOption as MapDeclarationOption<ImageFormat>);
-        typedoc.options.addDeclaration(this.classDiagramMethodParameterOutputOption as MapDeclarationOption<MethodParameterOutput>);
-        typedoc.options.addDeclaration(this.createPlantUmlFilesOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.sectionTitleOption as StringDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramPositionOption as MapDeclarationOption<ClassDiagramPosition>);
+        typedoc.options.addDeclaration(this.classDiagramMethodParameterOutputOption as MapDeclarationOption<MethodParameterOutput>);
         typedoc.options.addDeclaration(this.classDiagramHideEmptyMembersOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramTopDownLayoutMaxSiblingsOption as NumberDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramMemberVisibilityStyleOption as MapDeclarationOption<ClassDiagramMemberVisibilityStyle>);
@@ -350,6 +357,9 @@ export class PluginOptions {
         typedoc.options.addDeclaration(this.classDiagramClassAttributeFontSizeOption as NumberDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramClassAttributeFontStyleOption as MapDeclarationOption<FontStyle>);
         typedoc.options.addDeclaration(this.classDiagramClassAttributeFontColorOption as StringDeclarationOption);
+        typedoc.options.addDeclaration(this.hideProgressBarOption as BooleanDeclarationOption);
+        typedoc.options.addDeclaration(this.createPlantUmlFilesOption as BooleanDeclarationOption);
+        typedoc.options.addDeclaration(this.createVerboseOutputOption as BooleanDeclarationOption);
     }
 
     /**
@@ -359,13 +369,11 @@ export class PluginOptions {
     // prettier-ignore
     public readValuesFromApplication(typedoc: Application): void {
         this.classDiagramTypeOption.value = typedoc.options.getValue(this.classDiagramTypeOption.name) as ClassDiagramType;
-        this.hideProgressBarOption.value = typedoc.options.getValue(this.hideProgressBarOption.name) as boolean;
         this.outputImageLocationOption.value = typedoc.options.getValue(this.outputImageLocationOption.name) as ImageLocation;
         this.outputImageFormatOption.value = typedoc.options.getValue(this.outputImageFormatOption.name) as ImageFormat;
-        this.classDiagramMethodParameterOutputOption.value = typedoc.options.getValue(this.classDiagramMethodParameterOutputOption.name) as MethodParameterOutput;
-        this.createPlantUmlFilesOption.value = typedoc.options.getValue(this.createPlantUmlFilesOption.name) as boolean;
         this.sectionTitleOption.value = typedoc.options.getValue(this.sectionTitleOption.name) as string;
         this.classDiagramPositionOption.value = typedoc.options.getValue(this.classDiagramPositionOption.name) as ClassDiagramPosition;
+        this.classDiagramMethodParameterOutputOption.value = typedoc.options.getValue(this.classDiagramMethodParameterOutputOption.name) as MethodParameterOutput;
         this.classDiagramHideEmptyMembersOption.value = typedoc.options.getValue(this.classDiagramHideEmptyMembersOption.name) as boolean;
         this.classDiagramTopDownLayoutMaxSiblingsOption.value = typedoc.options.getValue(this.classDiagramTopDownLayoutMaxSiblingsOption.name) as number;
         this.classDiagramMemberVisibilityStyleOption.value = typedoc.options.getValue(this.classDiagramMemberVisibilityStyleOption.name) as ClassDiagramMemberVisibilityStyle;
@@ -384,6 +392,9 @@ export class PluginOptions {
         this.classDiagramClassAttributeFontSizeOption.value = typedoc.options.getValue(this.classDiagramClassAttributeFontSizeOption.name) as number;
         this.classDiagramClassAttributeFontStyleOption.value = typedoc.options.getValue(this.classDiagramClassAttributeFontStyleOption.name) as FontStyle;
         this.classDiagramClassAttributeFontColorOption.value = typedoc.options.getValue(this.classDiagramClassAttributeFontColorOption.name) as string;
+        this.hideProgressBarOption.value = typedoc.options.getValue(this.hideProgressBarOption.name) as boolean;
+        this.createPlantUmlFilesOption.value = typedoc.options.getValue(this.createPlantUmlFilesOption.name) as boolean;
+        this.createVerboseOutputOption.value = typedoc.options.getValue(this.createVerboseOutputOption.name) as boolean;
     }
 
     /**
@@ -392,14 +403,6 @@ export class PluginOptions {
      */
     get classDiagramType(): ClassDiagramType {
         return this.classDiagramTypeOption.value;
-    }
-
-    /**
-     * Returns whether to hide the progress bar while generating the class diagrams.
-     * @returns True, if the progress bar should not be displayed while generating the class diagrams, otherwise false.
-     */
-    get hideProgressBar(): boolean {
-        return this.hideProgressBarOption.value;
     }
 
     /**
@@ -419,22 +422,6 @@ export class PluginOptions {
     }
 
     /**
-     * Returns how method parameters should be output in the class diagrams.
-     * @returns How method parameters should be output in the class diagrams.
-     */
-    get classDiagramMethodParameterOutput(): MethodParameterOutput {
-        return this.classDiagramMethodParameterOutputOption.value;
-    }
-
-    /**
-     * Returns whether to create files containing the PlantUML code for the class diagrams.
-     * @returns True, if files with the PlantUML code should be created, otherwise false.
-     */
-    get createPlantUmlFiles(): boolean {
-        return this.createPlantUmlFilesOption.value;
-    }
-
-    /**
      * Returns the title that should be used for the section that contains the class diagrams.
      * @returns The title that should be used for the section that contains the class diagrams.
      */
@@ -448,6 +435,14 @@ export class PluginOptions {
      */
     get classDiagramPosition(): ClassDiagramPosition {
         return this.classDiagramPositionOption.value;
+    }
+
+    /**
+     * Returns how method parameters should be output in the class diagrams.
+     * @returns How method parameters should be output in the class diagrams.
+     */
+    get classDiagramMethodParameterOutput(): MethodParameterOutput {
+        return this.classDiagramMethodParameterOutputOption.value;
     }
 
     /**
@@ -612,5 +607,29 @@ export class PluginOptions {
      */
     get classDiagramClassAttributeFontColor(): string {
         return this.classDiagramClassAttributeFontColorOption.value;
+    }
+
+    /**
+     * Returns whether to hide the progress bar while generating the class diagrams.
+     * @returns True, if the progress bar should not be displayed while generating the class diagrams, otherwise false.
+     */
+    get hideProgressBar(): boolean {
+        return this.hideProgressBarOption.value;
+    }
+
+    /**
+     * Returns whether to create files containing the PlantUML code for the class diagrams.
+     * @returns True, if files with the PlantUML code should be created, otherwise false.
+     */
+    get createPlantUmlFiles(): boolean {
+        return this.createPlantUmlFilesOption.value;
+    }
+
+    /**
+     * Returns whether the plugin should output verbose info during its work.
+     * @returns True, if plugin should create verbose output, otherwise false.
+     */
+    get createVerboseOutput(): boolean {
+        return this.createVerboseOutputOption.value;
     }
 }
