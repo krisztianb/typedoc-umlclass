@@ -1,4 +1,9 @@
-import { DeclarationReflection, ReflectionKind, SignatureReflection } from "typedoc/dist/lib/models/index";
+import {
+    DeclarationReflection,
+    ReferenceType,
+    ReflectionKind,
+    SignatureReflection,
+} from "typedoc/dist/lib/models/index";
 import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle, MethodParameterOutput } from "../enumerations";
 import { TypeDocUtils } from "../typedoc/typedoc_utils";
 import { PlantUmlCodeGeneratorOptions } from "./plantuml_code_generator_options";
@@ -37,137 +42,132 @@ export class PlantUmlCodeGenerator {
         // add classes/interfaces this type is extending
         const extendedTypes = TypeDocUtils.getExtendedTypesForReflection(reflection);
 
-        for (const type of extendedTypes) {
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeMembers));
-            plantUmlLines.push(type.name + " <|-- " + reflection.name);
+        for (const extendedType of extendedTypes) {
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedType, includeMembers));
+            plantUmlLines.push(extendedType.name + " <|-- " + reflection.name);
             ++siblingsAbove;
         }
 
         // add classes/interfaces this type is implementing
         const implementedTypes = TypeDocUtils.getImplementedTypesForReflection(reflection);
 
-        for (const type of implementedTypes) {
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeMembers));
-            plantUmlLines.push(type.name + " <|.. " + reflection.name);
+        for (const implementedType of implementedTypes) {
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedType, includeMembers));
+            plantUmlLines.push(implementedType.name + " <|.. " + reflection.name);
             ++siblingsAbove;
         }
 
         // add classes/interfaces that are extending this type
         const extendedBys = TypeDocUtils.getExtendedBysForReflection(reflection);
 
-        for (const type of extendedBys) {
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeMembers));
-            plantUmlLines.push(reflection.name + " <|-- " + type.name);
+        for (const extendedBy of extendedBys) {
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedBy, includeMembers));
+            plantUmlLines.push(reflection.name + " <|-- " + extendedBy.name);
             ++siblingsBelow;
         }
 
         // add classes that are implementing this type
         const implementedBys = TypeDocUtils.getImplementedBysForReflection(reflection);
 
-        for (const type of implementedBys) {
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(type, includeMembers));
-            plantUmlLines.push(reflection.name + " <|.. " + type.name);
+        for (const implementedBy of implementedBys) {
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedBy, includeMembers));
+            plantUmlLines.push(reflection.name + " <|.. " + implementedBy.name);
             ++siblingsBelow;
         }
 
-        // Return no UML if there is no inheritance or implementation involved
-        if (siblingsAbove + siblingsBelow === 0) {
-            plantUmlLines = [];
-        } else {
-            if (this.options.classDiagramHideEmptyMembers) {
-                plantUmlLines.unshift("hide empty fields");
-                plantUmlLines.unshift("hide empty methods");
-            }
+        if (this.options.classDiagramHideEmptyMembers) {
+            plantUmlLines.unshift("hide empty fields");
+            plantUmlLines.unshift("hide empty methods");
+        }
 
-            if (this.options.classDiagramHideCircledChar) {
-                plantUmlLines.unshift("hide circle");
-            }
+        if (this.options.classDiagramHideCircledChar) {
+            plantUmlLines.unshift("hide circle");
+        }
 
-            if (
-                siblingsAbove > this.options.classDiagramTopDownLayoutMaxSiblings ||
-                siblingsBelow > this.options.classDiagramTopDownLayoutMaxSiblings
-            ) {
-                plantUmlLines.unshift("left to right direction");
-            }
+        if (
+            siblingsAbove > this.options.classDiagramTopDownLayoutMaxSiblings ||
+            siblingsBelow > this.options.classDiagramTopDownLayoutMaxSiblings
+        ) {
+            plantUmlLines.unshift("left to right direction");
+        }
 
-            if (this.options.classDiagramMemberVisibilityStyle === ClassDiagramMemberVisibilityStyle.Text) {
-                plantUmlLines.unshift("skinparam ClassAttributeIconSize 0");
-            }
+        if (this.options.classDiagramMemberVisibilityStyle === ClassDiagramMemberVisibilityStyle.Text) {
+            plantUmlLines.unshift("skinparam ClassAttributeIconSize 0");
+        }
 
-            if (this.options.classDiagramHideShadow) {
-                plantUmlLines.unshift("skinparam Shadowing false");
-            }
+        if (this.options.classDiagramHideShadow) {
+            plantUmlLines.unshift("skinparam Shadowing false");
+        }
 
-            if (this.options.classDiagramBoxBorderRadius) {
-                plantUmlLines.unshift("skinparam RoundCorner " + this.options.classDiagramBoxBorderRadius);
-            }
+        if (this.options.classDiagramBoxBorderRadius) {
+            plantUmlLines.unshift("skinparam RoundCorner " + this.options.classDiagramBoxBorderRadius);
+        }
 
-            if (this.options.classDiagramBoxBackgroundColor) {
-                plantUmlLines.unshift("skinparam ClassBackgroundColor " + this.options.classDiagramBoxBackgroundColor);
-            }
+        if (this.options.classDiagramBoxBackgroundColor) {
+            plantUmlLines.unshift("skinparam ClassBackgroundColor " + this.options.classDiagramBoxBackgroundColor);
+        }
 
-            if (this.options.classDiagramBoxBorderColor) {
-                plantUmlLines.unshift("skinparam ClassBorderColor " + this.options.classDiagramBoxBorderColor);
-            }
+        if (this.options.classDiagramBoxBorderColor) {
+            plantUmlLines.unshift("skinparam ClassBorderColor " + this.options.classDiagramBoxBorderColor);
+        }
 
-            if (this.options.classDiagramBoxBorderWidth >= 0) {
-                plantUmlLines.unshift("skinparam ClassBorderThickness " + this.options.classDiagramBoxBorderWidth);
-            }
+        if (this.options.classDiagramBoxBorderWidth >= 0) {
+            plantUmlLines.unshift("skinparam ClassBorderThickness " + this.options.classDiagramBoxBorderWidth);
+        }
 
-            if (this.options.classDiagramArrowColor) {
-                plantUmlLines.unshift("skinparam ClassArrowColor " + this.options.classDiagramArrowColor);
-            }
+        if (this.options.classDiagramArrowColor) {
+            plantUmlLines.unshift("skinparam ClassArrowColor " + this.options.classDiagramArrowColor);
+        }
 
-            if (this.options.classDiagramClassFontName) {
-                plantUmlLines.unshift("skinparam ClassFontName " + this.options.classDiagramClassFontName);
-            }
+        if (this.options.classDiagramClassFontName) {
+            plantUmlLines.unshift("skinparam ClassFontName " + this.options.classDiagramClassFontName);
+        }
 
-            if (this.options.classDiagramClassFontSize) {
-                plantUmlLines.unshift("skinparam ClassFontSize " + this.options.classDiagramClassFontSize);
-            }
+        if (this.options.classDiagramClassFontSize) {
+            plantUmlLines.unshift("skinparam ClassFontSize " + this.options.classDiagramClassFontSize);
+        }
 
-            if (this.options.classDiagramClassFontStyle !== FontStyle.Undefined) {
-                plantUmlLines.unshift("skinparam ClassFontStyle " + this.options.classDiagramClassFontStyle.toString());
-            }
+        if (this.options.classDiagramClassFontStyle !== FontStyle.Undefined) {
+            plantUmlLines.unshift("skinparam ClassFontStyle " + this.options.classDiagramClassFontStyle.toString());
+        }
 
-            if (this.options.classDiagramClassFontColor) {
-                plantUmlLines.unshift("skinparam ClassFontColor " + this.options.classDiagramClassFontColor);
-            }
+        if (this.options.classDiagramClassFontColor) {
+            plantUmlLines.unshift("skinparam ClassFontColor " + this.options.classDiagramClassFontColor);
+        }
 
-            if (this.options.classDiagramClassAttributeFontName) {
-                plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontName " + this.options.classDiagramClassAttributeFontName
-                );
-            }
+        if (this.options.classDiagramClassAttributeFontName) {
+            plantUmlLines.unshift(
+                "skinparam ClassAttributeFontName " + this.options.classDiagramClassAttributeFontName
+            );
+        }
 
-            if (this.options.classDiagramClassAttributeFontSize) {
-                plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontSize " + this.options.classDiagramClassAttributeFontSize
-                );
-            }
+        if (this.options.classDiagramClassAttributeFontSize) {
+            plantUmlLines.unshift(
+                "skinparam ClassAttributeFontSize " + this.options.classDiagramClassAttributeFontSize
+            );
+        }
 
-            if (this.options.classDiagramClassAttributeFontStyle !== FontStyle.Undefined) {
-                plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontStyle " + this.options.classDiagramClassAttributeFontStyle.toString()
-                );
-            }
+        if (this.options.classDiagramClassAttributeFontStyle !== FontStyle.Undefined) {
+            plantUmlLines.unshift(
+                "skinparam ClassAttributeFontStyle " + this.options.classDiagramClassAttributeFontStyle.toString()
+            );
+        }
 
-            if (this.options.classDiagramClassAttributeFontColor) {
-                plantUmlLines.unshift(
-                    "skinparam ClassAttributeFontColor " + this.options.classDiagramClassAttributeFontColor
-                );
-            }
+        if (this.options.classDiagramClassAttributeFontColor) {
+            plantUmlLines.unshift(
+                "skinparam ClassAttributeFontColor " + this.options.classDiagramClassAttributeFontColor
+            );
         }
 
         return plantUmlLines;
     }
 
     /**
-     * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a given type.
+     * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a reflection.
      * @param reflection The reflection for which the PlantUML should be generated.
      * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
-     *                       the given reflection as well.
-     * @returns The PlantUML lines for the given type.
+     *                       the reflection as well.
+     * @returns The PlantUML lines for the reflection.
      */
     protected createPlantUmlForReflection(reflection: DeclarationReflection, includeMembers: boolean): string[] {
         const plantUmlLines = new Array<string>();
@@ -191,6 +191,26 @@ export class PlantUmlCodeGenerator {
         }
 
         return plantUmlLines;
+    }
+
+    /**
+     * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a type.
+     * @param type The type for which the PlantUML should be generated.
+     * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
+     *                       the type as well.
+     * @returns The PlantUML lines for the type.
+     */
+    protected createPlantUmlForType(type: ReferenceType, includeMembers: boolean): string[] {
+        const reflection = type.reflection;
+
+        if (!reflection) {
+            // create a dummy definition: if you delete the comment older PlantUML versions raise a syntax error
+            return ["class " + type.name + " {", "' reflection not available", "}"];
+        } else if (reflection instanceof DeclarationReflection) {
+            return this.createPlantUmlForReflection(reflection, includeMembers);
+        }
+
+        return [];
     }
 
     /**
