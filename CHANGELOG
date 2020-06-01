@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2020-06-01
+### Added
+- Progress bar and option to hide it
+- New option to output the generated PlantUML code into files
+- New option for vebose output to debug the plugin
+### Fixed
+- External types without a reflection were not visible in the class diagrams
+- Creating empty diagrams that block typedoc from finishing
+- Types with complex names could lead to a PlantUML syntax error
+
 ## [0.1.5] - 2020-05-24
 ### Added
 - Embed diagrams into HTML output
@@ -36,7 +46,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.1.6...HEAD
+[0.1.6]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.6
 [0.1.5]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.5
 [0.1.4]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.4
 [0.1.3]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.1.3
