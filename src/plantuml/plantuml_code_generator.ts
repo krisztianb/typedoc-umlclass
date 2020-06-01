@@ -44,7 +44,7 @@ export class PlantUmlCodeGenerator {
 
         for (const extendedType of extendedTypes) {
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedType, includeMembers));
-            plantUmlLines.push(extendedType.name + " <|-- " + reflection.name);
+            plantUmlLines.push(this.escapeName(extendedType.name) + " <|-- " + this.escapeName(reflection.name));
             ++siblingsAbove;
         }
 
@@ -53,7 +53,7 @@ export class PlantUmlCodeGenerator {
 
         for (const implementedType of implementedTypes) {
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedType, includeMembers));
-            plantUmlLines.push(implementedType.name + " <|.. " + reflection.name);
+            plantUmlLines.push(this.escapeName(implementedType.name) + " <|.. " + this.escapeName(reflection.name));
             ++siblingsAbove;
         }
 
@@ -62,7 +62,7 @@ export class PlantUmlCodeGenerator {
 
         for (const extendedBy of extendedBys) {
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedBy, includeMembers));
-            plantUmlLines.push(reflection.name + " <|-- " + extendedBy.name);
+            plantUmlLines.push(this.escapeName(reflection.name) + " <|-- " + this.escapeName(extendedBy.name));
             ++siblingsBelow;
         }
 
@@ -71,7 +71,7 @@ export class PlantUmlCodeGenerator {
 
         for (const implementedBy of implementedBys) {
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedBy, includeMembers));
-            plantUmlLines.push(reflection.name + " <|.. " + implementedBy.name);
+            plantUmlLines.push(this.escapeName(reflection.name) + " <|.. " + this.escapeName(implementedBy.name));
             ++siblingsBelow;
         }
 
@@ -204,8 +204,17 @@ export class PlantUmlCodeGenerator {
         const reflection = type.reflection;
 
         if (!reflection) {
-            // create a dummy definition: if you delete the comment older PlantUML versions raise a syntax error
-            return ["class " + type.name + " {", "' reflection not available", "}"];
+            // create a dummy definition for the type which has no reflection
+            const name = this.escapeName(type.toString());
+            const code = new Array<string>();
+
+            code.push("hide " + name + " circle"); // hide the circle, because we don't know if it is really a class
+            code.push("class " + name + " {");
+            // Older PlantUML versions raise a syntax error when the class body is empty. So we add a comment:
+            code.push("    ' reflection not available");
+            code.push("}");
+
+            return code;
         } else if (reflection instanceof DeclarationReflection) {
             return this.createPlantUmlForReflection(reflection, includeMembers);
         }
@@ -309,8 +318,17 @@ export class PlantUmlCodeGenerator {
             plantUml += "interface ";
         }
 
-        plantUml += reflection.name;
+        plantUml += this.escapeName(reflection.name);
 
         return plantUml;
+    }
+
+    /**
+     * Escapes the name by putting double quotes around it preventing a PlantUML syntax error.
+     * @param name The original name.
+     * @returns The escaped name.
+     */
+    private escapeName(name: string): string {
+        return '"' + name + '"';
     }
 }
