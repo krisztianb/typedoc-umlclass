@@ -1,24 +1,49 @@
-// tslint:disable-next-line:no-var-requires
-const plantuml = require("node-plantuml"); // there are no type definitions for this module :-(
+import { PlantUmlPipe } from "plantuml-pipe";
+import Queue = require("queue-fifo");
 
 /**
  * Class for generating a diagram from PlantUML code.
+ * @typeparam The type of the identifier data.
  */
-export class PlantUmlDiagramGenerator {
+export class PlantUmlDiagramGenerator<TID> {
     /**
-     * Promises to write a diagram as an image into a buffer.
-     * @param plantUml The PlantUML code for the diagram.
-     * @param imageFormat The format of the image to generate. (eg.: "png" or "svg")
-     * @returns The promise of a buffer including the image of the diagram.
+     * The object which encapsulates the PlantUML JAVA process.
      */
-    public generateFromCode(plantUml: string, imageFormat: string): Promise<Buffer> {
-        return new Promise((resolve, reject) => {
-            const chunks = new Array<Buffer>();
-            const gen = plantuml.generate(plantUml, { format: imageFormat });
+    private plantUmlPipe: PlantUmlPipe;
 
-            gen.out.on("data", (chunk: Buffer) => chunks.push(chunk));
-            gen.out.on("error", (e: Error) => reject(e));
-            gen.out.on("end", () => resolve(Buffer.concat(chunks)));
+    /**
+     * Queue for identifiers of the generated diagrams.
+     */
+    private identifierQueue = new Queue<unknown>();
+
+    /**
+     * Creates a new PlantUML generator object.
+     * @param format The format for the generated diagrams.
+     * @param imageReadyHandler Callback called whenever a diagram has been generated.
+     */
+    constructor(format: "png" | "svg", imageReadyHandler: (id: TID, imageData: Buffer) => unknown) {
+        this.plantUmlPipe = new PlantUmlPipe({ outputFormat: format });
+
+        this.plantUmlPipe.out.on("data", (imageData: Buffer) => {
+            const id = this.identifierQueue.dequeue() as TID;
+            imageReadyHandler(id, imageData);
         });
+    }
+
+    /**
+     * Writes the PlantUML code to the PlantUML generator object.
+     * @param id The identifier for the PlantUML code.
+     * @param plantUml The PlantUML code.
+     */
+    public generate(id: TID, plantUml: string): void {
+        this.identifierQueue.enqueue(id);
+        this.plantUmlPipe.in.write(plantUml);
+    }
+
+    /**
+     * Shuts the PlantUML diagram generator down.
+     */
+    public shutdown(): void {
+        this.plantUmlPipe.in.end();
     }
 }

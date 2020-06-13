@@ -159,7 +159,7 @@ export class PlantUmlCodeGenerator {
             );
         }
 
-        return plantUmlLines;
+        return ["@startuml", ...plantUmlLines, "@enduml"];
     }
 
     /**

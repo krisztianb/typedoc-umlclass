@@ -39,7 +39,9 @@ export class Plugin {
     private plantUmlCodeGenerator!: CachingPlantUmlCodeGenerator;
 
     /** Object that uses PlantUML code to generate PlantUML diagrams. */
-    private plantUmlDiagramGenerator = new PlantUmlDiagramGenerator();
+    private plantUmlDiagramGenerator!:
+        | PlantUmlDiagramGenerator<{ reflection: DeclarationReflection; pageFilePath: string }>
+        | undefined;
 
     /** Objet that generates URLs for PlantUML diagrams.  */
     private imageUrlGenerator = new ImageUrlGenerator();
@@ -58,6 +60,17 @@ export class Plugin {
         return (
             this.options.classDiagramType === ClassDiagramType.Simple ||
             this.options.classDiagramType === ClassDiagramType.Detailed
+        );
+    }
+
+    /**
+     * Checks if the plugin is generating images from the generated PlantUML code.
+     * @returns True if the plugin is generating images, otherwise false.
+     */
+    get isGeneratingImages(): boolean {
+        return (
+            this.options.outputImageLocation === ImageLocation.Local ||
+            this.options.outputImageLocation === ImageLocation.Embed
         );
     }
 
@@ -154,6 +167,13 @@ export class Plugin {
     public onRendererBegin(event: RendererEvent): void {
         if (this.isActive) {
             this.outputDirectory = path.join(event.outputDirectory, "assets/images/");
+
+            if (this.isGeneratingImages) {
+                this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
+                    this.options.outputImageFormat,
+                    this.onImageGenerated
+                );
+            }
         }
     }
 
@@ -221,40 +241,52 @@ export class Plugin {
             this.writePlantUmlFileForReflection(plantUml, reflection);
         }
 
-        let imageUrlPromise: Promise<string>;
-
-        if (this.options.outputImageLocation === ImageLocation.Local) {
-            imageUrlPromise = this.plantUmlDiagramGenerator
-                .generateFromCode(plantUml, this.options.outputImageFormat)
-                .then((result: Buffer) => {
-                    this.log?.info(`Writing local image file for reflection ${reflection.name} ...`);
-                    const absoluteImageFilePath = this.writeLocalImageFileForReflection(result, reflection);
-                    this.log?.info(`Creating local image URL for reflection ${reflection.name} ...`);
-                    return this.imageUrlGenerator.createLocalImageFileUrl(event.filename, absoluteImageFilePath);
-                });
-        } else if (this.options.outputImageLocation === ImageLocation.Embed) {
-            imageUrlPromise = this.plantUmlDiagramGenerator
-                .generateFromCode(plantUml, this.options.outputImageFormat)
-                .then((result: Buffer) => {
-                    this.log?.info(`Creating embedded image URL for reflection ${reflection.name} ...`);
-                    return this.imageUrlGenerator.createEmbeddedImageUrl(result, this.options.outputImageFormat);
-                });
-        } else {
-            imageUrlPromise = new Promise<string>((resolve) => {
+        if (this.isGeneratingImages && this.plantUmlDiagramGenerator) {
+            this.plantUmlDiagramGenerator.generate({ reflection, pageFilePath: event.filename }, plantUml + "\n");
+        } else if (this.options.outputImageLocation === ImageLocation.Remote) {
+            new Promise<string>((resolve) => {
                 this.log?.info(`Creating remote image URL for reflection ${reflection.name} ...`);
                 resolve(this.imageUrlGenerator.createPlantUmlServerUrl(plantUml, this.options.outputImageFormat));
-            });
-        }
-
-        imageUrlPromise
-            .then((imageUrl: string) => {
-                this.log?.info(`Inserting diagram into page for reflection ${reflection.name} ...`);
-                this.insertHierarchyDiagramIntoFile(event.filename, reflection.name, imageUrl);
-                this.progressBar?.tick();
             })
-            .catch((e: Error) => {
-                this.log?.error(`Failed inserting diagram into page for reflection ${reflection.name}: ${e.message}`);
-            });
+                .then((imageUrl: string) => {
+                    this.log?.info(`Inserting diagram into page for reflection ${reflection.name} ...`);
+                    this.insertHierarchyDiagramIntoFile(event.filename, reflection.name, imageUrl);
+                    this.progressBar?.tick();
+                })
+                .catch((e: Error) => {
+                    this.log?.error(
+                        `Failed inserting diagram into page for reflection ${reflection.name}: ${e.message}`
+                    );
+                });
+        }
+    }
+
+    /**
+     * Called by the PlantUmlDiagramGenerator when a diagram images has been generated.
+     * @param id The reflection for which the image was generated.
+     * @param imageData The data of the generated image.
+     */
+    private onImageGenerated(id: { reflection: DeclarationReflection; pageFilePath: string }, imageData: Buffer): void {
+        try {
+            let imageUrl = "";
+
+            if (this.options.outputImageLocation === ImageLocation.Local) {
+                this.log?.info(`Writing local image file for reflection ${id.reflection.name} ...`);
+                const absoluteImageFilePath = this.writeLocalImageFileForReflection(imageData, id.reflection);
+
+                this.log?.info(`Creating local image URL for reflection ${id.reflection.name} ...`);
+                imageUrl = this.imageUrlGenerator.createLocalImageFileUrl(id.pageFilePath, absoluteImageFilePath);
+            } else {
+                this.log?.info(`Creating embedded image URL for reflection ${id.reflection.name} ...`);
+                imageUrl = this.imageUrlGenerator.createEmbeddedImageUrl(imageData, this.options.outputImageFormat);
+            }
+
+            this.log?.info(`Inserting diagram into page for reflection ${id.reflection.name} ...`);
+            this.insertHierarchyDiagramIntoFile(id.pageFilePath, id.reflection.name, imageUrl);
+            this.progressBar?.tick();
+        } catch (e) {
+            this.log?.error(`Failed inserting diagram into page for reflection ${id.reflection.name}: ${e.message}`);
+        }
     }
 
     /**
@@ -280,8 +312,7 @@ export class Plugin {
         const filename = reflection.name + "-umlClassDiagram-" + reflection.id + ".puml";
         const absoluteFilePath = path.join(this.outputDirectory, filename);
 
-        const fileContent = "@startuml\n" + plantUml + "\n@enduml";
-        fs.writeFileSync(absoluteFilePath, fileContent, "utf8");
+        fs.writeFileSync(absoluteFilePath, plantUml, "utf8");
     }
 
     /**
@@ -342,6 +373,10 @@ export class Plugin {
             fs.writeFileSync(filename, data, "utf8");
 
             this.log?.info("DONE");
+
+            if (this.isGeneratingImages && this.plantUmlDiagramGenerator) {
+                this.plantUmlDiagramGenerator.shutdown();
+            }
         }
     }
 }

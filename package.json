@@ -13,9 +13,12 @@
         "typedocplugin"
     ],
     "dependencies": {
-        "node-plantuml": "^0.5.0",
+        "binary-split": "^1.0.5",
         "plantuml-encoder": "^1.4.0",
-        "progress": "^2.0.3"
+        "plantuml-pipe": "^1.0.0",
+        "progress": "^2.0.3",
+        "queue-fifo": "^0.2.6",
+        "split2": "^3.1.1"
     },
     "devDependencies": {
         "@types/node": "^13.13.4",
