@@ -35,6 +35,9 @@ export class Plugin {
     /** The directory in which the plugin generates files. */
     private outputDirectory!: string;
 
+    /** Stores how many diagrams the plugin has to generate. */
+    private numberOfDiagramsToGenerate = 0;
+
     /** Object that uses TypeDoc reflection data to generate PlantUML code. */
     private plantUmlCodeGenerator!: CachingPlantUmlCodeGenerator;
 
@@ -61,6 +64,14 @@ export class Plugin {
             this.options.classDiagramType === ClassDiagramType.Simple ||
             this.options.classDiagramType === ClassDiagramType.Detailed
         );
+    }
+
+    /**
+     * Checks if the plugin has anything to do.
+     * @returns True if the plugin needs to generate diagrams, otherwise false.
+     */
+    get hasWork(): boolean {
+        return this.numberOfDiagramsToGenerate > 0;
     }
 
     /**
@@ -107,19 +118,11 @@ export class Plugin {
 
     /**
      * Triggered when the TypeDoc converter begins resolving a project.
-     * Reads plugin parameter values and init members.
+     * Reads plugin parameter values.
      * @param context Describes the current state the converter is in.
      */
     public onConverterResolveBegin(context: Context): void {
         this.options.readValuesFromApplication(context.converter.owner.application);
-
-        if (this.isActive) {
-            this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
-
-            if (this.options.createVerboseOutput) {
-                this.log = new Logger();
-            }
-        }
     }
 
     /**
@@ -128,15 +131,36 @@ export class Plugin {
      * @param context Describes the current state the converter is in.
      */
     public onConverterResolveEnd(context: Context): void {
-        if (this.isActive && !this.options.hideProgressBar) {
-            this.log?.info("Caculating number of diagrams to generate ...");
-            const numberOfDiagramsToGenerate = this.computeDiagramCount(context.project);
+        if (this.isActive) {
+            if (this.options.createVerboseOutput) {
+                this.log = new Logger();
+            }
 
-            this.log?.info("Setting up progress bar ...");
-            this.progressBar = new ProgressBar(`Adding ${numberOfDiagramsToGenerate} class diagrams [:bar] :percent`, {
-                total: numberOfDiagramsToGenerate,
-                width: 40,
-            });
+            this.log?.info("Caculating number of diagrams to generate ...");
+            this.numberOfDiagramsToGenerate = this.computeDiagramCount(context.project);
+            this.log?.info("The result is: " + this.numberOfDiagramsToGenerate.toString());
+
+            if (this.hasWork) {
+                this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
+
+                if (this.isGeneratingImages) {
+                    this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
+                        this.options.outputImageFormat,
+                        this.onImageGenerated
+                    );
+
+                    if (!this.options.hideProgressBar) {
+                        this.log?.info("Setting up progress bar ...");
+                        this.progressBar = new ProgressBar(
+                            `Adding ${this.numberOfDiagramsToGenerate} class diagrams [:bar] :percent`,
+                            {
+                                total: this.numberOfDiagramsToGenerate,
+                                width: 40,
+                            }
+                        );
+                    }
+                }
+            }
         }
     }
 
@@ -165,15 +189,8 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererBegin(event: RendererEvent): void {
-        if (this.isActive) {
+        if (this.isActive && this.hasWork) {
             this.outputDirectory = path.join(event.outputDirectory, "assets/images/");
-
-            if (this.isGeneratingImages) {
-                this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
-                    this.options.outputImageFormat,
-                    this.onImageGenerated
-                );
-            }
         }
     }
 
@@ -183,11 +200,13 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererEndPage(event: PageEvent): void {
-        if (this.isActive && this.shouldProcessPage(event.contents, event.model)) {
-            this.log?.info(`Processing page for reflection ${event.model?.name} ...`);
-            this.processPage(event);
-        } else {
-            this.log?.info(`Skipping page for reflection ${event.model?.name} ...`);
+        if (this.isActive && this.hasWork) {
+            if (this.shouldProcessPage(event.contents, event.model)) {
+                this.log?.info(`Processing page for reflection ${event.model?.name} ...`);
+                this.processPage(event);
+            } else {
+                this.log?.info(`Skipping page for reflection ${event.model?.name} ...`);
+            }
         }
     }
 
@@ -242,22 +261,18 @@ export class Plugin {
         }
 
         if (this.isGeneratingImages && this.plantUmlDiagramGenerator) {
+            this.log?.info(`Creating diagram image for reflection ${reflection.name} ...`);
             this.plantUmlDiagramGenerator.generate({ reflection, pageFilePath: event.filename }, plantUml + "\n");
         } else if (this.options.outputImageLocation === ImageLocation.Remote) {
-            new Promise<string>((resolve) => {
-                this.log?.info(`Creating remote image URL for reflection ${reflection.name} ...`);
-                resolve(this.imageUrlGenerator.createPlantUmlServerUrl(plantUml, this.options.outputImageFormat));
-            })
-                .then((imageUrl: string) => {
-                    this.log?.info(`Inserting diagram into page for reflection ${reflection.name} ...`);
-                    this.insertHierarchyDiagramIntoFile(event.filename, reflection.name, imageUrl);
-                    this.progressBar?.tick();
-                })
-                .catch((e: Error) => {
-                    this.log?.error(
-                        `Failed inserting diagram into page for reflection ${reflection.name}: ${e.message}`
-                    );
-                });
+            this.log?.info(`Creating remote image URL for reflection ${reflection.name} ...`);
+            const imageUrl = this.imageUrlGenerator.createPlantUmlServerUrl(plantUml, this.options.outputImageFormat);
+
+            this.log?.info(`Inserting diagram into page for reflection ${reflection.name} ...`);
+            event.contents = this.insertHierarchyDiagramIntoContent(
+                event.contents as string,
+                reflection.name,
+                imageUrl
+            );
         }
     }
 
@@ -266,28 +281,28 @@ export class Plugin {
      * @param id The reflection for which the image was generated.
      * @param imageData The data of the generated image.
      */
-    private onImageGenerated(id: { reflection: DeclarationReflection; pageFilePath: string }, imageData: Buffer): void {
-        try {
-            let imageUrl = "";
+    private readonly onImageGenerated = (
+        id: { reflection: DeclarationReflection; pageFilePath: string },
+        imageData: Buffer
+    ): void => {
+        let imageUrl = "";
 
-            if (this.options.outputImageLocation === ImageLocation.Local) {
-                this.log?.info(`Writing local image file for reflection ${id.reflection.name} ...`);
-                const absoluteImageFilePath = this.writeLocalImageFileForReflection(imageData, id.reflection);
+        if (this.options.outputImageLocation === ImageLocation.Local) {
+            this.log?.info(`Writing local image file for reflection ${id.reflection.name} ...`);
+            const absoluteImageFilePath = this.writeLocalImageFileForReflection(imageData, id.reflection);
 
-                this.log?.info(`Creating local image URL for reflection ${id.reflection.name} ...`);
-                imageUrl = this.imageUrlGenerator.createLocalImageFileUrl(id.pageFilePath, absoluteImageFilePath);
-            } else {
-                this.log?.info(`Creating embedded image URL for reflection ${id.reflection.name} ...`);
-                imageUrl = this.imageUrlGenerator.createEmbeddedImageUrl(imageData, this.options.outputImageFormat);
-            }
-
-            this.log?.info(`Inserting diagram into page for reflection ${id.reflection.name} ...`);
-            this.insertHierarchyDiagramIntoFile(id.pageFilePath, id.reflection.name, imageUrl);
-            this.progressBar?.tick();
-        } catch (e) {
-            this.log?.error(`Failed inserting diagram into page for reflection ${id.reflection.name}: ${e.message}`);
+            this.log?.info(`Creating local image URL for reflection ${id.reflection.name} ...`);
+            imageUrl = this.imageUrlGenerator.createLocalImageFileUrl(id.pageFilePath, absoluteImageFilePath);
+        } else {
+            this.log?.info(`Creating embedded image URL for reflection ${id.reflection.name} ...`);
+            imageUrl = this.imageUrlGenerator.createEmbeddedImageUrl(imageData, this.options.outputImageFormat);
         }
-    }
+
+        this.log?.info(`Inserting diagram into page for reflection ${id.reflection.name} ...`);
+        this.insertHierarchyDiagramIntoFile(id.pageFilePath, id.reflection.name, imageUrl);
+
+        this.progressBar?.tick();
+    };
 
     /**
      * Creates a local file with the class diagram of a reflection.
@@ -363,7 +378,7 @@ export class Plugin {
      * @param event The event emitted by the renderer class.
      */
     public onRendererEnd(event: RendererEvent): void {
-        if (this.isActive) {
+        if (this.isActive && this.hasWork) {
             this.log?.info("Attaching content to main.css file ...");
 
             const filename = path.join(event.outputDirectory, "assets/css/main.css");

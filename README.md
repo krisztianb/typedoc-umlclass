@@ -129,8 +129,9 @@ The following options are added to TypeDoc when the plugin is installed.
 ### Other settings
 
 -   `--umlClassDiagramHideProgressBar <true|false>`<br>
-    Since generating many diagrams can take several minutes the plugin displays a progress bar. However if other
-    plugins also output information to the console then the progress bar can mess that output up. If this is the case
+    Since generating many diagrams can take several minutes the plugin displays a progress bar when the diagrams are
+    created as local files or embedded into the HTML. No progress bar is displayed when generating remote URLs. If other
+    plugins also output information to the console then the progress bar can disturb that output. If this is the case
     you can disable the progress bar of this plugin using the value `true`.
     Default is `false`.
 -   `--umlClassDiagramCreatePlantUmlFiles <true|false>`<br>
