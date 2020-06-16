@@ -145,6 +145,7 @@ export class Plugin {
 
                 if (this.isGeneratingImages) {
                     this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
+                        this.options.generatorProcessCount,
                         this.options.outputImageFormat,
                         this.onImageGenerated
                     );

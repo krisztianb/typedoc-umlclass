@@ -128,6 +128,11 @@ The following options are added to TypeDoc when the plugin is installed.
 
 ### Other settings
 
+-   `--umlClassDiagramGeneratorProcessCount <integer>`<br>
+    Generating many diagrams can take several minutes. You can use this option to define how many PlantUML JAVA
+    processes should be used to generate the diagrams. The work is evenly scheduled among these processes. To increase
+    the performance of the plugin, it is a good idea to set this value to the number of CPUs that are available.
+    Default is `1`.
 -   `--umlClassDiagramHideProgressBar <true|false>`<br>
     Since generating many diagrams can take several minutes the plugin displays a progress bar when the diagrams are
     created as local files or embedded into the HTML. No progress bar is displayed when generating remote URLs. If other

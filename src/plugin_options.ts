@@ -300,6 +300,16 @@ export class PluginOptions {
         value: "",
     };
 
+    /** Specifies how many PlantUML processes should be used for generating the class diagrams. */
+    private generatorProcessCountOption = {
+        type: ParameterType.Number,
+        name: "umlClassDiagramGeneratorProcessCount",
+        help: "The number of PlantUML processes used for generating the class diagrams.",
+        defaultValue: 1,
+        minValue: 1,
+        value: 1,
+    };
+
     /** Specifies whether to hide the progress bar while generating diagrams. */
     private hideProgressBarOption = {
         type: ParameterType.Boolean,
@@ -357,6 +367,7 @@ export class PluginOptions {
         typedoc.options.addDeclaration(this.classDiagramClassAttributeFontSizeOption as NumberDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramClassAttributeFontStyleOption as MapDeclarationOption<FontStyle>);
         typedoc.options.addDeclaration(this.classDiagramClassAttributeFontColorOption as StringDeclarationOption);
+        typedoc.options.addDeclaration(this.generatorProcessCountOption as NumberDeclarationOption);
         typedoc.options.addDeclaration(this.hideProgressBarOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.createPlantUmlFilesOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.createVerboseOutputOption as BooleanDeclarationOption);
@@ -392,6 +403,7 @@ export class PluginOptions {
         this.classDiagramClassAttributeFontSizeOption.value = typedoc.options.getValue(this.classDiagramClassAttributeFontSizeOption.name) as number;
         this.classDiagramClassAttributeFontStyleOption.value = typedoc.options.getValue(this.classDiagramClassAttributeFontStyleOption.name) as FontStyle;
         this.classDiagramClassAttributeFontColorOption.value = typedoc.options.getValue(this.classDiagramClassAttributeFontColorOption.name) as string;
+        this.generatorProcessCountOption.value = typedoc.options.getValue(this.generatorProcessCountOption.name) as number;
         this.hideProgressBarOption.value = typedoc.options.getValue(this.hideProgressBarOption.name) as boolean;
         this.createPlantUmlFilesOption.value = typedoc.options.getValue(this.createPlantUmlFilesOption.name) as boolean;
         this.createVerboseOutputOption.value = typedoc.options.getValue(this.createVerboseOutputOption.name) as boolean;
@@ -607,6 +619,14 @@ export class PluginOptions {
      */
     get classDiagramClassAttributeFontColor(): string {
         return this.classDiagramClassAttributeFontColorOption.value;
+    }
+
+    /**
+     * Returns the number of PlantUML processes that should be used for generating the class diagrams.
+     * @returns The number of PlantUML processes that should be used for generating the class diagrams.
+     */
+    get generatorProcessCount(): number {
+        return this.generatorProcessCountOption.value;
     }
 
     /**
