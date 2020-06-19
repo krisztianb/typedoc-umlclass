@@ -56,6 +56,11 @@ The following options are added to TypeDoc when the plugin is installed.
     Use this option to specify if the class diagram should be inserted `above` or `below` the default hierarchy section
     on the TypeDoc page.
     Default is `above`.
+-   `--umlClassDiagramShowLegend <true|false>`<br>
+    If this option is set to true a legend is added below the class diagram explaining the icons (eg: visibility of
+    properties and methods) used in it. The content of the legend is affected by the following options:
+    `umlClassDiagramMemberVisibilityStyle` and `umlClassDiagramHideCircledChar`.
+    Default is `false`.
 
 ### Class diagram formating
 

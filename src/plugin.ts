@@ -4,7 +4,8 @@ import * as ProgressBar from "progress";
 import { Application, DeclarationReflection, ProjectReflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
-import { ClassDiagramType } from "./enumerations";
+import { DiagramLegend } from "./diagram_legend";
+import { ClassDiagramMemberVisibilityStyle, ClassDiagramType } from "./enumerations";
 import { ImageUrlGenerator } from "./image_url_generator";
 import { Logger } from "./logger";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
@@ -49,6 +50,9 @@ export class Plugin {
 
     /** Logger for verbose output in debug mode. */
     private log: Logger | undefined;
+
+    /** Stores the legend for the diagrams, if a legend should be output by the plugin. */
+    private diagramLegendHtml: string | undefined;
 
     /**
      * Checks if the plugin is active and should generate output.
@@ -154,6 +158,13 @@ export class Plugin {
     public onRendererBegin(event: RendererEvent): void {
         if (this.isActive) {
             this.outputDirectory = path.join(event.outputDirectory, "assets/images/");
+
+            if (this.options.showLegend) {
+                this.diagramLegendHtml = DiagramLegend.createHtml(
+                    this.options.classDiagramMemberVisibilityStyle === ClassDiagramMemberVisibilityStyle.Icon,
+                    !this.options.classDiagramHideCircledChar
+                );
+            }
         }
     }
 
@@ -311,10 +322,11 @@ export class Plugin {
     ): string {
         const page = new PageProcessor(originalContent);
 
-        const hierarchyDiagramSection = PageSection.createForHierarchyDiagram(
+        const hierarchyDiagramSection = PageSection.createHierarchyDiagramSection(
             this.options.sectionTitle,
             imageUrl,
-            reflectionName
+            reflectionName,
+            this.diagramLegendHtml
         );
 
         if (this.options.classDiagramPosition === ClassDiagramPosition.Above) {
@@ -336,9 +348,23 @@ export class Plugin {
             this.log?.info("Attaching content to main.css file ...");
 
             const filename = path.join(event.outputDirectory, "assets/css/main.css");
-            const data =
+            let data =
                 fs.readFileSync(filename, "utf8") +
-                "\n.uml-class { max-width:100%; display:block; margin:0 auto; text-align:center }\n";
+                "\n" +
+                ".uml-class { max-width: 100%; display: block; margin: 0 auto; text-align: center; }\n";
+
+            if (this.options.showLegend) {
+                data +=
+                    "hr.uml-class-legend { height: 1px; border: none; background-color: #eee; margin: 10px -20px 0 -20px; }\n";
+                data += "table.uml-class-legend { display: table; margin: 0 auto; }\n";
+                data += ".tsd-panel table.uml-class-legend tr { border: 0; height: 24px; background: inherit; }\n";
+                data += "table.uml-class-legend th { border: 0; text-align: left; padding: 20px 0; }\n";
+                data += "table.uml-class-legend td { border: 0; font-size: 10px; padding: 0; }\n";
+                data +=
+                    "table.uml-class-legend td.uml-class-legend-defined { width: 14%; text-align: right; padding-right: 10px; }\n";
+                data += "table.uml-class-legend td.uml-class-legend-definition { width: 19%; text-align: left; }\n";
+            }
+
             fs.writeFileSync(filename, data, "utf8");
 
             this.log?.info("DONE");

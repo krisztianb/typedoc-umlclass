@@ -100,6 +100,15 @@ export class PluginOptions {
         value: ClassDiagramPosition.Above,
     };
 
+    /** Specifies whether to show a legend below the class diagrams. */
+    private showLegendOption = {
+        type: ParameterType.Boolean,
+        name: "umlClassDiagramShowLegend",
+        help: "true|false",
+        defaultValue: false,
+        value: false,
+    };
+
     /** Specifies how method parameters should be output in the class diagrams. */
     private classDiagramMethodParameterOutputOption = {
         type: ParameterType.Map,
@@ -338,6 +347,7 @@ export class PluginOptions {
         typedoc.options.addDeclaration(this.outputImageFormatOption as MapDeclarationOption<ImageFormat>);
         typedoc.options.addDeclaration(this.sectionTitleOption as StringDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramPositionOption as MapDeclarationOption<ClassDiagramPosition>);
+        typedoc.options.addDeclaration(this.showLegendOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramMethodParameterOutputOption as MapDeclarationOption<MethodParameterOutput>);
         typedoc.options.addDeclaration(this.classDiagramHideEmptyMembersOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramTopDownLayoutMaxSiblingsOption as NumberDeclarationOption);
@@ -373,6 +383,7 @@ export class PluginOptions {
         this.outputImageFormatOption.value = typedoc.options.getValue(this.outputImageFormatOption.name) as ImageFormat;
         this.sectionTitleOption.value = typedoc.options.getValue(this.sectionTitleOption.name) as string;
         this.classDiagramPositionOption.value = typedoc.options.getValue(this.classDiagramPositionOption.name) as ClassDiagramPosition;
+        this.showLegendOption.value = typedoc.options.getValue(this.showLegendOption.name) as boolean;
         this.classDiagramMethodParameterOutputOption.value = typedoc.options.getValue(this.classDiagramMethodParameterOutputOption.name) as MethodParameterOutput;
         this.classDiagramHideEmptyMembersOption.value = typedoc.options.getValue(this.classDiagramHideEmptyMembersOption.name) as boolean;
         this.classDiagramTopDownLayoutMaxSiblingsOption.value = typedoc.options.getValue(this.classDiagramTopDownLayoutMaxSiblingsOption.name) as number;
@@ -435,6 +446,14 @@ export class PluginOptions {
      */
     get classDiagramPosition(): ClassDiagramPosition {
         return this.classDiagramPositionOption.value;
+    }
+
+    /**
+     * Returns whether to show a legend below the class diagrams.
+     * @returns Whether to show a legend below the class diagrams.
+     */
+    get showLegend(): boolean {
+        return this.showLegendOption.value;
     }
 
     /**
