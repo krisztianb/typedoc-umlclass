@@ -348,21 +348,13 @@ export class Plugin {
             this.log?.info("Attaching content to main.css file ...");
 
             const filename = path.join(event.outputDirectory, "assets/css/main.css");
+
             let data =
                 fs.readFileSync(filename, "utf8") +
-                "\n" +
-                ".uml-class { max-width: 100%; display: block; margin: 0 auto; text-align: center; }\n";
+                "\n.uml-class { max-width: 100%; display: block; margin: 0 auto; text-align: center; }\n";
 
             if (this.options.showLegend) {
-                data +=
-                    "hr.uml-class-legend { height: 1px; border: none; background-color: #eee; margin: 10px -20px 0 -20px; }\n";
-                data += "table.uml-class-legend { display: table; margin: 0 auto; }\n";
-                data += ".tsd-panel table.uml-class-legend tr { border: 0; height: 24px; background: inherit; }\n";
-                data += "table.uml-class-legend th { border: 0; text-align: left; padding: 20px 0; }\n";
-                data += "table.uml-class-legend td { border: 0; font-size: 10px; padding: 0; }\n";
-                data +=
-                    "table.uml-class-legend td.uml-class-legend-defined { width: 14%; text-align: right; padding-right: 10px; }\n";
-                data += "table.uml-class-legend td.uml-class-legend-definition { width: 19%; text-align: left; }\n";
+                data += DiagramLegend.getCss();
             }
 
             fs.writeFileSync(filename, data, "utf8");

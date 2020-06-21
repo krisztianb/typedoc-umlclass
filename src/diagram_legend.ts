@@ -1,5 +1,5 @@
 /**
- * Class for generating the HTML for a diagram legend.
+ * Class for generating the HTML and CSS for a diagram legend.
  */
 export class DiagramLegend {
     /**
@@ -9,60 +9,91 @@ export class DiagramLegend {
      * @returns The HTML for the diagram legend.
      */
     public static createHtml(memberVisbilityIsIcons: boolean, describeCircledChars: boolean): string {
-        let legend = `<hr class="uml-class-legend" />
-                      <table class="uml-class-legend">
-                         <tr>
-                             <th colspan="6">Legend</th>
-                         </tr>`;
+        let legend = `<h4>Legend</h4>
+                      <div class="legend">`;
 
         if (describeCircledChars) {
-            legend += `<tr>
-                           <td class="uml-class-legend-defined"><img src="data:image/svg+xml;base64,${Image.ClassCircledChar}" /></td>
-                           <td class="uml-class-legend-definition">class</td>
-                           <td class="uml-class-legend-defined"><img src="data:image/svg+xml;base64,${Image.AbstractClassCircledChar}" /></td>
-                           <td class="uml-class-legend-definition">abstract class</td>
-                           <td class="uml-class-legend-defined"><img src="data:image/svg+xml;base64,${Image.InterfaceCircledChar}" /></td>
-                           <td class="uml-class-legend-definition">interface</td>
-                       </tr>`;
+            legend += `<div>
+                           <span class="dt"><img src="data:image/svg+xml;base64,${Image.ClassCircledChar}" alt="icon for a class in the UML class diagram" /></span>
+                           <span class="dd">class</span>
+                       </div>
+                       <div>
+                           <span class="dt"><img src="data:image/svg+xml;base64,${Image.AbstractClassCircledChar}" alt="icon for an abstract class in the UML class diagram" /></span>
+                           <span class="dd">abstract class</span>
+                       </div>
+                       <div>
+                           <span class="dt"><img src="data:image/svg+xml;base64,${Image.InterfaceCircledChar}" alt="icon for an interface in the UML class diagram" /></span>
+                           <span class="dd">interface</span>
+                       </div>`;
         }
 
         if (memberVisbilityIsIcons) {
-            legend += `<tr>
-                           <td class="uml-class-legend-defined"><img src="data:image/svg+xml;base64,${Image.PublicProperty}" /></td>
-                           <td class="uml-class-legend-definition">public property</td>
-                           <td class="uml-class-legend-defined"><img src="data:image/svg+xml;base64,${Image.ProtectedProperty}" /></td>
-                           <td class="uml-class-legend-definition">protected property</td>
-                           <td class="uml-class-legend-defined"><img src="data:image/svg+xml;base64,${Image.PprivateProperty}" /></td>
-                           <td class="uml-class-legend-definition">private property</td>
-                       </tr>
-                       <tr>
-                           <td class="uml-class-legend-defined"><img src="data:image/svg+xml;base64,${Image.PublicMethod}" /></td>
-                           <td class="uml-class-legend-definition">public method</td>
-                           <td class="uml-class-legend-defined"><img src="data:image/svg+xml;base64,${Image.ProtectedMethod}" /></td>
-                           <td class="uml-class-legend-definition">protected method</td>
-                           <td class="uml-class-legend-defined"><img src="data:image/svg+xml;base64,${Image.PrivateMethod}" /></td>
-                           <td class="uml-class-legend-definition">private method</td>
-                       </tr>`;
+            legend += `<div>
+                           <span class="dt"><img src="data:image/svg+xml;base64,${Image.PublicProperty}" alt="icon for a public property in the UML class diagram" /></span>
+                           <span class="dd">public property</span>
+                       </div>
+                       <div>
+                           <span class="dt"><img src="data:image/svg+xml;base64,${Image.ProtectedProperty}" alt="icon for a protected property in the UML class diagram" /></span>
+                           <span class="dd">protected property</span>
+                       </div>
+                       <div>
+                           <span class="dt"><img src="data:image/svg+xml;base64,${Image.PprivateProperty}" alt="icon for a private property in the UML class diagram" /></span>
+                           <span class="dd">private property</span>
+                       </div>
+                       <div>
+                           <span class="dt"><img src="data:image/svg+xml;base64,${Image.PublicMethod}" alt="icon for a public method in the UML class diagram" /></span>
+                           <span class="dd">public method</span>
+                       </div>
+                       <div>
+                           <span class="dt"><img src="data:image/svg+xml;base64,${Image.ProtectedMethod}" alt="icon for a protected method in the UML class diagram" /></span>
+                           <span class="dd">protected method</span>
+                       </div>
+                       <div>
+                           <span class="dt"><img src="data:image/svg+xml;base64,${Image.PrivateMethod}" alt="icon for a private method in the UML class diagram" /></span>
+                           <span class="dd">private method</span>
+                       </div>`;
         } else {
-            legend += `<tr>
-                           <td class="uml-class-legend-defined">+</td>
-                           <td class="uml-class-legend-definition">public property/method</td>
-                           <td class="uml-class-legend-defined">#</td>
-                           <td class="uml-class-legend-definition">protected property/method</td>
-                           <td class="uml-class-legend-defined">-</td>
-                           <td class="uml-class-legend-definition">private property/method</td>
-                       </tr>`;
+            legend += `<div>
+                           <span class="dt">+</span>
+                           <span class="dd">public property/method</span>
+                       </div>
+                       <div>
+                           <span class="dt">#</span>
+                           <span class="dd">protected property/method</span>
+                       </div>
+                       <div>
+                           <span class="dt">-</span>
+                           <span class="dd">private property/method</span>
+                       </div>`;
         }
 
-        legend += `<tr>
-                       <td class="uml-class-legend-defined"><u>underlined</u></td>
-                       <td class="uml-class-legend-definition">static property/method</td>
-                       <td class="uml-class-legend-defined"><i>italic</i></td>
-                       <td class="uml-class-legend-definition">abstract property/method</td>
-                   </tr>
-               </table>`;
+        legend += `    <div>
+                           <span class="dt underlined">underlined</span>
+                           <span class="dd">static property/method</span>
+                       </div>
+                       <div>
+                           <span class="dt italic">italic</span>
+                           <span class="dd">abstract property/method</span>
+                       </div>
+                   </div>`;
 
         return legend;
+    }
+
+    /**
+     * Returns the CSS that is required to format the HTML of the diagram legend.
+     * @returns The CSS for the HTML of the diagram legend.
+     */
+    public static getCss(): string {
+        return (
+            ".tsd-hierarchy-diagram h4 { margin: 10px -20px 5px -20px; border-top: 1px solid #eee; padding: 10px 20px; }\n" +
+            ".tsd-hierarchy-diagram .legend { display: flex; flex-flow: row wrap; align-items: center; font-size: 10px; }\n" +
+            ".tsd-hierarchy-diagram .legend div { width: 185px; display: flex; flex-flow: row nowrap; align-items: center; height: 34px; }\n" +
+            ".tsd-hierarchy-diagram .legend div span.dt { display: block; width: 55px; text-align: center; margin-right: 5px; }\n" +
+            ".tsd-hierarchy-diagram .legend div span.dd { display: block; }\n" +
+            ".tsd-hierarchy-diagram .legend div span.dt.underlined { text-decoration: underline; }\n" +
+            ".tsd-hierarchy-diagram .legend div span.dt.italic { font-style: italic; }`\n"
+        );
     }
 }
 
