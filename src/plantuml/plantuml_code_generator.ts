@@ -208,11 +208,15 @@ export class PlantUmlCodeGenerator {
             const name = this.escapeName(type.toString());
             const code = new Array<string>();
 
-            code.push("hide " + name + " circle"); // hide the circle, because we don't know if it is really a class
             code.push("class " + name + " {");
             // Older PlantUML versions raise a syntax error when the class body is empty. So we add a comment:
             code.push("    ' reflection not available");
             code.push("}");
+
+            // Note:
+            // The following hide command must be behind the class definition because of a bug in PlantUML.
+            // See: https://github.com/plantuml/plantuml/issues/342
+            code.push("hide " + name + " circle"); // hide the circle, because we don't know if it is really a class
 
             return code;
         } else if (reflection instanceof DeclarationReflection) {
