@@ -5,7 +5,7 @@ import { Application, DeclarationReflection, ProjectReflection, ReflectionKind }
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { DiagramLegend } from "./diagram_legend";
-import { ClassDiagramMemberVisibilityStyle, ClassDiagramType } from "./enumerations";
+import { ClassDiagramType, LegendType } from "./enumerations";
 import { ImageUrlGenerator } from "./image_url_generator";
 import { Logger } from "./logger";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
@@ -50,9 +50,6 @@ export class Plugin {
 
     /** Logger for verbose output in debug mode. */
     private log: Logger | undefined;
-
-    /** Stores the legend for the diagrams, if a legend should be output by the plugin. */
-    private diagramLegendHtml: string | undefined;
 
     /**
      * Checks if the plugin is active and should generate output.
@@ -158,13 +155,6 @@ export class Plugin {
     public onRendererBegin(event: RendererEvent): void {
         if (this.isActive) {
             this.outputDirectory = path.join(event.outputDirectory, "assets/images/");
-
-            if (this.options.showLegend) {
-                this.diagramLegendHtml = DiagramLegend.createHtml(
-                    this.options.classDiagramMemberVisibilityStyle === ClassDiagramMemberVisibilityStyle.Icon,
-                    !this.options.classDiagramHideCircledChar
-                );
-            }
         }
     }
 
@@ -325,8 +315,7 @@ export class Plugin {
         const hierarchyDiagramSection = PageSection.createHierarchyDiagramSection(
             this.options.sectionTitle,
             imageUrl,
-            reflectionName,
-            this.diagramLegendHtml
+            reflectionName
         );
 
         if (this.options.classDiagramPosition === ClassDiagramPosition.Above) {
@@ -353,7 +342,7 @@ export class Plugin {
                 fs.readFileSync(filename, "utf8") +
                 "\n.uml-class { max-width: 100%; display: block; margin: 0 auto; text-align: center; }\n";
 
-            if (this.options.showLegend) {
+            if (this.options.legendType !== LegendType.None) {
                 data += DiagramLegend.getCss();
             }
 

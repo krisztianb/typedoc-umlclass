@@ -35,3 +35,12 @@ export enum MethodParameterOutput {
     OnlyTypes = 2,
     Complete = 3,
 }
+
+/**
+ * Possible diagram legend types.
+ */
+export enum LegendType {
+    None = 0,
+    OnlyIncluded = 1,
+    Complete = 2,
+}
