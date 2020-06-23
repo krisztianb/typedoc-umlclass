@@ -2,107 +2,166 @@
  * Class for generating the HTML and CSS for a diagram legend.
  */
 export class DiagramLegend {
+    private hasClassIcon: boolean;
+    private hasAbstractClassIcon: boolean;
+    private hasInterfaceIcon: boolean;
+    private hasPublicPropertyItem: boolean;
+    private hasProtectedPropertyItem: boolean;
+    private hasPrivatePropertyItem: boolean;
+    private hasPublicMethodItem: boolean;
+    private hasProtectedMethodItem: boolean;
+    private hasPrivateMethodItem: boolean;
+    private hasStaticMemberItem: boolean;
+    private hasAbstractMemberItem: boolean;
+
     /**
-     * Creates the HTML for a complete diagram legend with a given style.
-     * @param style The style of the items used within the legend.
-     * @returns The HTML for the diagram legend.
+     * Creates a new legend for a diagram.
+     * @param hasClassItem Include the class item in the legend?
+     * @param hasAbstractClassItem Include the abstract class item in the legend?
+     * @param hasInterfaceItem Include the interface item in the legend?
+     * @param hasPublicPropertyItem Include the public property item in the legend?
+     * @param hasProtectedPropertyItem Include the protected property item in the legend?
+     * @param hasPrivatePropertyItem Include the private property item in the legend?
+     * @param hasPublicMethodItem Include the public method item in the legend?
+     * @param hasProtectedMethodItem Include the protected method item in the legend?
+     * @param hasPrivateMethodItem Include the private method item in the legend?
+     * @param hasStaticMemberItem Include the static member item in the legend?
+     * @param hasAbstractMemberItem Include the abstract member item in the legend?
      */
-    public static createCompleteHtml(style: "text" | "icon"): string {
-        return DiagramLegend.createHtml({
-            style,
-            hasClassItem: true,
-            hasAbstractClassItem: true,
-            hasInterfaceItem: true,
-            hasPublicPropertyItem: true,
-            hasProtectedPropertyItem: true,
-            hasPrivatePropertyItem: true,
-            hasPublicMethodItem: true,
-            hasProtectedMethodItem: true,
-            hasPrivateMethodItem: true,
-            hasStaticMemberItem: true,
-            hasAbstractMemberItem: true,
-        });
+    constructor(
+        hasClassItem: boolean = true,
+        hasAbstractClassItem: boolean = true,
+        hasInterfaceItem: boolean = true,
+        hasPublicPropertyItem: boolean = true,
+        hasProtectedPropertyItem: boolean = true,
+        hasPrivatePropertyItem: boolean = true,
+        hasPublicMethodItem: boolean = true,
+        hasProtectedMethodItem: boolean = true,
+        hasPrivateMethodItem: boolean = true,
+        hasStaticMemberItem: boolean = true,
+        hasAbstractMemberItem: boolean = true
+    ) {
+        this.hasClassIcon = hasClassItem;
+        this.hasAbstractClassIcon = hasAbstractClassItem;
+        this.hasInterfaceIcon = hasInterfaceItem;
+        this.hasPublicPropertyItem = hasPublicPropertyItem;
+        this.hasProtectedPropertyItem = hasProtectedPropertyItem;
+        this.hasPrivatePropertyItem = hasPrivatePropertyItem;
+        this.hasPublicMethodItem = hasPublicMethodItem;
+        this.hasProtectedMethodItem = hasProtectedMethodItem;
+        this.hasPrivateMethodItem = hasPrivateMethodItem;
+        this.hasStaticMemberItem = hasStaticMemberItem;
+        this.hasAbstractMemberItem = hasAbstractMemberItem;
     }
 
     /**
-     * Creates the HTML for a diagram legend whos content depends on the given options.
-     * @param options On object describing the content of the legend.
+     * Checks if the legend has nothing to display.
+     * @returns True if the legend is empty, otherwise false.
+     */
+    get isEmpty(): boolean {
+        return (
+            !this.hasClassIcon &&
+            !this.hasAbstractClassIcon &&
+            !this.hasInterfaceIcon &&
+            !this.hasPublicPropertyItem &&
+            !this.hasProtectedPropertyItem &&
+            !this.hasPrivatePropertyItem &&
+            !this.hasPublicMethodItem &&
+            !this.hasProtectedMethodItem &&
+            !this.hasPrivateMethodItem &&
+            !this.hasStaticMemberItem &&
+            !this.hasAbstractMemberItem
+        );
+    }
+
+    /**
+     * Tells the legend not to include icons for types.
+     */
+    public hideTypeIcons(): void {
+        this.hasClassIcon = false;
+        this.hasAbstractClassIcon = false;
+        this.hasInterfaceIcon = false;
+    }
+
+    /**
+     * Creates the HTML for the diagram legend.
+     * @param memberVisbilityStyle The style of the visibility of members in the diagram.
      * @returns The HTML for the diagram legend.
      */
-    public static createHtml(options: DiagramLegendOptions): string {
+    public getHtml(memberVisbilityStyle: "text" | "icon"): string {
         let legend = `<h4>Legend</h4>
                       <div class="legend">`;
 
-        if (options.hasClassItem) {
+        if (this.hasClassIcon) {
             legend += `<div>
                            <span class="dt"><img src="data:image/svg+xml;base64,${Image.ClassCircledChar}" alt="icon for a class in the UML class diagram" /></span>
                            <span class="dd">class</span>
                        </div>`;
         }
-        if (options.hasAbstractClassItem) {
+        if (this.hasAbstractClassIcon) {
             legend += `<div>
                            <span class="dt"><img src="data:image/svg+xml;base64,${Image.AbstractClassCircledChar}" alt="icon for an abstract class in the UML class diagram" /></span>
                            <span class="dd">abstract class</span>
                        </div>`;
         }
-        if (options.hasInterfaceItem) {
+        if (this.hasInterfaceIcon) {
             legend += `<div>
                            <span class="dt"><img src="data:image/svg+xml;base64,${Image.InterfaceCircledChar}" alt="icon for an interface in the UML class diagram" /></span>
                            <span class="dd">interface</span>
                        </div>`;
         }
 
-        if (options.style === "icon") {
-            if (options.hasPublicPropertyItem) {
+        if (memberVisbilityStyle === "icon") {
+            if (this.hasPublicPropertyItem) {
                 legend += `<div>
                                <span class="dt"><img src="data:image/svg+xml;base64,${Image.PublicProperty}" alt="icon for a public property in the UML class diagram" /></span>
                                <span class="dd">public property</span>
                            </div>`;
             }
-            if (options.hasProtectedPropertyItem) {
+            if (this.hasProtectedPropertyItem) {
                 legend += `<div>
                                <span class="dt"><img src="data:image/svg+xml;base64,${Image.ProtectedProperty}" alt="icon for a protected property in the UML class diagram" /></span>
                                <span class="dd">protected property</span>
                            </div>`;
             }
-            if (options.hasPrivatePropertyItem) {
+            if (this.hasPrivatePropertyItem) {
                 legend += `<div>
                                <span class="dt"><img src="data:image/svg+xml;base64,${Image.PrivateProperty}" alt="icon for a private property in the UML class diagram" /></span>
                                <span class="dd">private property</span>
                            </div>`;
             }
-            if (options.hasPublicMethodItem) {
+            if (this.hasPublicMethodItem) {
                 legend += `<div>
                                <span class="dt"><img src="data:image/svg+xml;base64,${Image.PublicMethod}" alt="icon for a public method in the UML class diagram" /></span>
                                <span class="dd">public method</span>
                            </div>`;
             }
-            if (options.hasProtectedMethodItem) {
+            if (this.hasProtectedMethodItem) {
                 legend += `<div>
                                <span class="dt"><img src="data:image/svg+xml;base64,${Image.ProtectedMethod}" alt="icon for a protected method in the UML class diagram" /></span>
                                <span class="dd">protected method</span>
                            </div>`;
             }
-            if (options.hasPrivateMethodItem) {
+            if (this.hasPrivateMethodItem) {
                 legend += `<div>
                                <span class="dt"><img src="data:image/svg+xml;base64,${Image.PrivateMethod}" alt="icon for a private method in the UML class diagram" /></span>
                                <span class="dd">private method</span>
                            </div>`;
             }
         } else {
-            if (options.hasPublicPropertyItem || options.hasPublicMethodItem) {
+            if (this.hasPublicPropertyItem || this.hasPublicMethodItem) {
                 legend += `<div>
                                <span class="dt">+</span>
                                <span class="dd">public property/method</span>
                            </div>`;
             }
-            if (options.hasProtectedPropertyItem || options.hasProtectedMethodItem) {
+            if (this.hasProtectedPropertyItem || this.hasProtectedMethodItem) {
                 legend += `<div>
                                <span class="dt">#</span>
                                <span class="dd">protected property/method</span>
                            </div>`;
             }
-            if (options.hasPrivatePropertyItem || options.hasPrivateMethodItem) {
+            if (this.hasPrivatePropertyItem || this.hasPrivateMethodItem) {
                 legend += `<div>
                                <span class="dt">-</span>
                                <span class="dd">private property/method</span>
@@ -110,13 +169,13 @@ export class DiagramLegend {
             }
         }
 
-        if (options.hasStaticMemberItem) {
+        if (this.hasStaticMemberItem) {
             legend += `<div>
                            <span class="dt underlined">underlined</span>
                            <span class="dd">static property/method</span>
                        </div>`;
         }
-        if (options.hasAbstractMemberItem) {
+        if (this.hasAbstractMemberItem) {
             legend += `<div>
                            <span class="dt italic">italic</span>
                            <span class="dd">abstract property/method</span>
@@ -143,24 +202,6 @@ export class DiagramLegend {
             ".tsd-hierarchy-diagram .legend div span.dt.italic { font-style: italic; }`\n"
         );
     }
-}
-
-/**
- * Options for generating a new diagram legend.
- */
-export interface DiagramLegendOptions {
-    style: "text" | "icon";
-    hasClassItem: boolean;
-    hasAbstractClassItem: boolean;
-    hasInterfaceItem: boolean;
-    hasPublicPropertyItem: boolean;
-    hasProtectedPropertyItem: boolean;
-    hasPrivatePropertyItem: boolean;
-    hasPublicMethodItem: boolean;
-    hasProtectedMethodItem: boolean;
-    hasPrivateMethodItem: boolean;
-    hasStaticMemberItem: boolean;
-    hasAbstractMemberItem: boolean;
 }
 
 /**

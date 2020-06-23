@@ -110,12 +110,12 @@ export class PluginOptions {
     private legendTypeOption = {
         type: ParameterType.Map,
         name: "umlClassDiagramLegendType",
-        help: "none|only-included|complete",
+        help: "none|only-included|full",
         defaultValue: LegendType.None,
         map: new Map([
             ["none", LegendType.None],
             ["only-included", LegendType.OnlyIncluded],
-            ["complete", LegendType.Complete],
+            ["full", LegendType.Full],
         ]),
         value: LegendType.None,
     };

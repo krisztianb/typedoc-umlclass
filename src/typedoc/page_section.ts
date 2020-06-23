@@ -24,7 +24,7 @@ export class PageSection {
         if (imageUrl.startsWith("data:")) {
             return `<section class="tsd-panel tsd-hierarchy-diagram">
                         <h3>${title}</h3>
-                        <img class="uml-class" src="${imageUrl}"
+                        <img class="diagram" src="${imageUrl}"
                              alt="UML class diagram of ${reflectionName}"
                              title="Right click and select 'View image' to enlarge" />
                         ${legendHtml ?? ""}
@@ -32,7 +32,7 @@ export class PageSection {
         } else {
             return `<section class="tsd-panel tsd-hierarchy-diagram">
                         <h3>${title}</h3>
-                        <a class="uml-class" href="${imageUrl}" title="Click to enlarge">
+                        <a class="diagram" href="${imageUrl}" title="Click to enlarge">
                             <img src="${imageUrl}"
                                  alt="UML class diagram of ${reflectionName}" />
                         </a>
