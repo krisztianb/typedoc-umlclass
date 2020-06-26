@@ -1,6 +1,7 @@
 import {
     DeclarationReflection,
     ReferenceType,
+    ReflectionFlags,
     ReflectionKind,
     SignatureReflection,
 } from "typedoc/dist/lib/models/index";
@@ -181,7 +182,7 @@ export class PlantUmlCodeGenerator {
                         plantUmlLines.push(this.createPlantUmlForProperty(children));
                     } else if (children.kind === ReflectionKind.Method && children.signatures) {
                         for (const signature of children.signatures) {
-                            plantUmlLines.push(this.createPlantUmlForMethod(signature));
+                            plantUmlLines.push(this.createPlantUmlForMethodSignature(children.flags, signature));
                         }
                     }
                 }
@@ -253,37 +254,38 @@ export class PlantUmlCodeGenerator {
 
     /**
      * Returns the PlantUML line for generating the output for a given method.
-     * @param methode The method for which the PlantUML should be generated.
+     * @param methodFlags Flags for the method the signature belongs to.
+     * @param signature Data about the method signature.
      * @returns The PlantUML line for the given method.
      */
-    private createPlantUmlForMethod(method: SignatureReflection): string {
+    private createPlantUmlForMethodSignature(methodFlags: ReflectionFlags, signature: SignatureReflection): string {
         let plantUml = "    "; // indent
 
-        if (method.flags.isStatic) {
+        if (methodFlags.isStatic) {
             plantUml += "{static} ";
         }
 
-        if (method.flags.isAbstract) {
+        if (methodFlags.isAbstract) {
             plantUml += "{abstract} ";
         }
 
-        if (method.flags.isPrivate) {
+        if (methodFlags.isPrivate) {
             plantUml += "-";
-        } else if (method.flags.isProtected) {
+        } else if (methodFlags.isProtected) {
             plantUml += "#";
         } else {
             plantUml += "+"; // public is default for JS/TS
         }
 
-        plantUml += method.name + "(";
+        plantUml += signature.name + "(";
 
-        if (method.parameters) {
+        if (signature.parameters) {
             if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyNames) {
-                plantUml += method.parameters.map((p) => p.name).join(", ");
+                plantUml += signature.parameters.map((p) => p.name).join(", ");
             } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyTypes) {
-                plantUml += method.parameters.map((p) => (p.type ? p.type.toString() : "unknown")).join(", ");
+                plantUml += signature.parameters.map((p) => (p.type ? p.type.toString() : "unknown")).join(", ");
             } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.Complete) {
-                plantUml += method.parameters
+                plantUml += signature.parameters
                     .map((p) => p.name + ": " + (p.type ? p.type.toString() : "unknown"))
                     .join(", ");
             }
@@ -291,8 +293,8 @@ export class PlantUmlCodeGenerator {
 
         plantUml += ")";
 
-        if (method.type) {
-            plantUml += " : " + method.type.toString();
+        if (signature.type) {
+            plantUml += " : " + signature.type.toString();
         } else {
             plantUml += " : void";
         }
