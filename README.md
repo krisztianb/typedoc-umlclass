@@ -9,13 +9,9 @@
 TypeDoc automatically detects plugins installed via npm. After installation TypeDoc can be used normally and
 this plugin is going to create a UML class diagram for every class and interface within your project.
 
-Example (default style):
+Example:
 
 ![Example default style](https://krisztianb.github.io/typedoc-umlclass/docs/human-default-layout.png)
-
-Example (styled using plugin options):
-
-![Example styled using plugin options](https://krisztianb.github.io/typedoc-umlclass/docs/human-custom-layout.png)
 
 ## Installation
 
