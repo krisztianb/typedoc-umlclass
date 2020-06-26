@@ -4,7 +4,7 @@ import * as ProgressBar from "progress";
 import { Application, DeclarationReflection, ProjectReflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
-import { ClassDiagramType, LegendType } from "./enumerations";
+import { ClassDiagramType, FontStyle, LegendType } from "./enumerations";
 import { ImageUrlGenerator } from "./image_url_generator";
 import { DiagramLegend } from "./legends/diagram_legend";
 import { DiagramLegendGenerator } from "./legends/diagram_lenged_generator";
@@ -252,6 +252,10 @@ export class Plugin {
 
             if (this.options.classDiagramHideCircledChar) {
                 legend.hideTypeIcons();
+            }
+
+            if (this.options.classDiagramClassAttributeFontStyle === FontStyle.Italic) {
+                legend.hideAbstractMemberItem();
             }
 
             this.diagramLegends.set(reflection.id, legend);

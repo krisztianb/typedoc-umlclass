@@ -84,6 +84,13 @@ export class DiagramLegend {
     }
 
     /**
+     * Tells the legend not to include the "italic" item for abstract members.
+     */
+    public hideAbstractMemberItem(): void {
+        this.hasAbstractMemberItem = false;
+    }
+
+    /**
      * Creates the HTML for the diagram legend.
      * @param memberVisbilityStyle The style of the visibility of members in the diagram.
      * @returns The HTML for the diagram legend.
