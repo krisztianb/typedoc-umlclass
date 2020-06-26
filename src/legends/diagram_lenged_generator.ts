@@ -10,7 +10,8 @@ export class DiagramLegendGenerator {
      * @returns The legend for the PlantUML code.
      */
     public static createForPlantUmlLines(plantUml: string[]): DiagramLegend {
-        const hasClassItem = plantUml.some((str) => str.startsWith("class "));
+        // Check for a trailing "{" too to distinguish between a dummy type and a real class
+        const hasClassItem = plantUml.some((str) => str.startsWith("class ") && str.endsWith("{"));
         const hasAbstractClassItem = plantUml.some((str) => str.startsWith("abstract "));
         const hasInterfaceItem = plantUml.some((str) => str.startsWith("interface "));
         const hasPublicPropertyItem = plantUml.some((str) => / \+\w+ : /.test(str));

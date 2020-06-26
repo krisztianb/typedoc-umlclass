@@ -173,23 +173,21 @@ export class PlantUmlCodeGenerator {
     protected createPlantUmlForReflection(reflection: DeclarationReflection, includeMembers: boolean): string[] {
         const plantUmlLines = new Array<string>();
 
-        if (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) {
-            plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection) + " {");
+        plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection) + " {");
 
-            if (includeMembers && reflection.children) {
-                for (const children of reflection.children) {
-                    if (children.kind === ReflectionKind.Property) {
-                        plantUmlLines.push(this.createPlantUmlForProperty(children));
-                    } else if (children.kind === ReflectionKind.Method && children.signatures) {
-                        for (const signature of children.signatures) {
-                            plantUmlLines.push(this.createPlantUmlForMethodSignature(children.flags, signature));
-                        }
+        if (includeMembers && reflection.children) {
+            for (const children of reflection.children) {
+                if (children.kind === ReflectionKind.Property) {
+                    plantUmlLines.push(this.createPlantUmlForProperty(children));
+                } else if (children.kind === ReflectionKind.Method && children.signatures) {
+                    for (const signature of children.signatures) {
+                        plantUmlLines.push(this.createPlantUmlForMethodSignature(children.flags, signature));
                     }
                 }
             }
-
-            plantUmlLines.push("}");
         }
+
+        plantUmlLines.push("}");
 
         return plantUmlLines;
     }
@@ -204,15 +202,18 @@ export class PlantUmlCodeGenerator {
     protected createPlantUmlForType(type: ReferenceType, includeMembers: boolean): string[] {
         const reflection = type.reflection;
 
-        if (!reflection) {
-            // create a dummy definition for the type which has no reflection
+        if (
+            reflection &&
+            reflection instanceof DeclarationReflection &&
+            (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface)
+        ) {
+            return this.createPlantUmlForReflection(reflection, includeMembers);
+        } else {
+            // create a dummy definition for the type
             const name = this.escapeName(type.toString());
             const code = new Array<string>();
 
-            code.push("class " + name + " {");
-            // Older PlantUML versions raise a syntax error when the class body is empty. So we add a comment:
-            code.push("    ' reflection not available");
-            code.push("}");
+            code.push("class " + name);
 
             // Note:
             // The following hide command must be behind the class definition because of a bug in PlantUML.
@@ -220,11 +221,7 @@ export class PlantUmlCodeGenerator {
             code.push("hide " + name + " circle"); // hide the circle, because we don't know if it is really a class
 
             return code;
-        } else if (reflection instanceof DeclarationReflection) {
-            return this.createPlantUmlForReflection(reflection, includeMembers);
         }
-
-        return [];
     }
 
     /**
