@@ -72,22 +72,6 @@ export class Plugin {
     }
 
     /**
-     * Checks if the plugin should generate diagram legends.
-     * @returns True if the plugin should generate diagram legends, otherwise false.
-     */
-    get shouldGenerateLegends(): boolean {
-        // The simple diagram type can only contain the circled chars.
-        // If those are deactivated then it does not make sense to have any legends.
-        if (this.options.classDiagramType === ClassDiagramType.Simple && this.options.classDiagramHideCircledChar) {
-            return false;
-        } else if (this.options.legendType === LegendType.OnlyIncluded || this.options.legendType === LegendType.Full) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Checks if the plugin has anything to do.
      * @returns True if the plugin needs to generate diagrams, otherwise false.
      */
@@ -104,6 +88,22 @@ export class Plugin {
             this.options.outputImageLocation === ImageLocation.Local ||
             this.options.outputImageLocation === ImageLocation.Embed
         );
+    }
+
+    /**
+     * Checks if the plugin should generate diagram legends.
+     * @returns True if the plugin should generate diagram legends, otherwise false.
+     */
+    get shouldGenerateLegends(): boolean {
+        // The simple diagram type can only contain the circled chars.
+        // If those are deactivated then it does not make sense to have any legends.
+        if (this.options.classDiagramType === ClassDiagramType.Simple && this.options.classDiagramHideCircledChar) {
+            return false;
+        } else if (this.options.legendType === LegendType.OnlyIncluded || this.options.legendType === LegendType.Full) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -148,7 +148,6 @@ export class Plugin {
 
     /**
      * Triggered when the TypeDoc converter has finished resolving a project.
-     * Setup progress bar.
      * @param context Describes the current state the converter is in.
      */
     public onConverterResolveEnd(context: Context): void {
@@ -285,20 +284,7 @@ export class Plugin {
 
         if (this.shouldGenerateLegends) {
             this.log?.info(`Creating leged for diagram of reflection ${reflection.name} ...`);
-            const legend =
-                this.options.legendType === LegendType.OnlyIncluded
-                    ? DiagramLegendGenerator.createForPlantUmlLines(plantUmlLines)
-                    : new DiagramLegend();
-
-            if (this.options.classDiagramHideCircledChar) {
-                legend.hideTypeIcons();
-            }
-
-            if (this.options.classDiagramClassAttributeFontStyle === FontStyle.Italic) {
-                legend.hideAbstractMemberItem();
-            }
-
-            this.diagramLegends.set(reflection.id, legend);
+            this.createLegendForReflection(reflection, plantUmlLines);
         }
 
         if (this.isGeneratingImages && this.plantUmlDiagramGenerator) {
@@ -309,11 +295,7 @@ export class Plugin {
             const imageUrl = this.imageUrlGenerator.createPlantUmlServerUrl(plantUml, this.options.outputImageFormat);
 
             this.log?.info(`Inserting diagram into page for reflection ${reflection.name} ...`);
-            event.contents = this.insertHierarchyDiagramIntoContent(
-                event.contents as string,
-                reflection.name,
-                imageUrl
-            );
+            event.contents = this.insertHierarchyDiagramIntoContent(event.contents as string, reflection, imageUrl);
         }
     }
 
@@ -340,7 +322,7 @@ export class Plugin {
         }
 
         this.log?.info(`Inserting diagram into page for reflection ${id.reflection.name} ...`);
-        this.insertHierarchyDiagramIntoFile(id.pageFilePath, id.reflection.name, imageUrl);
+        this.insertHierarchyDiagramIntoFile(id.pageFilePath, id.reflection, imageUrl);
 
         this.progressBar?.tick();
     };
@@ -369,6 +351,28 @@ export class Plugin {
         const absoluteFilePath = path.join(this.outputDirectory, filename);
 
         fs.writeFileSync(absoluteFilePath, plantUml, "utf8");
+    }
+
+    /**
+     * Creates a legend for the reflection and stores it in the internal map.
+     * @param reflection The reflection for which the legend should be generated.
+     * @param plantUmlLines The PlantUML lines for the reflection's diagram.
+     */
+    private createLegendForReflection(reflection: DeclarationReflection, plantUmlLines: string[]): void {
+        const legend =
+            this.options.legendType === LegendType.OnlyIncluded
+                ? DiagramLegendGenerator.createForPlantUmlLines(plantUmlLines)
+                : new DiagramLegend();
+
+        if (this.options.classDiagramHideCircledChar) {
+            legend.hideTypeIcons();
+        }
+
+        if (this.options.classDiagramClassAttributeFontStyle === FontStyle.Italic) {
+            legend.hideAbstractMemberItem();
+        }
+
+        this.diagramLegends.set(reflection.id, legend);
     }
 
     /**
