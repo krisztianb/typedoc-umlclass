@@ -1,6 +1,6 @@
 {
     "name": "typedoc-umlclass",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "description": "Plugin for TypeDoc that generates uml class diagrams",
     "author": {
         "name": "Krisztián Balla",
@@ -21,13 +21,13 @@
         "split2": "^3.1.1"
     },
     "devDependencies": {
-        "@types/node": "^13.13.4",
+        "@types/node": "^14.0.14",
         "@types/plantuml-encoder": "^1.4.0",
         "@types/progress": "^2.0.3",
         "prettier": "^2.0.5",
         "tslint": "^6.1.2",
         "typedoc": "^0.17.7",
-        "typescript": "^3.8.3"
+        "typescript": "^3.9.5"
     },
     "peerDependencies": {
         "typedoc": "^0.17.7"

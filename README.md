@@ -9,13 +9,9 @@
 TypeDoc automatically detects plugins installed via npm. After installation TypeDoc can be used normally and
 this plugin is going to create a UML class diagram for every class and interface within your project.
 
-Example (default style):
+Example:
 
 ![Example default style](https://krisztianb.github.io/typedoc-umlclass/docs/human-default-layout.png)
-
-Example (styled using plugin options):
-
-![Example styled using plugin options](https://krisztianb.github.io/typedoc-umlclass/docs/human-custom-layout.png)
 
 ## Installation
 
@@ -56,6 +52,12 @@ The following options are added to TypeDoc when the plugin is installed.
     Use this option to specify if the class diagram should be inserted `above` or `below` the default hierarchy section
     on the TypeDoc page.
     Default is `above`.
+-   `--umlClassDiagramLegendType <none|only-included|full>`<br>
+    Use this option to add a legend below each class diagram explaining the icons (eg: visibility of properties and
+    methods) used in it. If `full` every legend contains every possible icon in a class diagram. If `only-included`
+    every legend contains only the icons that are included in the class diagram. The content of the legends is affected
+    by the options `umlClassDiagramMemberVisibilityStyle` and `umlClassDiagramHideCircledChar`.
+    Default is `none`.
 
 ### Class diagram formating
 

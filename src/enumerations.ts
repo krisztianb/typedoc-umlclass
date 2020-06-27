@@ -10,9 +10,9 @@ export enum ClassDiagramType {
 /**
  * Supported visibility styles for members in the class diagram.
  */
-export enum ClassDiagramMemberVisibilityStyle {
-    Text = 1,
-    Icon = 2,
+export const enum ClassDiagramMemberVisibilityStyle {
+    Text = "text",
+    Icon = "icon",
 }
 
 /**
@@ -34,4 +34,13 @@ export enum MethodParameterOutput {
     OnlyNames = 1,
     OnlyTypes = 2,
     Complete = 3,
+}
+
+/**
+ * Possible diagram legend types.
+ */
+export enum LegendType {
+    None = 0,
+    OnlyIncluded = 1,
+    Full = 2,
 }

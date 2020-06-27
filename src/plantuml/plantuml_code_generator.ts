@@ -1,6 +1,7 @@
 import {
     DeclarationReflection,
     ReferenceType,
+    ReflectionFlags,
     ReflectionKind,
     SignatureReflection,
 } from "typedoc/dist/lib/models/index";
@@ -172,23 +173,21 @@ export class PlantUmlCodeGenerator {
     protected createPlantUmlForReflection(reflection: DeclarationReflection, includeMembers: boolean): string[] {
         const plantUmlLines = new Array<string>();
 
-        if (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) {
-            plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection) + " {");
+        plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection) + " {");
 
-            if (includeMembers && reflection.children) {
-                for (const children of reflection.children) {
-                    if (children.kind === ReflectionKind.Property) {
-                        plantUmlLines.push(this.createPlantUmlForProperty(children));
-                    } else if (children.kind === ReflectionKind.Method && children.signatures) {
-                        for (const signature of children.signatures) {
-                            plantUmlLines.push(this.createPlantUmlForMethod(signature));
-                        }
+        if (includeMembers && reflection.children) {
+            for (const children of reflection.children) {
+                if (children.kind === ReflectionKind.Property) {
+                    plantUmlLines.push(this.createPlantUmlForProperty(children));
+                } else if (children.kind === ReflectionKind.Method && children.signatures) {
+                    for (const signature of children.signatures) {
+                        plantUmlLines.push(this.createPlantUmlForMethodSignature(children.flags, signature));
                     }
                 }
             }
-
-            plantUmlLines.push("}");
         }
+
+        plantUmlLines.push("}");
 
         return plantUmlLines;
     }
@@ -203,23 +202,26 @@ export class PlantUmlCodeGenerator {
     protected createPlantUmlForType(type: ReferenceType, includeMembers: boolean): string[] {
         const reflection = type.reflection;
 
-        if (!reflection) {
-            // create a dummy definition for the type which has no reflection
+        if (
+            reflection &&
+            reflection instanceof DeclarationReflection &&
+            (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface)
+        ) {
+            return this.createPlantUmlForReflection(reflection, includeMembers);
+        } else {
+            // create a dummy definition for the type
             const name = this.escapeName(type.toString());
             const code = new Array<string>();
 
+            code.push("class " + name);
+
+            // Note:
+            // The following hide command must be behind the class definition because of a bug in PlantUML.
+            // See: https://github.com/plantuml/plantuml/issues/342
             code.push("hide " + name + " circle"); // hide the circle, because we don't know if it is really a class
-            code.push("class " + name + " {");
-            // Older PlantUML versions raise a syntax error when the class body is empty. So we add a comment:
-            code.push("    ' reflection not available");
-            code.push("}");
 
             return code;
-        } else if (reflection instanceof DeclarationReflection) {
-            return this.createPlantUmlForReflection(reflection, includeMembers);
         }
-
-        return [];
     }
 
     /**
@@ -249,37 +251,38 @@ export class PlantUmlCodeGenerator {
 
     /**
      * Returns the PlantUML line for generating the output for a given method.
-     * @param methode The method for which the PlantUML should be generated.
+     * @param methodFlags Flags for the method the signature belongs to.
+     * @param signature Data about the method signature.
      * @returns The PlantUML line for the given method.
      */
-    private createPlantUmlForMethod(method: SignatureReflection): string {
+    private createPlantUmlForMethodSignature(methodFlags: ReflectionFlags, signature: SignatureReflection): string {
         let plantUml = "    "; // indent
 
-        if (method.flags.isStatic) {
+        if (methodFlags.isStatic) {
             plantUml += "{static} ";
         }
 
-        if (method.flags.isAbstract) {
+        if (methodFlags.isAbstract) {
             plantUml += "{abstract} ";
         }
 
-        if (method.flags.isPrivate) {
+        if (methodFlags.isPrivate) {
             plantUml += "-";
-        } else if (method.flags.isProtected) {
+        } else if (methodFlags.isProtected) {
             plantUml += "#";
         } else {
             plantUml += "+"; // public is default for JS/TS
         }
 
-        plantUml += method.name + "(";
+        plantUml += signature.name + "(";
 
-        if (method.parameters) {
+        if (signature.parameters) {
             if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyNames) {
-                plantUml += method.parameters.map((p) => p.name).join(", ");
+                plantUml += signature.parameters.map((p) => p.name).join(", ");
             } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyTypes) {
-                plantUml += method.parameters.map((p) => (p.type ? p.type.toString() : "unknown")).join(", ");
+                plantUml += signature.parameters.map((p) => (p.type ? p.type.toString() : "unknown")).join(", ");
             } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.Complete) {
-                plantUml += method.parameters
+                plantUml += signature.parameters
                     .map((p) => p.name + ": " + (p.type ? p.type.toString() : "unknown"))
                     .join(", ");
             }
@@ -287,8 +290,8 @@ export class PlantUmlCodeGenerator {
 
         plantUml += ")";
 
-        if (method.type) {
-            plantUml += " : " + method.type.toString();
+        if (signature.type) {
+            plantUml += " : " + signature.type.toString();
         } else {
             plantUml += " : void";
         }

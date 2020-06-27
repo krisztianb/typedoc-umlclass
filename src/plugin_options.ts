@@ -6,7 +6,13 @@ import {
     ParameterType,
     StringDeclarationOption,
 } from "typedoc";
-import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle, MethodParameterOutput } from "./enumerations";
+import {
+    ClassDiagramMemberVisibilityStyle,
+    ClassDiagramType,
+    FontStyle,
+    LegendType,
+    MethodParameterOutput,
+} from "./enumerations";
 
 /**
  * Supported image output formats.
@@ -98,6 +104,20 @@ export class PluginOptions {
             ["below", ClassDiagramPosition.Below],
         ]),
         value: ClassDiagramPosition.Above,
+    };
+
+    /** Specifies what kind of legend should be added below the class diagrams. */
+    private legendTypeOption = {
+        type: ParameterType.Map,
+        name: "umlClassDiagramLegendType",
+        help: "none|only-included|full",
+        defaultValue: LegendType.None,
+        map: new Map([
+            ["none", LegendType.None],
+            ["only-included", LegendType.OnlyIncluded],
+            ["full", LegendType.Full],
+        ]),
+        value: LegendType.None,
     };
 
     /** Specifies how method parameters should be output in the class diagrams. */
@@ -348,6 +368,7 @@ export class PluginOptions {
         typedoc.options.addDeclaration(this.outputImageFormatOption as MapDeclarationOption<ImageFormat>);
         typedoc.options.addDeclaration(this.sectionTitleOption as StringDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramPositionOption as MapDeclarationOption<ClassDiagramPosition>);
+        typedoc.options.addDeclaration(this.legendTypeOption as MapDeclarationOption<LegendType>);
         typedoc.options.addDeclaration(this.classDiagramMethodParameterOutputOption as MapDeclarationOption<MethodParameterOutput>);
         typedoc.options.addDeclaration(this.classDiagramHideEmptyMembersOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramTopDownLayoutMaxSiblingsOption as NumberDeclarationOption);
@@ -384,6 +405,7 @@ export class PluginOptions {
         this.outputImageFormatOption.value = typedoc.options.getValue(this.outputImageFormatOption.name) as ImageFormat;
         this.sectionTitleOption.value = typedoc.options.getValue(this.sectionTitleOption.name) as string;
         this.classDiagramPositionOption.value = typedoc.options.getValue(this.classDiagramPositionOption.name) as ClassDiagramPosition;
+        this.legendTypeOption.value = typedoc.options.getValue(this.legendTypeOption.name) as LegendType;
         this.classDiagramMethodParameterOutputOption.value = typedoc.options.getValue(this.classDiagramMethodParameterOutputOption.name) as MethodParameterOutput;
         this.classDiagramHideEmptyMembersOption.value = typedoc.options.getValue(this.classDiagramHideEmptyMembersOption.name) as boolean;
         this.classDiagramTopDownLayoutMaxSiblingsOption.value = typedoc.options.getValue(this.classDiagramTopDownLayoutMaxSiblingsOption.name) as number;
@@ -447,6 +469,14 @@ export class PluginOptions {
      */
     get classDiagramPosition(): ClassDiagramPosition {
         return this.classDiagramPositionOption.value;
+    }
+
+    /**
+     * Returns the type of legend that should be generated for the class diagrams.
+     * @returns The type of legend that should be generated for the class diagrams.
+     */
+    get legendType(): LegendType {
+        return this.legendTypeOption.value;
     }
 
     /**

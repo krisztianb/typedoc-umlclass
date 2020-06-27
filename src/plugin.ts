@@ -4,8 +4,10 @@ import * as ProgressBar from "progress";
 import { Application, DeclarationReflection, ProjectReflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
-import { ClassDiagramType } from "./enumerations";
+import { ClassDiagramType, FontStyle, LegendType } from "./enumerations";
 import { ImageUrlGenerator } from "./image_url_generator";
+import { DiagramLegend } from "./legends/diagram_legend";
+import { DiagramLegendGenerator } from "./legends/diagram_lenged_generator";
 import { Logger } from "./logger";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
 import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator";
@@ -55,6 +57,9 @@ export class Plugin {
     /** Logger for verbose output in debug mode. */
     private log: Logger | undefined;
 
+    /** Stores the legends for the diagram of every reflection. (KEY = ID of the reflection) */
+    private diagramLegends = new Map<number, DiagramLegend>();
+
     /**
      * Checks if the plugin is active and should generate output.
      * @returns True if the plugin is active, otherwise false.
@@ -64,6 +69,22 @@ export class Plugin {
             this.options.classDiagramType === ClassDiagramType.Simple ||
             this.options.classDiagramType === ClassDiagramType.Detailed
         );
+    }
+
+    /**
+     * Checks if the plugin should generate diagram legends.
+     * @returns True if the plugin should generate diagram legends, otherwise false.
+     */
+    get shouldGenerateLegends(): boolean {
+        // The simple diagram type can only contain the circled chars.
+        // If those are deactivated then it does not make sense to have any legends.
+        if (this.options.classDiagramType === ClassDiagramType.Simple && this.options.classDiagramHideCircledChar) {
+            return false;
+        } else if (this.options.legendType === LegendType.OnlyIncluded || this.options.legendType === LegendType.Full) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -254,11 +275,30 @@ export class Plugin {
         const reflection = event.model as DeclarationReflection;
 
         this.log?.info(`Generating PlantUML code for reflection ${reflection.name} ...`);
-        const plantUml = this.plantUmlCodeGenerator.createClassDiagramPlantUmlForReflection(reflection).join("\n");
+        const plantUmlLines = this.plantUmlCodeGenerator.createClassDiagramPlantUmlForReflection(reflection);
+        const plantUml = plantUmlLines.join("\n");
 
         if (this.options.createPlantUmlFiles) {
             this.log?.info(`Writing PlantUML file for reflection ${reflection.name} ...`);
             this.writePlantUmlFileForReflection(plantUml, reflection);
+        }
+
+        if (this.shouldGenerateLegends) {
+            this.log?.info(`Creating leged for diagram of reflection ${reflection.name} ...`);
+            const legend =
+                this.options.legendType === LegendType.OnlyIncluded
+                    ? DiagramLegendGenerator.createForPlantUmlLines(plantUmlLines)
+                    : new DiagramLegend();
+
+            if (this.options.classDiagramHideCircledChar) {
+                legend.hideTypeIcons();
+            }
+
+            if (this.options.classDiagramClassAttributeFontStyle === FontStyle.Italic) {
+                legend.hideAbstractMemberItem();
+            }
+
+            this.diagramLegends.set(reflection.id, legend);
         }
 
         if (this.isGeneratingImages && this.plantUmlDiagramGenerator) {
@@ -334,34 +374,41 @@ export class Plugin {
     /**
      * Inserts the hierarchy diagram into the page file.
      * @param filePath Absolute path to the page file.
-     * @param reflectionName The name of the reflection for which the diagram was generated.
+     * @param reflection The reflection for which the diagram was generated.
      * @param imageUrl The URL to the image of the diagram.
      */
-    private insertHierarchyDiagramIntoFile(filePath: string, reflectionName: string, imageUrl: string): void {
+    private insertHierarchyDiagramIntoFile(
+        filePath: string,
+        reflection: DeclarationReflection,
+        imageUrl: string
+    ): void {
         let fileContent = fs.readFileSync(filePath, "utf8");
 
-        fileContent = this.insertHierarchyDiagramIntoContent(fileContent, reflectionName, imageUrl);
+        fileContent = this.insertHierarchyDiagramIntoContent(fileContent, reflection, imageUrl);
         fs.writeFileSync(filePath, fileContent, "utf8");
     }
 
     /**
      * Inserts the hierarchy diagram into the content string.
      * @param originalContent The content string into which the diagram is inserted.
-     * @param reflectionName The name of the reflection for which the diagram was generated.
+     * @param reflection The reflection for which the diagram was generated.
      * @param imageUrl The URL to the image of the diagram.
      * @returns The updated content string with the diagram inserted into it.
      */
     private insertHierarchyDiagramIntoContent(
         originalContent: string,
-        reflectionName: string,
+        reflection: DeclarationReflection,
         imageUrl: string
     ): string {
         const page = new PageProcessor(originalContent);
 
-        const hierarchyDiagramSection = PageSection.createForHierarchyDiagram(
+        const legend = this.diagramLegends.get(reflection.id);
+
+        const hierarchyDiagramSection = PageSection.createHierarchyDiagramSection(
             this.options.sectionTitle,
             imageUrl,
-            reflectionName
+            reflection.name,
+            legend && !legend.isEmpty ? legend.getHtml(this.options.classDiagramMemberVisibilityStyle) : ""
         );
 
         if (this.options.classDiagramPosition === ClassDiagramPosition.Above) {
@@ -383,9 +430,15 @@ export class Plugin {
             this.log?.info("Attaching content to main.css file ...");
 
             const filename = path.join(event.outputDirectory, "assets/css/main.css");
-            const data =
+
+            let data =
                 fs.readFileSync(filename, "utf8") +
-                "\n.uml-class { max-width:100%; display:block; margin:0 auto; text-align:center }\n";
+                "\n.tsd-hierarchy-diagram .diagram { max-width: 100%; display: block; margin: 0 auto; text-align: center; }\n";
+
+            if (this.shouldGenerateLegends) {
+                data += DiagramLegend.getCss();
+            }
+
             fs.writeFileSync(filename, data, "utf8");
 
             this.log?.info("DONE");
