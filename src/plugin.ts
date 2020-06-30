@@ -27,7 +27,7 @@ import { TypeDocUtils } from "./typedoc/typedoc_utils";
  * # How does it do it?
  *
  * 1. The plugin scans through the classes and interfaces and generates PlantUML code for them.
- * 2. The plugin uses the node-plantuml module to generate image files from the PlantUML code.
+ * 2. The plugin uses the plantuml-pipe module to generate image files from the PlantUML code.
  * 3. The plugin adds a section with the image to the page of each class and interface.
  */
 export class Plugin {
@@ -294,7 +294,7 @@ export class Plugin {
             this.log?.info(`Creating remote image URL for reflection ${reflection.name} ...`);
             const imageUrl = this.imageUrlGenerator.createPlantUmlServerUrl(plantUml, this.options.outputImageFormat);
 
-            this.log?.info(`Inserting diagram into page for reflection ${reflection.name} ...`);
+            this.log?.info(`Inserting diagram into page of reflection ${reflection.name} ...`);
             event.contents = this.insertHierarchyDiagramIntoContent(event.contents as string, reflection, imageUrl);
         }
     }
