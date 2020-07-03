@@ -66,6 +66,11 @@ The following options are added to TypeDoc when the plugin is installed.
     `only-names` to include only parameter names, `only-types` to include only parameter types and `complete` to include
     names and types.
     Default is `complete`.
+-   `--umlClassDiagramMemberOrder <abc|public-to-private|private-to-public>`<br>
+    Specifies the order of properties and methods within the class boxes in the class diagram. Use `abc` to sort them
+    alphabetically, `public-to-private` to have public properties/methods before protected and private ones or
+    `private-to-public` to have private properties/methods before protected and public ones.
+    Default is `public-to-private`.
 -   `--umlClassDiagramHideEmptyMembers <true|false>`<br>
     If this option is set to true properties and methods are hidden if they are empty.
     Default is `true`.

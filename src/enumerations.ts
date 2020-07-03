@@ -44,3 +44,13 @@ export enum LegendType {
     OnlyIncluded = 1,
     Full = 2,
 }
+
+/**
+ * Possible ways to order class members in the class diagram.
+ */
+export enum MemberOrder {
+    Undefined = 0,
+    Abc = 1,
+    PublicToPrivate = 2,
+    PrivateToPublic = 3,
+}

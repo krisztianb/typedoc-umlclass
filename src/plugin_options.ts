@@ -11,6 +11,7 @@ import {
     ClassDiagramType,
     FontStyle,
     LegendType,
+    MemberOrder,
     MethodParameterOutput,
 } from "./enumerations";
 
@@ -133,6 +134,20 @@ export class PluginOptions {
             ["complete", MethodParameterOutput.Complete],
         ]),
         value: MethodParameterOutput.Complete,
+    };
+
+    /** Specifies how class members should be ordered in the class diagrams. */
+    private classDiagramMemberOrderOption = {
+        type: ParameterType.Map,
+        name: "umlClassDiagramMemberOrder",
+        help: "abc|public-to-private|private-to-public",
+        defaultValue: MemberOrder.PublicToPrivate,
+        map: new Map([
+            ["abc", MemberOrder.Abc],
+            ["public-to-private", MemberOrder.PublicToPrivate],
+            ["private-to-public", MemberOrder.PrivateToPublic],
+        ]),
+        value: MemberOrder.PublicToPrivate,
     };
 
     /** Specifies whether to hide empty properties and methods in the class diagrams. */
@@ -370,6 +385,7 @@ export class PluginOptions {
         typedoc.options.addDeclaration(this.classDiagramPositionOption as MapDeclarationOption<ClassDiagramPosition>);
         typedoc.options.addDeclaration(this.legendTypeOption as MapDeclarationOption<LegendType>);
         typedoc.options.addDeclaration(this.classDiagramMethodParameterOutputOption as MapDeclarationOption<MethodParameterOutput>);
+        typedoc.options.addDeclaration(this.classDiagramMemberOrderOption as MapDeclarationOption<MemberOrder>);
         typedoc.options.addDeclaration(this.classDiagramHideEmptyMembersOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramTopDownLayoutMaxSiblingsOption as NumberDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramMemberVisibilityStyleOption as MapDeclarationOption<ClassDiagramMemberVisibilityStyle>);
@@ -407,6 +423,7 @@ export class PluginOptions {
         this.classDiagramPositionOption.value = typedoc.options.getValue(this.classDiagramPositionOption.name) as ClassDiagramPosition;
         this.legendTypeOption.value = typedoc.options.getValue(this.legendTypeOption.name) as LegendType;
         this.classDiagramMethodParameterOutputOption.value = typedoc.options.getValue(this.classDiagramMethodParameterOutputOption.name) as MethodParameterOutput;
+        this.classDiagramMemberOrderOption.value = typedoc.options.getValue(this.classDiagramMemberOrderOption.name) as MemberOrder;
         this.classDiagramHideEmptyMembersOption.value = typedoc.options.getValue(this.classDiagramHideEmptyMembersOption.name) as boolean;
         this.classDiagramTopDownLayoutMaxSiblingsOption.value = typedoc.options.getValue(this.classDiagramTopDownLayoutMaxSiblingsOption.name) as number;
         this.classDiagramMemberVisibilityStyleOption.value = typedoc.options.getValue(this.classDiagramMemberVisibilityStyleOption.name) as ClassDiagramMemberVisibilityStyle;
@@ -485,6 +502,14 @@ export class PluginOptions {
      */
     get classDiagramMethodParameterOutput(): MethodParameterOutput {
         return this.classDiagramMethodParameterOutputOption.value;
+    }
+
+    /**
+     * Returns how class members should be ordered in the class diagrams.
+     * @returns How class members should be ordered the class diagrams.
+     */
+    get classDiagramMemberOrder(): MemberOrder {
+        return this.classDiagramMemberOrderOption.value;
     }
 
     /**
