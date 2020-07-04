@@ -5,7 +5,19 @@ import {
     ReflectionKind,
     SignatureReflection,
 } from "typedoc/dist/lib/models/index";
-import { ClassDiagramMemberVisibilityStyle, ClassDiagramType, FontStyle, MethodParameterOutput } from "../enumerations";
+import {
+    ClassDiagramMemberVisibilityStyle,
+    ClassDiagramType,
+    FontStyle,
+    MemberOrder,
+    MethodParameterOutput,
+} from "../enumerations";
+import {
+    nameAbc,
+    privateToPublic,
+    publicToPrivate,
+    TypeDocMemberCompareFunction,
+} from "../typedoc/typedoc_member_sorter";
 import { TypeDocUtils } from "../typedoc/typedoc_utils";
 import { PlantUmlCodeGeneratorOptions } from "./plantuml_code_generator_options";
 
@@ -16,12 +28,23 @@ export class PlantUmlCodeGenerator {
     /** The options for the PlantUML output. */
     private options: PlantUmlCodeGeneratorOptions;
 
+    /** Compare function used for sorting class members. */
+    private classMemberCompareFunction: TypeDocMemberCompareFunction;
+
     /**
      * Creates a new PlantUmlGenerator object with the given options.
      * @param options The options for the PlantUML output.
      */
     constructor(options: PlantUmlCodeGeneratorOptions) {
         this.options = options;
+
+        if (this.options.classDiagramMemberOrder === MemberOrder.PublicToPrivate) {
+            this.classMemberCompareFunction = publicToPrivate;
+        } else if (this.options.classDiagramMemberOrder === MemberOrder.PrivateToPublic) {
+            this.classMemberCompareFunction = privateToPublic;
+        } else {
+            this.classMemberCompareFunction = nameAbc;
+        }
     }
 
     /**
@@ -176,12 +199,24 @@ export class PlantUmlCodeGenerator {
         plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection) + " {");
 
         if (includeMembers && reflection.children) {
-            for (const children of reflection.children) {
-                if (children.kind === ReflectionKind.Property) {
-                    plantUmlLines.push(this.createPlantUmlForProperty(children));
-                } else if (children.kind === ReflectionKind.Method && children.signatures) {
-                    for (const signature of children.signatures) {
-                        plantUmlLines.push(this.createPlantUmlForMethodSignature(children.flags, signature));
+            // Process properties
+            const props = reflection.children
+                .filter((c) => c.kind === ReflectionKind.Property)
+                .sort(this.classMemberCompareFunction);
+
+            for (const prop of props) {
+                plantUmlLines.push(this.createPlantUmlForProperty(prop));
+            }
+
+            // Process method signatures
+            const methods = reflection.children
+                .filter((c) => c.kind === ReflectionKind.Method)
+                .sort(this.classMemberCompareFunction);
+
+            for (const method of methods) {
+                if (method.signatures) {
+                    for (const signature of method.signatures) {
+                        plantUmlLines.push(this.createPlantUmlForMethodSignature(method.flags, signature));
                     }
                 }
             }
