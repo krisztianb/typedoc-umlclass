@@ -1,6 +1,6 @@
 {
     "name": "typedoc-umlclass",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Plugin for TypeDoc that generates uml class diagrams",
     "author": {
         "name": "Krisztián Balla",
