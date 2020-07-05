@@ -57,7 +57,7 @@ The following options are added to TypeDoc when the plugin is installed.
     methods) used in it. If `full` every legend contains every possible icon in a class diagram. If `only-included`
     every legend contains only the icons that are included in the class diagram. The content of the legends is affected
     by the options `umlClassDiagramMemberVisibilityStyle` and `umlClassDiagramHideCircledChar`.
-    Default is `none`.
+    Default is `only-included`.
 
 ### Class diagram formating
 
@@ -67,7 +67,7 @@ The following options are added to TypeDoc when the plugin is installed.
     names and types.
     Default is `complete`.
 -   `--umlClassDiagramMemberOrder <abc|public-to-private|private-to-public>`<br>
-    Specifies the order of properties and methods within the class boxes in the class diagram. Use `abc` to sort them
+    Specifies the order of properties and methods within the boxes in the class diagram. Use `abc` to sort them
     alphabetically, `public-to-private` to have public properties/methods before protected and private ones or
     `private-to-public` to have private properties/methods before protected and public ones.
     Default is `public-to-private`.

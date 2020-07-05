@@ -112,13 +112,13 @@ export class PluginOptions {
         type: ParameterType.Map,
         name: "umlClassDiagramLegendType",
         help: "none|only-included|full",
-        defaultValue: LegendType.None,
+        defaultValue: LegendType.OnlyIncluded,
         map: new Map([
             ["none", LegendType.None],
             ["only-included", LegendType.OnlyIncluded],
             ["full", LegendType.Full],
         ]),
-        value: LegendType.None,
+        value: LegendType.OnlyIncluded,
     };
 
     /** Specifies how method parameters should be output in the class diagrams. */
