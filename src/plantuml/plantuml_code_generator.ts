@@ -4,6 +4,7 @@ import {
     ReflectionFlags,
     ReflectionKind,
     SignatureReflection,
+    Type,
 } from "typedoc/dist/lib/models/index";
 import {
     ClassDiagramMemberVisibilityStyle,
@@ -68,7 +69,7 @@ export class PlantUmlCodeGenerator {
 
         for (const extendedType of extendedTypes) {
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedType, includeMembers));
-            plantUmlLines.push(this.escapeName(extendedType.name) + " <|-- " + this.escapeName(reflection.name));
+            plantUmlLines.push(this.escapeName(extendedType.toString()) + " <|-- " + this.escapeName(reflection.name));
             ++siblingsAbove;
         }
 
@@ -77,7 +78,9 @@ export class PlantUmlCodeGenerator {
 
         for (const implementedType of implementedTypes) {
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedType, includeMembers));
-            plantUmlLines.push(this.escapeName(implementedType.name) + " <|.. " + this.escapeName(reflection.name));
+            plantUmlLines.push(
+                this.escapeName(implementedType.toString()) + " <|.. " + this.escapeName(reflection.name)
+            );
             ++siblingsAbove;
         }
 
@@ -86,7 +89,7 @@ export class PlantUmlCodeGenerator {
 
         for (const extendedBy of extendedBys) {
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedBy, includeMembers));
-            plantUmlLines.push(this.escapeName(reflection.name) + " <|-- " + this.escapeName(extendedBy.name));
+            plantUmlLines.push(this.escapeName(reflection.name) + " <|-- " + this.escapeName(extendedBy.toString()));
             ++siblingsBelow;
         }
 
@@ -95,7 +98,7 @@ export class PlantUmlCodeGenerator {
 
         for (const implementedBy of implementedBys) {
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedBy, includeMembers));
-            plantUmlLines.push(this.escapeName(reflection.name) + " <|.. " + this.escapeName(implementedBy.name));
+            plantUmlLines.push(this.escapeName(reflection.name) + " <|.. " + this.escapeName(implementedBy.toString()));
             ++siblingsBelow;
         }
 
@@ -187,16 +190,49 @@ export class PlantUmlCodeGenerator {
     }
 
     /**
+     * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a type.
+     * @param type The type for which the PlantUML should be generated.
+     * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
+     *                       the type as well.
+     * @returns The PlantUML lines for the type.
+     */
+    protected createPlantUmlForType(type: ReferenceType, includeMembers: boolean): string[] {
+        const reflection = type.reflection;
+
+        if (
+            reflection &&
+            reflection instanceof DeclarationReflection &&
+            (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface)
+        ) {
+            return this.createPlantUmlForReflection(reflection, includeMembers, type.typeArguments);
+        } else {
+            // create a dummy definition for the type
+            const name = this.escapeName(type.toString());
+            const code = new Array<string>();
+
+            code.push("class " + name);
+            code.push("hide " + name + " circle"); // hide the circle, because we don't know if it is really a class
+
+            return code;
+        }
+    }
+
+    /**
      * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a reflection.
      * @param reflection The reflection for which the PlantUML should be generated.
      * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
      *                       the reflection as well.
+     * @param typeArguments Possible type arguments if the reflection is based on a template class.
      * @returns The PlantUML lines for the reflection.
      */
-    protected createPlantUmlForReflection(reflection: DeclarationReflection, includeMembers: boolean): string[] {
+    protected createPlantUmlForReflection(
+        reflection: DeclarationReflection,
+        includeMembers: boolean,
+        typeArguments?: Type[]
+    ): string[] {
         const plantUmlLines = new Array<string>();
 
-        plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection) + " {");
+        plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection, typeArguments) + " {");
 
         if (includeMembers && reflection.children) {
             // Process properties
@@ -228,35 +264,48 @@ export class PlantUmlCodeGenerator {
     }
 
     /**
-     * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a type.
-     * @param type The type for which the PlantUML should be generated.
-     * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
-     *                       the type as well.
-     * @returns The PlantUML lines for the type.
+     * Returns the PlantUML line for the introduction of a class or interface.
+     * @param reflection The class or interface for which the PlantUML should be generated.
+     * @param typeArguments Possible type arguments if the reflection is based on a template class.
+     * @returns The PlantUML line for the given class or interface.
      */
-    protected createPlantUmlForType(type: ReferenceType, includeMembers: boolean): string[] {
-        const reflection = type.reflection;
+    private createPlantUmlForClassOrInterface(reflection: DeclarationReflection, typeArguments?: Type[]): string {
+        let plantUml = "";
 
-        if (
-            reflection &&
-            reflection instanceof DeclarationReflection &&
-            (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface)
-        ) {
-            return this.createPlantUmlForReflection(reflection, includeMembers);
-        } else {
-            // create a dummy definition for the type
-            const name = this.escapeName(type.toString());
-            const code = new Array<string>();
-
-            code.push("class " + name);
-
-            // Note:
-            // The following hide command must be behind the class definition because of a bug in PlantUML.
-            // See: https://github.com/plantuml/plantuml/issues/342
-            code.push("hide " + name + " circle"); // hide the circle, because we don't know if it is really a class
-
-            return code;
+        if (reflection.flags.isStatic) {
+            plantUml += "static ";
         }
+
+        if (reflection.flags.isAbstract) {
+            plantUml += "abstract ";
+        }
+
+        if (reflection.kind === ReflectionKind.Class) {
+            plantUml += "class ";
+        } else {
+            plantUml += "interface ";
+        }
+
+        let name = reflection.name;
+
+        if (reflection.typeParameters) {
+            name += "<";
+            if (typeArguments) {
+                name += typeArguments.map((t) => t.toString()).join(", ");
+            } else {
+                name += reflection.typeParameters.map((t) => t.name).join(", ");
+            }
+            name += ">";
+        }
+
+        plantUml += this.escapeName(name);
+
+        // Add an alias for a template class, so that its type parameters are displayed on the top/right corner
+        if (reflection.typeParameters && !typeArguments) {
+            plantUml += " as " + reflection.name;
+        }
+
+        return plantUml;
     }
 
     /**
@@ -330,33 +379,6 @@ export class PlantUmlCodeGenerator {
         } else {
             plantUml += " : void";
         }
-
-        return plantUml;
-    }
-
-    /**
-     * Returns the PlantUML line for the introduction of a class or interface.
-     * @param reflection The class or interface for which the PlantUML should be generated.
-     * @returns The PlantUML line for the given class or interface.
-     */
-    private createPlantUmlForClassOrInterface(reflection: DeclarationReflection): string {
-        let plantUml = "";
-
-        if (reflection.flags.isStatic) {
-            plantUml += "static ";
-        }
-
-        if (reflection.flags.isAbstract) {
-            plantUml += "abstract ";
-        }
-
-        if (reflection.kind === ReflectionKind.Class) {
-            plantUml += "class ";
-        } else {
-            plantUml += "interface ";
-        }
-
-        plantUml += this.escapeName(reflection.name);
 
         return plantUml;
     }
