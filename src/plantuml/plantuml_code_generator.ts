@@ -5,6 +5,7 @@ import {
     ReflectionKind,
     SignatureReflection,
     Type,
+    TypeParameterReflection,
 } from "typedoc/dist/lib/models/index";
 import {
     ClassDiagramMemberVisibilityStyle,
@@ -230,6 +231,13 @@ export class PlantUmlCodeGenerator {
         includeMembers: boolean,
         typeArguments?: Type[]
     ): string[] {
+        // Build type parameter map used in the methods below
+        const typeParamsMap =
+            reflection.typeParameters && typeArguments
+                ? this.createTypeParameterMapping(reflection.typeParameters, typeArguments)
+                : new Map<string, string>();
+
+        // Build PlantUML code
         const plantUmlLines = new Array<string>();
 
         plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection, typeArguments) + " {");
@@ -241,7 +249,7 @@ export class PlantUmlCodeGenerator {
                 .sort(this.classMemberCompareFunction);
 
             for (const prop of props) {
-                plantUmlLines.push(this.createPlantUmlForProperty(prop));
+                plantUmlLines.push(this.createPlantUmlForProperty(prop, typeParamsMap));
             }
 
             // Process method signatures
@@ -252,7 +260,9 @@ export class PlantUmlCodeGenerator {
             for (const method of methods) {
                 if (method.signatures) {
                     for (const signature of method.signatures) {
-                        plantUmlLines.push(this.createPlantUmlForMethodSignature(method.flags, signature));
+                        plantUmlLines.push(
+                            this.createPlantUmlForMethodSignature(method.flags, signature, typeParamsMap)
+                        );
                     }
                 }
             }
@@ -311,9 +321,11 @@ export class PlantUmlCodeGenerator {
     /**
      * Returns the PlantUML line for generating the output for a given property.
      * @param property The property for which the PlantUML should be generated.
+     * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
+     *                      the type parameters to their type arguments.
      * @returns The PlantUML line for the given property.
      */
-    private createPlantUmlForProperty(property: DeclarationReflection): string {
+    private createPlantUmlForProperty(property: DeclarationReflection, typeParamsMap: Map<string, string>): string {
         let plantUml = "    "; // indent
 
         if (property.flags.isStatic) {
@@ -328,7 +340,10 @@ export class PlantUmlCodeGenerator {
             plantUml += "+"; // default is public for JS/TS
         }
 
-        plantUml += property.name + " : " + (property.type ? property.type.toString() : "unknown");
+        plantUml +=
+            property.name +
+            " : " +
+            (property.type ? this.getTypeNameWithReplacedTypeParameters(property.type, typeParamsMap) : "unknown");
 
         return plantUml;
     }
@@ -337,9 +352,15 @@ export class PlantUmlCodeGenerator {
      * Returns the PlantUML line for generating the output for a given method.
      * @param methodFlags Flags for the method the signature belongs to.
      * @param signature Data about the method signature.
+     * @param typeParamsMap If the method belongs to a class which has type arguments this map contains the mapping of
+     *                      the type parameters to their type arguments.
      * @returns The PlantUML line for the given method.
      */
-    private createPlantUmlForMethodSignature(methodFlags: ReflectionFlags, signature: SignatureReflection): string {
+    private createPlantUmlForMethodSignature(
+        methodFlags: ReflectionFlags,
+        signature: SignatureReflection,
+        typeParamsMap: Map<string, string>
+    ): string {
         let plantUml = "    "; // indent
 
         if (methodFlags.isStatic) {
@@ -364,10 +385,19 @@ export class PlantUmlCodeGenerator {
             if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyNames) {
                 plantUml += signature.parameters.map((p) => p.name).join(", ");
             } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyTypes) {
-                plantUml += signature.parameters.map((p) => (p.type ? p.type.toString() : "unknown")).join(", ");
+                plantUml += signature.parameters
+                    .map((p) =>
+                        p.type ? this.getTypeNameWithReplacedTypeParameters(p.type, typeParamsMap) : "unknown"
+                    )
+                    .join(", ");
             } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.Complete) {
                 plantUml += signature.parameters
-                    .map((p) => p.name + ": " + (p.type ? p.type.toString() : "unknown"))
+                    .map(
+                        (p) =>
+                            p.name +
+                            ": " +
+                            (p.type ? this.getTypeNameWithReplacedTypeParameters(p.type, typeParamsMap) : "unknown")
+                    )
                     .join(", ");
             }
         }
@@ -375,7 +405,7 @@ export class PlantUmlCodeGenerator {
         plantUml += ")";
 
         if (signature.type) {
-            plantUml += " : " + signature.type.toString();
+            plantUml += " : " + this.getTypeNameWithReplacedTypeParameters(signature.type, typeParamsMap);
         } else {
             plantUml += " : void";
         }
@@ -390,5 +420,45 @@ export class PlantUmlCodeGenerator {
      */
     private escapeName(name: string): string {
         return '"' + name + '"';
+    }
+
+    /**
+     * Creates a map which includes the type argument names for every type parameter name.
+     * @param typeParameters The type parameters.
+     * @param typeArguments The type arguments.
+     * @returns A map which includes the type argument names for every type parameter name.
+     */
+    private createTypeParameterMapping(
+        typeParameters: TypeParameterReflection[],
+        typeArguments: Type[]
+    ): Map<string, string> {
+        const typeParamsMap = new Map<string, string>();
+
+        for (let i = 0; i < typeParameters.length; ++i) {
+            const typeArgumentName = typeParameters[i].name;
+            const typeArgumentValue = typeArguments[i].toString();
+            typeParamsMap.set(typeArgumentName, typeArgumentValue);
+        }
+
+        return typeParamsMap;
+    }
+
+    /**
+     * Returns the name of a type. If the type includes template parameters those are replaced with their values
+     * using the second argument (typeParamsMap).
+     * @param type The type whos name is wanted.
+     * @param typeParamsMap Possible template parameter values.
+     * @returns The name of the type.
+     */
+    private getTypeNameWithReplacedTypeParameters(type: Type, typeParamsMap: Map<string, string>): string {
+        let name = type.toString();
+
+        // Replace type parameters with their arguments
+        for (const [key, value] of typeParamsMap.entries()) {
+            const regex = new RegExp("(?<=[^\\w])" + key, "g"); // positive look-behind
+            name = name.replace(regex, value);
+        }
+
+        return name;
     }
 }
