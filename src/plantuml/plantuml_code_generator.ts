@@ -63,14 +63,18 @@ export class PlantUmlCodeGenerator {
         let siblingsBelow = 0;
 
         // add class/interface
+        const reflectionName = this.getFullReflectionName(reflection);
         plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(reflection, includeMembers));
 
         // add classes/interfaces this type is extending
         const extendedTypes = TypeDocUtils.getExtendedTypesForReflection(reflection);
 
         for (const extendedType of extendedTypes) {
+            const extendedTypeName = this.getFullTypeName(extendedType);
+
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedType, includeMembers));
-            plantUmlLines.push(this.escapeName(extendedType.toString()) + " <|-- " + this.escapeName(reflection.name));
+            plantUmlLines.push(this.escapeName(extendedTypeName) + " <|-- " + this.escapeName(reflectionName));
+
             ++siblingsAbove;
         }
 
@@ -78,10 +82,11 @@ export class PlantUmlCodeGenerator {
         const implementedTypes = TypeDocUtils.getImplementedTypesForReflection(reflection);
 
         for (const implementedType of implementedTypes) {
+            const implementedTypeName = this.getFullTypeName(implementedType);
+
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedType, includeMembers));
-            plantUmlLines.push(
-                this.escapeName(implementedType.toString()) + " <|.. " + this.escapeName(reflection.name)
-            );
+            plantUmlLines.push(this.escapeName(implementedTypeName) + " <|.. " + this.escapeName(reflectionName));
+
             ++siblingsAbove;
         }
 
@@ -89,8 +94,11 @@ export class PlantUmlCodeGenerator {
         const extendedBys = TypeDocUtils.getExtendedBysForReflection(reflection);
 
         for (const extendedBy of extendedBys) {
+            const extendedByName = this.getFullTypeName(extendedBy);
+
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedBy, includeMembers));
-            plantUmlLines.push(this.escapeName(reflection.name) + " <|-- " + this.escapeName(extendedBy.toString()));
+            plantUmlLines.push(this.escapeName(reflectionName) + " <|-- " + this.escapeName(extendedByName));
+
             ++siblingsBelow;
         }
 
@@ -98,8 +106,11 @@ export class PlantUmlCodeGenerator {
         const implementedBys = TypeDocUtils.getImplementedBysForReflection(reflection);
 
         for (const implementedBy of implementedBys) {
+            const implementedByName = this.getFullTypeName(implementedBy);
+
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedBy, includeMembers));
-            plantUmlLines.push(this.escapeName(reflection.name) + " <|.. " + this.escapeName(implementedBy.toString()));
+            plantUmlLines.push(this.escapeName(reflectionName) + " <|.. " + this.escapeName(implementedByName));
+
             ++siblingsBelow;
         }
 
@@ -197,7 +208,7 @@ export class PlantUmlCodeGenerator {
      *                       the type as well.
      * @returns The PlantUML lines for the type.
      */
-    protected createPlantUmlForType(type: ReferenceType, includeMembers: boolean): string[] {
+    private createPlantUmlForType(type: ReferenceType, includeMembers: boolean): string[] {
         const reflection = type.reflection;
 
         if (
@@ -207,15 +218,25 @@ export class PlantUmlCodeGenerator {
         ) {
             return this.createPlantUmlForReflection(reflection, includeMembers, type.typeArguments);
         } else {
-            // create a dummy definition for the type
-            const name = this.escapeName(type.toString());
-            const code = new Array<string>();
-
-            code.push("class " + name);
-            code.push("hide " + name + " circle"); // hide the circle, because we don't know if it is really a class
-
-            return code;
+            return this.createDummyPlantUmlForType(type);
         }
+    }
+
+    /**
+     * Creates dummy PlantUML lines for the given type.
+     * @param type The type for which the PlantUML lines are generated.
+     * @returns The PlantUML lines for the given type.
+     */
+    private createDummyPlantUmlForType(type: ReferenceType): string[] {
+        const name = this.getFullTypeName(type);
+        const escapedName = this.escapeName(name);
+
+        const code = new Array<string>();
+
+        code.push("class " + escapedName);
+        code.push("hide " + escapedName + " circle"); // hide the circle, because we don't know if it is really a class
+
+        return code;
     }
 
     /**
@@ -296,24 +317,8 @@ export class PlantUmlCodeGenerator {
             plantUml += "interface ";
         }
 
-        let name = reflection.name;
-
-        if (reflection.typeParameters) {
-            name += "<";
-            if (typeArguments) {
-                name += typeArguments.map((t) => t.toString()).join(", ");
-            } else {
-                name += reflection.typeParameters.map((t) => t.name).join(", ");
-            }
-            name += ">";
-        }
-
+        const name = this.getFullReflectionName(reflection, typeArguments);
         plantUml += this.escapeName(name);
-
-        // Add an alias for a template class, so that its type parameters are displayed on the top/right corner
-        if (reflection.typeParameters && !typeArguments) {
-            plantUml += " as " + reflection.name;
-        }
 
         return plantUml;
     }
@@ -460,5 +465,49 @@ export class PlantUmlCodeGenerator {
         }
 
         return name;
+    }
+
+    /**
+     * Returns the full name of a given reflection. If the reflection is a template class and therefore has type
+     * parameters, these are included in the name as <A, B, C>. If the reflection is based on a template class and
+     * therefore has type arguments, these are included in the name as <D, E, F>.
+     * @param reflection The reflection whos full name is wanted.
+     * @param typeArguments Possible type arguments.
+     * @returns The full name of the reflection.
+     */
+    private getFullReflectionName(reflection: DeclarationReflection, typeArguments?: Type[]): string {
+        let name = reflection.name;
+
+        if (reflection.typeParameters) {
+            name += "<";
+            if (typeArguments) {
+                name += typeArguments.map((t) => t.toString()).join(", ");
+            } else {
+                name += reflection.typeParameters.map((t) => t.name).join(", ");
+            }
+            name += ">";
+        }
+
+        return name;
+    }
+
+    /**
+     * Returns the full name of a given type. If the type has a reflection, the full name of that reflection is
+     * returned. If the type is based on a template class and therefore has type arguments, these are included
+     * in the name as <D, E, F>.
+     * @param type The type whos full name is wanted.
+     * @returns The full name of the type.
+     */
+    private getFullTypeName(type: ReferenceType): string {
+        if (type.reflection instanceof DeclarationReflection) {
+            return this.getFullReflectionName(type.reflection, type.typeArguments);
+        } else if (type.typeArguments) {
+            let name = type.name + "<";
+            name += type.typeArguments.map((t) => t.toString()).join(", ");
+            name += ">";
+            return name;
+        } else {
+            return type.toString();
+        }
     }
 }

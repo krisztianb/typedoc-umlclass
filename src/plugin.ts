@@ -9,6 +9,7 @@ import { ImageUrlGenerator } from "./image_url_generator";
 import { DiagramLegend } from "./legends/diagram_legend";
 import { DiagramLegendGenerator } from "./legends/diagram_lenged_generator";
 import { Logger } from "./logger";
+import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
 import { PlantUmlCodeGenerator } from "./plantuml/plantuml_code_generator";
 import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator";
 import { ClassDiagramPosition, ImageLocation, PluginOptions } from "./plugin_options";
@@ -161,7 +162,7 @@ export class Plugin {
             this.log?.info("The result is: " + this.numberOfDiagramsToGenerate.toString());
 
             if (this.hasWork) {
-                this.plantUmlCodeGenerator = new PlantUmlCodeGenerator(this.options);
+                this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
 
                 if (this.isGeneratingImages) {
                     this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
