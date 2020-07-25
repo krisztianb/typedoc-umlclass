@@ -384,7 +384,17 @@ export class PlantUmlCodeGenerator {
             plantUml += "+"; // public is default for JS/TS
         }
 
-        plantUml += signature.name + "(";
+        plantUml += signature.name;
+
+        // Type-parameters
+        if (signature.typeParameters) {
+            plantUml += "<";
+            plantUml += signature.typeParameters.map((p) => p.name).join(", ");
+            plantUml += ">";
+        }
+
+        // Arguments
+        plantUml += "(";
 
         if (signature.parameters) {
             if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyNames) {
@@ -409,6 +419,7 @@ export class PlantUmlCodeGenerator {
 
         plantUml += ")";
 
+        // Return type
         if (signature.type) {
             plantUml += " : " + this.getTypeNameWithReplacedTypeParameters(signature.type, typeParamsMap);
         } else {
