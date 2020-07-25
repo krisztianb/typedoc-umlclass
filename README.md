@@ -156,6 +156,10 @@ The following options are added to TypeDoc when the plugin is installed.
     debug possible plugin issues.
     Default is `false`.
 
+## Bugs
+
+Please report bugs [here](https://github.com/krisztianb/typedoc-umlclass/issues). Thanks for your contribution!
+
 ## Credits
 
 I would like to thank the following people that influenced this project:
