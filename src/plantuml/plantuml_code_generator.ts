@@ -391,6 +391,13 @@ export class PlantUmlCodeGenerator {
             plantUml += "<";
             plantUml += signature.typeParameters.map((p) => p.name).join(", ");
             plantUml += ">";
+
+            // Remove type parameters of signature from type parameter/argument mapping of class
+            typeParamsMap = new Map(typeParamsMap);
+
+            signature.typeParameters.forEach((p) => {
+                typeParamsMap.delete(p.name);
+            });
         }
 
         // Arguments
@@ -471,7 +478,7 @@ export class PlantUmlCodeGenerator {
 
         // Replace type parameters with their arguments
         for (const [key, value] of typeParamsMap.entries()) {
-            const regex = new RegExp("(?<=[^\\w])" + key, "g"); // positive look-behind
+            const regex = new RegExp("(?<![\\w])" + key + "(?![\\w])", "g"); // negative look-behind & look-ahead
             name = name.replace(regex, value);
         }
 
