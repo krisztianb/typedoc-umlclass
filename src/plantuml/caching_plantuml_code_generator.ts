@@ -26,7 +26,7 @@ export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
     protected createPlantUmlForReflection(
         reflection: DeclarationReflection,
         includeMembers: boolean,
-        typeArguments?: Type[]
+        typeArguments?: Type[],
     ): string[] {
         // Build cache-key
         let cacheKey = String(reflection.id);
@@ -43,7 +43,7 @@ export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
         if (!this.reflectionPlantUmlCache.has(cacheKey)) {
             this.reflectionPlantUmlCache.set(
                 cacheKey,
-                super.createPlantUmlForReflection(reflection, includeMembers, typeArguments)
+                super.createPlantUmlForReflection(reflection, includeMembers, typeArguments),
             );
         }
 

@@ -18,7 +18,7 @@ export class PageSection {
         title: string,
         imageUrl: string,
         reflectionName: string,
-        legendHtml?: string
+        legendHtml?: string,
     ): string {
         // URLs with data are not clickable in browsers for security concerns => just output an image tag
         if (imageUrl.startsWith("data:")) {

@@ -168,7 +168,7 @@ export class Plugin {
                     this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
                         this.options.generatorProcessCount,
                         this.options.outputImageFormat,
-                        this.onImageGenerated
+                        this.onImageGenerated,
                     );
 
                     if (!this.options.hideProgressBar) {
@@ -178,7 +178,7 @@ export class Plugin {
                             {
                                 total: this.numberOfDiagramsToGenerate,
                                 width: 40,
-                            }
+                            },
                         );
                     }
                 }
@@ -307,7 +307,7 @@ export class Plugin {
      */
     private readonly onImageGenerated = (
         id: { reflection: DeclarationReflection; pageFilePath: string },
-        imageData: Buffer
+        imageData: Buffer,
     ): void => {
         let imageUrl = "";
 
@@ -385,7 +385,7 @@ export class Plugin {
     private insertHierarchyDiagramIntoFile(
         filePath: string,
         reflection: DeclarationReflection,
-        imageUrl: string
+        imageUrl: string,
     ): void {
         let fileContent = fs.readFileSync(filePath, "utf8");
 
@@ -403,7 +403,7 @@ export class Plugin {
     private insertHierarchyDiagramIntoContent(
         originalContent: string,
         reflection: DeclarationReflection,
-        imageUrl: string
+        imageUrl: string,
     ): string {
         const page = new PageProcessor(originalContent);
 
@@ -413,7 +413,7 @@ export class Plugin {
             this.options.sectionTitle,
             imageUrl,
             reflection.name,
-            legend && !legend.isEmpty ? legend.getHtml(this.options.classDiagramMemberVisibilityStyle) : ""
+            legend && !legend.isEmpty ? legend.getHtml(this.options.classDiagramMemberVisibilityStyle) : "",
         );
 
         if (this.options.classDiagramPosition === ClassDiagramPosition.Above) {

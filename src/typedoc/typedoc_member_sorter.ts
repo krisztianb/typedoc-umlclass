@@ -30,7 +30,7 @@ export const nameAbc: TypeDocMemberCompareFunction = (a: DeclarationReflection, 
  */
 export const publicToPrivate: TypeDocMemberCompareFunction = (
     a: DeclarationReflection,
-    b: DeclarationReflection
+    b: DeclarationReflection,
 ): number => {
     if (a.flags.isProtected) {
         if (b.flags.isProtected) {
@@ -67,7 +67,7 @@ export const publicToPrivate: TypeDocMemberCompareFunction = (
  */
 export const privateToPublic: TypeDocMemberCompareFunction = (
     a: DeclarationReflection,
-    b: DeclarationReflection
+    b: DeclarationReflection,
 ): number => {
     if (a.flags.isProtected) {
         if (b.flags.isProtected) {

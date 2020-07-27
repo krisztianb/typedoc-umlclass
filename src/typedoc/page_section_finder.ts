@@ -46,7 +46,7 @@ export class PageSectionFinder {
         if (!PageSectionFinder.pageSectionLookUpCache.has(section)) {
             PageSectionFinder.pageSectionLookUpCache.set(
                 section,
-                PageSectionFinder.createLookUpRegexpForSection(section)
+                PageSectionFinder.createLookUpRegexpForSection(section),
             );
         }
 

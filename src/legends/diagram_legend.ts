@@ -39,7 +39,7 @@ export class DiagramLegend {
         hasProtectedMethodItem: boolean = true,
         hasPrivateMethodItem: boolean = true,
         hasStaticMemberItem: boolean = true,
-        hasAbstractMemberItem: boolean = true
+        hasAbstractMemberItem: boolean = true,
     ) {
         this.hasClassIcon = hasClassItem;
         this.hasAbstractClassIcon = hasAbstractClassItem;

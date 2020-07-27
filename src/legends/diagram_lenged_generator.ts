@@ -34,7 +34,7 @@ export class DiagramLegendGenerator {
             hasProtectedMethodItem,
             hasPrivateMethodItem,
             hasStaticMemberItem,
-            hasAbstractMemberItem
+            hasAbstractMemberItem,
         );
     }
 }

@@ -176,25 +176,25 @@ export class PlantUmlCodeGenerator {
 
         if (this.options.classDiagramClassAttributeFontName) {
             plantUmlLines.unshift(
-                "skinparam ClassAttributeFontName " + this.options.classDiagramClassAttributeFontName
+                "skinparam ClassAttributeFontName " + this.options.classDiagramClassAttributeFontName,
             );
         }
 
         if (this.options.classDiagramClassAttributeFontSize) {
             plantUmlLines.unshift(
-                "skinparam ClassAttributeFontSize " + this.options.classDiagramClassAttributeFontSize
+                "skinparam ClassAttributeFontSize " + this.options.classDiagramClassAttributeFontSize,
             );
         }
 
         if (this.options.classDiagramClassAttributeFontStyle !== FontStyle.Undefined) {
             plantUmlLines.unshift(
-                "skinparam ClassAttributeFontStyle " + this.options.classDiagramClassAttributeFontStyle.toString()
+                "skinparam ClassAttributeFontStyle " + this.options.classDiagramClassAttributeFontStyle.toString(),
             );
         }
 
         if (this.options.classDiagramClassAttributeFontColor) {
             plantUmlLines.unshift(
-                "skinparam ClassAttributeFontColor " + this.options.classDiagramClassAttributeFontColor
+                "skinparam ClassAttributeFontColor " + this.options.classDiagramClassAttributeFontColor,
             );
         }
 
@@ -250,7 +250,7 @@ export class PlantUmlCodeGenerator {
     protected createPlantUmlForReflection(
         reflection: DeclarationReflection,
         includeMembers: boolean,
-        typeArguments?: Type[]
+        typeArguments?: Type[],
     ): string[] {
         // Build type parameter map used in the methods below
         const typeParamsMap =
@@ -282,7 +282,7 @@ export class PlantUmlCodeGenerator {
                 if (method.signatures) {
                     for (const signature of method.signatures) {
                         plantUmlLines.push(
-                            this.createPlantUmlForMethodSignature(method.flags, signature, typeParamsMap)
+                            this.createPlantUmlForMethodSignature(method.flags, signature, typeParamsMap),
                         );
                     }
                 }
@@ -364,7 +364,7 @@ export class PlantUmlCodeGenerator {
     private createPlantUmlForMethodSignature(
         methodFlags: ReflectionFlags,
         signature: SignatureReflection,
-        typeParamsMap: Map<string, string>
+        typeParamsMap: Map<string, string>,
     ): string {
         let plantUml = "    "; // indent
 
@@ -409,7 +409,7 @@ export class PlantUmlCodeGenerator {
             } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyTypes) {
                 plantUml += signature.parameters
                     .map((p) =>
-                        p.type ? this.getTypeNameWithReplacedTypeParameters(p.type, typeParamsMap) : "unknown"
+                        p.type ? this.getTypeNameWithReplacedTypeParameters(p.type, typeParamsMap) : "unknown",
                     )
                     .join(", ");
             } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.Complete) {
@@ -418,7 +418,7 @@ export class PlantUmlCodeGenerator {
                         (p) =>
                             p.name +
                             ": " +
-                            (p.type ? this.getTypeNameWithReplacedTypeParameters(p.type, typeParamsMap) : "unknown")
+                            (p.type ? this.getTypeNameWithReplacedTypeParameters(p.type, typeParamsMap) : "unknown"),
                     )
                     .join(", ");
             }
@@ -453,7 +453,7 @@ export class PlantUmlCodeGenerator {
      */
     private createTypeParameterMapping(
         typeParameters: TypeParameterReflection[],
-        typeArguments: Type[]
+        typeArguments: Type[],
     ): Map<string, string> {
         const typeParamsMap = new Map<string, string>();
 

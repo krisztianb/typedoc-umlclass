@@ -42,7 +42,7 @@ export class PlantUmlDiagramGenerator<DiagramId> {
     constructor(
         processCount: number,
         format: "png" | "svg",
-        imageGeneratedHandler: (id: DiagramId, imageData: Buffer) => unknown
+        imageGeneratedHandler: (id: DiagramId, imageData: Buffer) => unknown,
     ) {
         if (processCount <= 0) {
             throw new Error("processCount must be > 0");

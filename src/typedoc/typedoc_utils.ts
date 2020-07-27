@@ -87,7 +87,7 @@ export class TypeDocUtils {
                         extendedType.reflection instanceof DeclarationReflection
                     ) {
                         extendedTypeParents = extendedTypeParents.concat(
-                            TypeDocUtils.getParentTypesForReflection(extendedType.reflection)
+                            TypeDocUtils.getParentTypesForReflection(extendedType.reflection),
                         );
                     }
                 }
@@ -130,7 +130,7 @@ export class TypeDocUtils {
             for (const implementedBy of implementedBys) {
                 if (implementedBy.reflection instanceof DeclarationReflection) {
                     implementedBySubTypes = implementedBySubTypes.concat(
-                        TypeDocUtils.getSubTypesForReflection(implementedBy.reflection)
+                        TypeDocUtils.getSubTypesForReflection(implementedBy.reflection),
                     );
                 }
             }
@@ -165,7 +165,7 @@ export class TypeDocUtils {
 
                     if (extendedType.reflection instanceof DeclarationReflection) {
                         parentTypes = parentTypes.concat(
-                            TypeDocUtils.getParentTypesForReflection(extendedType.reflection)
+                            TypeDocUtils.getParentTypesForReflection(extendedType.reflection),
                         );
                     }
                 }
@@ -180,7 +180,7 @@ export class TypeDocUtils {
 
                     if (implementedType.reflection instanceof DeclarationReflection) {
                         parentTypes = parentTypes.concat(
-                            TypeDocUtils.getParentTypesForReflection(implementedType.reflection)
+                            TypeDocUtils.getParentTypesForReflection(implementedType.reflection),
                         );
                     }
                 }
