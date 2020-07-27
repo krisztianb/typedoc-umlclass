@@ -49,7 +49,7 @@ export class Plugin {
         | PlantUmlDiagramGenerator<{ reflection: DeclarationReflection; pageFilePath: string }>
         | undefined;
 
-    /** Objet that generates URLs for PlantUML diagrams.  */
+    /** Object that generates URLs for PlantUML diagrams.  */
     private imageUrlGenerator = new ImageUrlGenerator();
 
     /** Progress bar shown when generating the diagrams. */
