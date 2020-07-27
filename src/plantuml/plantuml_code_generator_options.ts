@@ -9,7 +9,7 @@ import {
 /**
  * Options for the PlantUmlGenerator.
  */
-export interface PlantUmlCodeGeneratorOptions {
+export type PlantUmlCodeGeneratorOptions = {
     classDiagramType: ClassDiagramType;
     classDiagramMethodParameterOutput: MethodParameterOutput;
     classDiagramMemberOrder: MemberOrder;
@@ -31,4 +31,4 @@ export interface PlantUmlCodeGeneratorOptions {
     classDiagramClassAttributeFontSize: number;
     classDiagramClassAttributeFontStyle: FontStyle;
     classDiagramClassAttributeFontColor: string;
-}
+};

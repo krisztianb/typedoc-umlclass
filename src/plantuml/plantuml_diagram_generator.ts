@@ -4,13 +4,13 @@ import Queue = require("queue-fifo");
 /**
  * Type that groups data for a PlantUML process.
  */
-interface PlantUmlProcessInfo<DiagramId> {
+type PlantUmlProcessInfo<DiagramId> = {
     /** The object that encapsulates the PlantUML process. */
     pipe: PlantUmlPipe;
 
     /** Stores the ID and the order of the diagrams that the process is generating. */
     diagramIdQueue: Queue<DiagramId>;
-}
+};
 
 /**
  * Class for generating diagrams from PlantUML code.
