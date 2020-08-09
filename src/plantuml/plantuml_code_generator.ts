@@ -216,7 +216,7 @@ export class PlantUmlCodeGenerator {
             reflection instanceof DeclarationReflection &&
             (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface)
         ) {
-            return this.createPlantUmlForReflection(reflection, includeMembers, type.typeArguments);
+            return this.createPlantUmlForReflection(reflection, includeMembers, type.typeArguments, true);
         } else {
             return this.createDummyPlantUmlForType(type);
         }
@@ -245,16 +245,20 @@ export class PlantUmlCodeGenerator {
      * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
      *                       the reflection as well.
      * @param typeArguments Possible type arguments if the reflection is based on a template class.
+     * @param isType Specifies whether the reflection belongs to a type. This parameter is necessary to distinguish
+     *               between a template class and a type based on the template class, because missing typeArguments
+     *               can also mean that the default types for all type parameters are used for the type.
      * @returns The PlantUML lines for the reflection.
      */
     protected createPlantUmlForReflection(
         reflection: DeclarationReflection,
         includeMembers: boolean,
         typeArguments?: Type[],
+        isType: boolean = false,
     ): string[] {
         // Build type parameter map used in the methods below
         const typeParamsMap =
-            reflection.typeParameters && typeArguments
+            reflection.typeParameters && isType
                 ? this.createTypeParameterMapping(reflection.typeParameters, typeArguments)
                 : new Map<string, string>();
 
@@ -448,19 +452,22 @@ export class PlantUmlCodeGenerator {
     /**
      * Creates a map which includes the type argument names for every type parameter name.
      * @param typeParameters The type parameters.
-     * @param typeArguments The type arguments.
+     * @param typeArguments The possible type arguments.
      * @returns A map which includes the type argument names for every type parameter name.
      */
     private createTypeParameterMapping(
         typeParameters: TypeParameterReflection[],
-        typeArguments: Type[],
+        typeArguments?: Type[],
     ): Map<string, string> {
         const typeParamsMap = new Map<string, string>();
 
         for (let i = 0; i < typeParameters.length; ++i) {
-            const typeArgumentName = typeParameters[i].name;
-            const typeArgumentValue = typeArguments[i].toString();
-            typeParamsMap.set(typeArgumentName, typeArgumentValue);
+            const typeArgument = typeArguments && typeArguments[i] ? typeArguments[i] : typeParameters[i].default;
+            if (typeArgument) {
+                const typeArgumentName = typeParameters[i].name;
+                const typeArgumentValue = typeArgument.toString();
+                typeParamsMap.set(typeArgumentName, typeArgumentValue);
+            }
         }
 
         return typeParamsMap;
