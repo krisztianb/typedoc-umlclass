@@ -56,15 +56,13 @@ export class PlantUmlCodeGenerator {
      *          If the given reflection is not part of an inheritance or implementation, the result is an empty array.
      */
     public createClassDiagramPlantUmlForReflection(reflection: DeclarationReflection): string[] {
-        const includeMembers = this.options.classDiagramType === ClassDiagramType.Detailed;
-
         let plantUmlLines = new Array<string>();
         let siblingsAbove = 0;
         let siblingsBelow = 0;
 
         // add class/interface
         const reflectionName = this.getFullReflectionName(reflection);
-        plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(reflection, includeMembers));
+        plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(reflection));
 
         // add classes/interfaces this type is extending
         const extendedTypes = TypeDocUtils.getExtendedTypesForReflection(reflection);
@@ -72,7 +70,7 @@ export class PlantUmlCodeGenerator {
         for (const extendedType of extendedTypes) {
             const extendedTypeName = this.getFullTypeName(extendedType);
 
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedType, includeMembers));
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedType));
             plantUmlLines.push(this.escapeName(extendedTypeName) + " <|-- " + this.escapeName(reflectionName));
 
             ++siblingsAbove;
@@ -84,7 +82,7 @@ export class PlantUmlCodeGenerator {
         for (const implementedType of implementedTypes) {
             const implementedTypeName = this.getFullTypeName(implementedType);
 
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedType, includeMembers));
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedType));
             plantUmlLines.push(this.escapeName(implementedTypeName) + " <|.. " + this.escapeName(reflectionName));
 
             ++siblingsAbove;
@@ -96,7 +94,7 @@ export class PlantUmlCodeGenerator {
         for (const extendedBy of extendedBys) {
             const extendedByName = this.getFullTypeName(extendedBy);
 
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedBy, includeMembers));
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedBy));
             plantUmlLines.push(this.escapeName(reflectionName) + " <|-- " + this.escapeName(extendedByName));
 
             ++siblingsBelow;
@@ -108,7 +106,7 @@ export class PlantUmlCodeGenerator {
         for (const implementedBy of implementedBys) {
             const implementedByName = this.getFullTypeName(implementedBy);
 
-            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedBy, includeMembers));
+            plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedBy));
             plantUmlLines.push(this.escapeName(reflectionName) + " <|.. " + this.escapeName(implementedByName));
 
             ++siblingsBelow;
@@ -204,11 +202,9 @@ export class PlantUmlCodeGenerator {
     /**
      * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a type.
      * @param type The type for which the PlantUML should be generated.
-     * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
-     *                       the type as well.
      * @returns The PlantUML lines for the type.
      */
-    private createPlantUmlForType(type: ReferenceType, includeMembers: boolean): string[] {
+    private createPlantUmlForType(type: ReferenceType): string[] {
         const reflection = type.reflection;
 
         if (
@@ -216,7 +212,7 @@ export class PlantUmlCodeGenerator {
             reflection instanceof DeclarationReflection &&
             (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface)
         ) {
-            return this.createPlantUmlForReflection(reflection, includeMembers, type.typeArguments, true);
+            return this.createPlantUmlForReflection(reflection, type.typeArguments, true);
         } else {
             return this.createDummyPlantUmlForType(type);
         }
@@ -242,17 +238,15 @@ export class PlantUmlCodeGenerator {
     /**
      * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a reflection.
      * @param reflection The reflection for which the PlantUML should be generated.
-     * @param includeMembers Specifies whether the resulting PlantUML should include the properties and methods of
-     *                       the reflection as well.
      * @param typeArguments Possible type arguments if the reflection is based on a template class.
      * @param isType Specifies whether the reflection belongs to a type. This parameter is necessary to distinguish
      *               between a template class and a type based on the template class, because missing typeArguments
-     *               can also mean that the default types for all type parameters are used for the type.
+     *               can either mean that the default types for all type parameters are used for the type or that the
+     *               reflection stands for a template class.
      * @returns The PlantUML lines for the reflection.
      */
     protected createPlantUmlForReflection(
         reflection: DeclarationReflection,
-        includeMembers: boolean,
         typeArguments?: Type[],
         isType: boolean = false,
     ): string[] {
@@ -265,9 +259,9 @@ export class PlantUmlCodeGenerator {
         // Build PlantUML code
         const plantUmlLines = new Array<string>();
 
-        plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection, typeArguments) + " {");
+        plantUmlLines.push(this.createPlantUmlForClassOrInterface(reflection, typeParamsMap) + " {");
 
-        if (includeMembers && reflection.children) {
+        if (this.options.classDiagramType === ClassDiagramType.Detailed && reflection.children) {
             // Process properties
             const props = reflection.children
                 .filter((c) => c.kind === ReflectionKind.Property)
@@ -301,10 +295,14 @@ export class PlantUmlCodeGenerator {
     /**
      * Returns the PlantUML line for the introduction of a class or interface.
      * @param reflection The class or interface for which the PlantUML should be generated.
-     * @param typeArguments Possible type arguments if the reflection is based on a template class.
+     * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
+     *                      the type parameters to their type arguments.
      * @returns The PlantUML line for the given class or interface.
      */
-    private createPlantUmlForClassOrInterface(reflection: DeclarationReflection, typeArguments?: Type[]): string {
+    private createPlantUmlForClassOrInterface(
+        reflection: DeclarationReflection,
+        typeParamsMap: Map<string, string>,
+    ): string {
         let plantUml = "";
 
         if (reflection.flags.isStatic) {
@@ -321,7 +319,7 @@ export class PlantUmlCodeGenerator {
             plantUml += "interface ";
         }
 
-        const name = this.getFullReflectionName(reflection, typeArguments);
+        const name = this.getFullReflectionName(reflection, typeParamsMap);
         plantUml += this.escapeName(name);
 
         return plantUml;
@@ -455,7 +453,7 @@ export class PlantUmlCodeGenerator {
      * @param typeArguments The possible type arguments.
      * @returns A map which includes the type argument names for every type parameter name.
      */
-    private createTypeParameterMapping(
+    protected createTypeParameterMapping(
         typeParameters: TypeParameterReflection[],
         typeArguments?: Type[],
     ): Map<string, string> {
@@ -495,18 +493,19 @@ export class PlantUmlCodeGenerator {
     /**
      * Returns the full name of a given reflection. If the reflection is a template class and therefore has type
      * parameters, these are included in the name as <A, B, C>. If the reflection is based on a template class and
-     * therefore has type arguments, these are included in the name as <D, E, F>.
+     * therefore has type arguments, these are included in the name as <string, number, any>.
      * @param reflection The reflection whos full name is wanted.
-     * @param typeArguments Possible type arguments.
+     * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
+     *                      the type parameters to their type arguments.
      * @returns The full name of the reflection.
      */
-    private getFullReflectionName(reflection: DeclarationReflection, typeArguments?: Type[]): string {
+    private getFullReflectionName(reflection: DeclarationReflection, typeParamsMap?: Map<string, string>): string {
         let name = reflection.name;
 
         if (reflection.typeParameters) {
             name += "<";
-            if (typeArguments) {
-                name += typeArguments.map((t) => t.toString()).join(", ");
+            if (typeParamsMap?.size) {
+                name += Array.from(typeParamsMap.values()).join(", ");
             } else {
                 name += reflection.typeParameters.map((t) => t.name).join(", ");
             }
@@ -525,7 +524,10 @@ export class PlantUmlCodeGenerator {
      */
     private getFullTypeName(type: ReferenceType): string {
         if (type.reflection instanceof DeclarationReflection) {
-            return this.getFullReflectionName(type.reflection, type.typeArguments);
+            const typeParamsMap = type.reflection.typeParameters
+                ? this.createTypeParameterMapping(type.reflection.typeParameters, type.typeArguments)
+                : new Map<string, string>();
+            return this.getFullReflectionName(type.reflection, typeParamsMap);
         } else if (type.typeArguments) {
             let name = type.name + "<";
             name += type.typeArguments.map((t) => t.toString()).join(", ");

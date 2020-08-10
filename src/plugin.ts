@@ -162,7 +162,7 @@ export class Plugin {
             this.log?.info("The result is: " + this.numberOfDiagramsToGenerate.toString());
 
             if (this.hasWork) {
-                this.plantUmlCodeGenerator = new PlantUmlCodeGenerator(this.options);
+                this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
 
                 if (this.isGeneratingImages) {
                     this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
