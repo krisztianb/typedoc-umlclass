@@ -461,9 +461,11 @@ export class PlantUmlCodeGenerator {
 
         for (let i = 0; i < typeParameters.length; ++i) {
             const typeArgument = typeArguments && typeArguments[i] ? typeArguments[i] : typeParameters[i].default;
+
             if (typeArgument) {
                 const typeArgumentName = typeParameters[i].name;
                 const typeArgumentValue = typeArgument.toString();
+
                 typeParamsMap.set(typeArgumentName, typeArgumentValue);
             }
         }
