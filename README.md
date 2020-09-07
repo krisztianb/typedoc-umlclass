@@ -172,6 +172,12 @@ I would like to thank the following people that influenced this project:
 -   [Gerrit Birkeland](https://github.com/Gerrit0) for his help on questions about TypeDoc.
 -   [Youssef Boujraf](https://github.com/yboujraf) for his impulse to create a separate plugin and help with testing it.
 
+## Donate
+
+If you find this piece of software helpful, please consider a donation. Any amount is greatly appreciated.
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=67UU75EUH4S8A)
+
 ## License
 
 Licensed under ISC.
