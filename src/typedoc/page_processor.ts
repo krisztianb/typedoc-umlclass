@@ -12,7 +12,7 @@ export class PageProcessor {
      * Creates a new PageProcessor with the content of the page.
      * @param content The content of the page.
      */
-    constructor(content?: string) {
+    public constructor(content?: string) {
         this._content = content ?? "";
     }
 
@@ -20,7 +20,7 @@ export class PageProcessor {
      * Returns the current content of the page.
      * @returns The current content of the page.
      */
-    get content(): string {
+    public get content(): string {
         return this._content;
     }
 

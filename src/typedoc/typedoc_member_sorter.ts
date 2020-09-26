@@ -1,7 +1,10 @@
 import { DeclarationReflection } from "typedoc";
 
 /** Type for a reflection compare function for sorting reflections. */
-export type TypeDocMemberCompareFunction = (a: DeclarationReflection, b: DeclarationReflection) => number;
+export type TypeDocMemberCompareFunction = (
+    a: Readonly<DeclarationReflection>,
+    b: Readonly<DeclarationReflection>,
+) => number;
 
 /**
  * Compare function for sorting reflections by their name alphabetically.
@@ -9,7 +12,10 @@ export type TypeDocMemberCompareFunction = (a: DeclarationReflection, b: Declara
  * @param b Second reflection.
  * @returns -1 if (a < b), 0 if (a === b) or 1 if (a > b).
  */
-export const nameAbc: TypeDocMemberCompareFunction = (a: DeclarationReflection, b: DeclarationReflection): number => {
+export const nameAbc: TypeDocMemberCompareFunction = (
+    a: Readonly<DeclarationReflection>,
+    b: Readonly<DeclarationReflection>,
+): number => {
     const aName = a.name.toUpperCase();
     const bName = b.name.toUpperCase();
 
@@ -29,34 +35,30 @@ export const nameAbc: TypeDocMemberCompareFunction = (a: DeclarationReflection, 
  * @returns -1 if (a < b), 0 if (a === b) or 1 if (a > b).
  */
 export const publicToPrivate: TypeDocMemberCompareFunction = (
-    a: DeclarationReflection,
-    b: DeclarationReflection,
+    a: Readonly<DeclarationReflection>,
+    b: Readonly<DeclarationReflection>,
 ): number => {
     if (a.flags.isProtected) {
         if (b.flags.isProtected) {
             return nameAbc(a, b);
         } else if (b.flags.isPrivate) {
             return -1;
-        } else {
-            return 1;
         }
+        return 1;
     } else if (a.flags.isPrivate) {
         if (b.flags.isProtected) {
             return 1;
         } else if (b.flags.isPrivate) {
             return nameAbc(a, b);
-        } else {
-            return 1;
         }
-    } else {
-        if (b.flags.isProtected) {
-            return -1;
-        } else if (b.flags.isPrivate) {
-            return -1;
-        } else {
-            return nameAbc(a, b);
-        }
+        return 1;
     }
+    if (b.flags.isProtected) {
+        return -1;
+    } else if (b.flags.isPrivate) {
+        return -1;
+    }
+    return nameAbc(a, b);
 };
 
 /**
@@ -74,24 +76,20 @@ export const privateToPublic: TypeDocMemberCompareFunction = (
             return nameAbc(a, b);
         } else if (b.flags.isPrivate) {
             return 1;
-        } else {
-            return -1;
         }
+        return -1;
     } else if (a.flags.isPrivate) {
         if (b.flags.isProtected) {
             return -1;
         } else if (b.flags.isPrivate) {
             return nameAbc(a, b);
-        } else {
-            return -1;
         }
-    } else {
-        if (b.flags.isProtected) {
-            return 1;
-        } else if (b.flags.isPrivate) {
-            return 1;
-        } else {
-            return nameAbc(a, b);
-        }
+        return -1;
     }
+    if (b.flags.isProtected) {
+        return 1;
+    } else if (b.flags.isPrivate) {
+        return 1;
+    }
+    return nameAbc(a, b);
 };

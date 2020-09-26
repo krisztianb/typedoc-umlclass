@@ -107,7 +107,8 @@
             "error",
             {
                 "selector": "default",
-                "format": ["camelCase"]
+                "format": ["camelCase"],
+                "leadingUnderscore": "allow"
             },
             {
                 "selector": "typeLike",

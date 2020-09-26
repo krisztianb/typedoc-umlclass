@@ -13,9 +13,9 @@ import { PlantUmlCodeGenerator } from "./plantuml/plantuml_code_generator";
 import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator";
 import { ClassDiagramPosition, ImageLocation, PluginOptions } from "./plugin_options";
 import { PageProcessor } from "./typedoc/page_processor";
-import { PageSection, PageSections } from "./typedoc/page_section";
+import { createHierarchyDiagramSection, PageSections } from "./typedoc/page_section";
 import { PageSectionFinder } from "./typedoc/page_section_finder";
-import { TypeDocUtils } from "./typedoc/typedoc_utils";
+import { reflectionIsPartOfClassHierarchy } from "./typedoc/typedoc_utils";
 
 /**
  * The UML class diagram generator plugin.
@@ -258,7 +258,7 @@ export class Plugin {
         if (
             reflection instanceof DeclarationReflection &&
             (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) &&
-            TypeDocUtils.reflectionIsPartOfClassHierarchy(reflection)
+            reflectionIsPartOfClassHierarchy(reflection)
         ) {
             return true;
         }
@@ -408,7 +408,7 @@ export class Plugin {
 
         const legend = this.diagramLegends.get(reflection.id);
 
-        const hierarchyDiagramSection = PageSection.createHierarchyDiagramSection(
+        const hierarchyDiagramSection = createHierarchyDiagramSection(
             this.options.sectionTitle,
             imageUrl,
             reflection.name,

@@ -21,7 +21,12 @@ import {
     publicToPrivate,
     TypeDocMemberCompareFunction,
 } from "../typedoc/typedoc_member_sorter";
-import { TypeDocUtils } from "../typedoc/typedoc_utils";
+import {
+    getExtendedBysForReflection,
+    getExtendedTypesForReflection,
+    getImplementedBysForReflection,
+    getImplementedTypesForReflection,
+} from "../typedoc/typedoc_utils";
 import { PlantUmlCodeGeneratorOptions } from "./plantuml_code_generator_options";
 
 /**
@@ -66,7 +71,7 @@ export class PlantUmlCodeGenerator {
         plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(reflection));
 
         // add classes/interfaces this type is extending
-        const extendedTypes = TypeDocUtils.getExtendedTypesForReflection(reflection);
+        const extendedTypes = getExtendedTypesForReflection(reflection);
 
         for (const extendedType of extendedTypes) {
             const extendedTypeName = PlantUmlCodeGenerator.getFullTypeName(extendedType);
@@ -82,7 +87,7 @@ export class PlantUmlCodeGenerator {
         }
 
         // add classes/interfaces this type is implementing
-        const implementedTypes = TypeDocUtils.getImplementedTypesForReflection(reflection);
+        const implementedTypes = getImplementedTypesForReflection(reflection);
 
         for (const implementedType of implementedTypes) {
             const implementedTypeName = PlantUmlCodeGenerator.getFullTypeName(implementedType);
@@ -98,7 +103,7 @@ export class PlantUmlCodeGenerator {
         }
 
         // add classes/interfaces that are extending this type
-        const extendedBys = TypeDocUtils.getExtendedBysForReflection(reflection);
+        const extendedBys = getExtendedBysForReflection(reflection);
 
         for (const extendedBy of extendedBys) {
             const extendedByName = PlantUmlCodeGenerator.getFullTypeName(extendedBy);
@@ -114,7 +119,7 @@ export class PlantUmlCodeGenerator {
         }
 
         // add classes that are implementing this type
-        const implementedBys = TypeDocUtils.getImplementedBysForReflection(reflection);
+        const implementedBys = getImplementedBysForReflection(reflection);
 
         for (const implementedBy of implementedBys) {
             const implementedByName = PlantUmlCodeGenerator.getFullTypeName(implementedBy);
