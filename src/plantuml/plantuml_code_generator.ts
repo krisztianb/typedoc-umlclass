@@ -181,7 +181,7 @@ export class PlantUmlCodeGenerator {
             plantUmlLines.unshift(`skinparam ClassFontSize ${this.options.classDiagramClassFontSize}`);
         }
 
-        if (this.options.classDiagramClassFontStyle !== FontStyle.Undefined) {
+        if (this.options.classDiagramClassFontStyle !== FontStyle.Default) {
             plantUmlLines.unshift("skinparam ClassFontStyle " + this.options.classDiagramClassFontStyle.toString());
         }
 
@@ -201,7 +201,7 @@ export class PlantUmlCodeGenerator {
             );
         }
 
-        if (this.options.classDiagramClassAttributeFontStyle !== FontStyle.Undefined) {
+        if (this.options.classDiagramClassAttributeFontStyle !== FontStyle.Default) {
             plantUmlLines.unshift(
                 "skinparam ClassAttributeFontStyle " + this.options.classDiagramClassAttributeFontStyle.toString(),
             );

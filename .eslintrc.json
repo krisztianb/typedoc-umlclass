@@ -103,7 +103,21 @@
         "no-useless-rename": "error",
 
         // TypeScript plugin basic rules
-        "@typescript-eslint/naming-convention": "error",
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": "default",
+                "format": ["camelCase"]
+            },
+            {
+                "selector": "typeLike",
+                "format": ["PascalCase"]
+            },
+            {
+                "selector": "enumMember",
+                "format": ["PascalCase"]
+            }
+        ],
         "@typescript-eslint/consistent-type-assertions": "error",
         "@typescript-eslint/consistent-type-definitions": ["error", "type"],
         "@typescript-eslint/explicit-function-return-type": ["error"],

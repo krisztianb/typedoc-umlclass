@@ -19,7 +19,7 @@ export const enum ClassDiagramMemberVisibilityStyle {
  * Font styles supported by PlantUML.
  */
 export const enum FontStyle {
-    Undefined = "",
+    Default = "",
     Normal = "normal",
     Plain = "plain",
     Italic = "italic",
@@ -49,7 +49,7 @@ export enum LegendType {
  * Possible ways to order class members in the class diagram.
  */
 export enum MemberOrder {
-    Undefined = 0,
+    None = 0,
     Abc = 1,
     PublicToPrivate = 2,
     PrivateToPublic = 3,

@@ -273,14 +273,14 @@ export class PluginOptions {
         type: ParameterType.Map,
         name: "umlClassDiagramClassFontStyle",
         help: "normal|plain|italic|bold",
-        defaultValue: FontStyle.Undefined,
+        defaultValue: FontStyle.Default,
         map: new Map([
             ["normal", FontStyle.Normal],
             ["plain", FontStyle.Plain],
             ["italic", FontStyle.Italic],
             ["bold", FontStyle.Bold],
         ]),
-        value: FontStyle.Undefined,
+        value: FontStyle.Default,
     };
 
     /** Specifies the font color for the class name in the class diagrams. */
@@ -316,14 +316,14 @@ export class PluginOptions {
         type: ParameterType.Map,
         name: "umlClassDiagramClassAttributeFontStyle",
         help: "normal|plain|italic|bold",
-        defaultValue: FontStyle.Undefined,
+        defaultValue: FontStyle.Default,
         map: new Map([
             ["normal", FontStyle.Normal],
             ["plain", FontStyle.Plain],
             ["italic", FontStyle.Italic],
             ["bold", FontStyle.Bold],
         ]),
-        value: FontStyle.Undefined,
+        value: FontStyle.Default,
     };
 
     /** Specifies the font color for the class attributes in the class diagrams. */
