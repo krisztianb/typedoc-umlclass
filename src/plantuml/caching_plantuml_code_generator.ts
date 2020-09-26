@@ -1,6 +1,6 @@
 import { DeclarationReflection } from "typedoc";
-import { Type } from "typedoc/dist/lib/models";
-import { PlantUmlCodeGenerator } from "./plantuml_code_generator";
+import { Type, TypeParameterReflection } from "typedoc/dist/lib/models";
+import { createTypeParameterMapping, PlantUmlCodeGenerator } from "./plantuml_code_generator";
 
 /**
  * Class that generates PlantUML code and caches results internally.
@@ -11,7 +11,7 @@ export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
      * KEY = ID of the reflection (and possible type arguments)
      * VALUE = PlantUML lines
      */
-    private reflectionPlantUmlCache = new Map<string, string[]>();
+    private readonly reflectionPlantUmlCache = new Map<string, string[]>();
 
     /**
      * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a reflection.
@@ -26,23 +26,26 @@ export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
      * @returns The PlantUML lines for the reflection.
      */
     protected createPlantUmlForReflection(
-        reflection: DeclarationReflection,
-        typeArguments?: Type[],
-        isType: boolean = false,
+        reflection: Readonly<DeclarationReflection>,
+        typeArguments?: ReadonlyArray<Type>,
+        isType = false,
     ): string[] {
         // Build cache-key
         let cacheKey = String(reflection.id);
 
         const typeParamsMap =
             reflection.typeParameters && isType
-                ? super.createTypeParameterMapping(reflection.typeParameters, typeArguments)
+                ? createTypeParameterMapping(reflection.typeParameters, typeArguments)
                 : new Map<string, string>();
 
         if (reflection.typeParameters) {
             if (typeParamsMap.size > 0) {
                 cacheKey += "<" + Array.from(typeParamsMap.values()).join(", ") + ">";
             } else {
-                cacheKey += "<" + reflection.typeParameters.map((t) => t.name).join(", ") + ">";
+                cacheKey +=
+                    "<" +
+                    reflection.typeParameters.map((t: Readonly<TypeParameterReflection>) => t.name).join(", ") +
+                    ">";
             }
         }
 

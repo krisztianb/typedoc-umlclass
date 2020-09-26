@@ -4,10 +4,9 @@ import * as ProgressBar from "progress";
 import { Application, DeclarationReflection, ProjectReflection, ReflectionKind } from "typedoc";
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
+import { createDiagramLegendForPlantUml, DiagramLegend } from "./diagram_legend";
 import { ClassDiagramType, FontStyle, LegendType } from "./enumerations";
 import { ImageUrlGenerator } from "./image_url_generator";
-import { DiagramLegend } from "./legends/diagram_legend";
-import { DiagramLegendGenerator } from "./legends/diagram_lenged_generator";
 import { Logger } from "./logger";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
 import { PlantUmlCodeGenerator } from "./plantuml/plantuml_code_generator";
@@ -307,7 +306,7 @@ export class Plugin {
      */
     private readonly onImageGenerated = (
         id: { reflection: DeclarationReflection; pageFilePath: string },
-        imageData: Buffer,
+        imageData: Readonly<Buffer>,
     ): void => {
         let imageUrl = "";
 
@@ -334,11 +333,11 @@ export class Plugin {
      * @param reflection The reflection for which the file is written.
      * @returns The absolute path to the file that was created.
      */
-    private writeLocalImageFileForReflection(imageData: Buffer, reflection: DeclarationReflection): string {
+    private writeLocalImageFileForReflection(imageData: Readonly<Buffer>, reflection: DeclarationReflection): string {
         const filename = reflection.name + "-umlClassDiagram-" + reflection.id + "." + this.options.outputImageFormat;
         const absoluteFilePath = path.join(this.outputDirectory, filename);
 
-        fs.writeFileSync(absoluteFilePath, imageData);
+        fs.writeFileSync(absoluteFilePath, imageData as Buffer);
         return absoluteFilePath;
     }
 
@@ -362,7 +361,7 @@ export class Plugin {
     private createLegendForReflection(reflection: DeclarationReflection, plantUmlLines: string[]): void {
         const legend =
             this.options.legendType === LegendType.OnlyIncluded
-                ? DiagramLegendGenerator.createForPlantUmlLines(plantUmlLines)
+                ? createDiagramLegendForPlantUml(plantUmlLines)
                 : new DiagramLegend();
 
         if (this.options.classDiagramHideCircledChar) {

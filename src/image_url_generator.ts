@@ -22,7 +22,7 @@ export class ImageUrlGenerator {
      * @param imageFormat The format of the image data.
      * @returns The URL for the embedded image.
      */
-    public createEmbeddedImageUrl(imageData: Buffer, imageFormat: string): string {
+    public createEmbeddedImageUrl(imageData: Readonly<Buffer>, imageFormat: string): string {
         const mimeType = imageFormat === "png" ? "image/png" : "image/svg+xml";
         return "data:" + mimeType + ";base64," + imageData.toString("base64");
     }

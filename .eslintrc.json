@@ -95,7 +95,6 @@
         "unicode-bom": "error",
 
         // ECMAScript 6
-        "no-confusing-arrow": "error",
         "no-dupe-class-members": "off", // in favor of @typescript-eslint/no-dupe-class-members
         "no-duplicate-imports": "error",
         "no-var": "error",

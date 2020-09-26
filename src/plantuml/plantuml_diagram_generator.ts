@@ -19,16 +19,16 @@ type PlantUmlProcessInfo<DiagramId> = {
  */
 export class PlantUmlDiagramGenerator<DiagramId> {
     /** Number of PlantUML processes used to schedule the diagram generation. */
-    private processCount: number;
+    private readonly processCount: number;
 
     /** The format for the generated diagrams. */
-    private outputFormat: "png" | "svg";
+    private readonly outputFormat: "png" | "svg";
 
     /** Callback that should be called whenever a diagram has been generated. */
-    private imageGeneratedHandler: (id: DiagramId, imageData: Buffer) => unknown;
+    private readonly imageGeneratedHandler: (id: DiagramId, imageData: Readonly<Buffer>) => unknown;
 
     /** The object which encapsulates the PlantUML processes. */
-    private plantUmlProcesses = new Array<PlantUmlProcessInfo<DiagramId>>();
+    private readonly plantUmlProcesses = new Array<PlantUmlProcessInfo<DiagramId>>();
 
     /** Index of the process that should generate the next diagram. */
     private nextProcessToGetWorkIndex = 0;
@@ -39,10 +39,10 @@ export class PlantUmlDiagramGenerator<DiagramId> {
      * @param format The format for the generated diagrams.
      * @param imageGeneratedHandler Callback called whenever a diagram has been generated.
      */
-    constructor(
+    public constructor(
         processCount: number,
         format: "png" | "svg",
-        imageGeneratedHandler: (id: DiagramId, imageData: Buffer) => unknown,
+        imageGeneratedHandler: (id: DiagramId, imageData: Readonly<Buffer>) => unknown,
     ) {
         if (processCount <= 0) {
             throw new Error("processCount must be > 0");
@@ -87,7 +87,7 @@ export class PlantUmlDiagramGenerator<DiagramId> {
             const newPipe = new PlantUmlPipe({ outputFormat: this.outputFormat });
             const newQueue = new Queue<DiagramId>();
 
-            newPipe.out.on("data", (imageData: Buffer) => {
+            newPipe.out.on("data", (imageData: Readonly<Buffer>) => {
                 const id = newQueue.dequeue() as DiagramId;
                 this.imageGeneratedHandler(id, imageData);
             });
