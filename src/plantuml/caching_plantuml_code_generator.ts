@@ -1,6 +1,6 @@
 import { DeclarationReflection } from "typedoc";
 import { Type, TypeParameterReflection } from "typedoc/dist/lib/models";
-import { createTypeParameterMapping, PlantUmlCodeGenerator } from "./plantuml_code_generator";
+import { PlantUmlCodeGenerator } from "./plantuml_code_generator";
 
 /**
  * Class that generates PlantUML code and caches results internally.
@@ -35,7 +35,7 @@ export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
 
         const typeParamsMap =
             reflection.typeParameters && isType
-                ? createTypeParameterMapping(reflection.typeParameters, typeArguments)
+                ? PlantUmlCodeGenerator.createTypeParameterMapping(reflection.typeParameters, typeArguments)
                 : new Map<string, string>();
 
         if (reflection.typeParameters) {

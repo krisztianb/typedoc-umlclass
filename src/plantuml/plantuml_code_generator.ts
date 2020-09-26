@@ -25,197 +25,6 @@ import { TypeDocUtils } from "../typedoc/typedoc_utils";
 import { PlantUmlCodeGeneratorOptions } from "./plantuml_code_generator_options";
 
 /**
- * Escapes the name by putting double quotes around it preventing a PlantUML syntax error.
- * @param name The original name.
- * @returns The escaped name.
- */
-function escapeName(name: string): string {
-    return '"' + name + '"';
-}
-
-/**
- * Creates a map which includes the type argument names for every type parameter name.
- * @param typeParameters The type parameters.
- * @param typeArguments The possible type arguments.
- * @returns A map which includes the type argument names for every type parameter name.
- */
-export function createTypeParameterMapping(
-    typeParameters: ReadonlyArray<TypeParameterReflection>,
-    typeArguments?: ReadonlyArray<Type>,
-): Map<string, string> {
-    const typeParamsMap = new Map<string, string>();
-
-    for (let i = 0; i < typeParameters.length; ++i) {
-        const typeArgument = typeArguments && typeArguments[i] ? typeArguments[i] : typeParameters[i].default;
-
-        if (typeArgument) {
-            const typeArgumentName = typeParameters[i].name;
-            const typeArgumentValue = typeArgument.toString();
-
-            typeParamsMap.set(typeArgumentName, typeArgumentValue);
-        }
-    }
-
-    return typeParamsMap;
-}
-
-/**
- * Returns the name of a type. If the type includes template parameters those are replaced with their values
- * using the second argument (typeParamsMap).
- * @param type The type whos name is wanted.
- * @param typeParamsMap Possible template parameter values.
- * @returns The name of the type.
- */
-function getTypeNameWithReplacedTypeParameters(
-    type: Readonly<Type>,
-    typeParamsMap: ReadonlyMap<string, string>,
-): string {
-    let name = type.toString();
-
-    // Replace type parameters with their arguments
-    for (const [key, value] of typeParamsMap.entries()) {
-        const regex = new RegExp("(?<![\\w])" + key + "(?![\\w])", "g"); // negative look-behind & look-ahead
-        name = name.replace(regex, value);
-    }
-
-    return name;
-}
-
-/**
- * Returns the PlantUML line for generating the output for a given property.
- * @param property The property for which the PlantUML should be generated.
- * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
- *                      the type parameters to their type arguments.
- * @returns The PlantUML line for the given property.
- */
-function createPlantUmlForProperty(
-    property: Readonly<DeclarationReflection>,
-    typeParamsMap: ReadonlyMap<string, string>,
-): string {
-    let plantUml = "    "; // indent
-
-    if (property.flags.isStatic) {
-        plantUml += "{static} ";
-    }
-
-    if (property.flags.isPrivate) {
-        plantUml += "-";
-    } else if (property.flags.isProtected) {
-        plantUml += "#";
-    } else {
-        plantUml += "+"; // default is public for JS/TS
-    }
-
-    plantUml +=
-        property.name +
-        " : " +
-        (property.type ? getTypeNameWithReplacedTypeParameters(property.type, typeParamsMap) : "unknown");
-
-    return plantUml;
-}
-
-/**
- * Returns the full name of a given reflection. If the reflection is a template class and therefore has type
- * parameters, these are included in the name as <A, B, C>. If the reflection is based on a template class and
- * therefore has type arguments, these are included in the name as <string, number, any>.
- * @param reflection The reflection whos full name is wanted.
- * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
- *                      the type parameters to their type arguments.
- * @returns The full name of the reflection.
- */
-function getFullReflectionName(
-    reflection: Readonly<DeclarationReflection>,
-    typeParamsMap?: ReadonlyMap<string, string>,
-): string {
-    let name = reflection.name;
-
-    if (reflection.typeParameters) {
-        name += "<";
-        if (typeParamsMap?.size) {
-            name += Array.from(typeParamsMap.values()).join(", ");
-        } else {
-            name += reflection.typeParameters.map((t: Readonly<TypeParameterReflection>) => t.name).join(", ");
-        }
-        name += ">";
-    }
-
-    return name;
-}
-
-/**
- * Returns the PlantUML line for the introduction of a class or interface.
- * @param reflection The class or interface for which the PlantUML should be generated.
- * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
- *                      the type parameters to their type arguments.
- * @returns The PlantUML line for the given class or interface.
- */
-function createPlantUmlForClassOrInterface(
-    reflection: Readonly<DeclarationReflection>,
-    typeParamsMap: ReadonlyMap<string, string>,
-): string {
-    let plantUml = "";
-
-    if (reflection.flags.isStatic) {
-        plantUml += "static ";
-    }
-
-    if (reflection.flags.isAbstract) {
-        plantUml += "abstract ";
-    }
-
-    if (reflection.kind === ReflectionKind.Class) {
-        plantUml += "class ";
-    } else {
-        plantUml += "interface ";
-    }
-
-    const name = getFullReflectionName(reflection, typeParamsMap);
-    plantUml += escapeName(name);
-
-    return plantUml;
-}
-
-/**
- * Returns the full name of a given type. If the type has a reflection, the full name of that reflection is
- * returned. If the type is based on a template class and therefore has type arguments, these are included
- * in the name as <D, E, F>.
- * @param type The type whos full name is wanted.
- * @returns The full name of the type.
- */
-function getFullTypeName(type: Readonly<ReferenceType>): string {
-    if (type.reflection instanceof DeclarationReflection) {
-        const typeParamsMap = type.reflection.typeParameters
-            ? createTypeParameterMapping(type.reflection.typeParameters, type.typeArguments)
-            : new Map<string, string>();
-        return getFullReflectionName(type.reflection, typeParamsMap);
-    } else if (type.typeArguments) {
-        let name = type.name + "<";
-        name += type.typeArguments.map((t: Readonly<Type>) => t.toString()).join(", ");
-        name += ">";
-        return name;
-    }
-
-    return type.toString();
-}
-
-/**
- * Creates dummy PlantUML lines for the given type.
- * @param type The type for which the PlantUML lines are generated.
- * @returns The PlantUML lines for the given type.
- */
-function createDummyPlantUmlForType(type: Readonly<ReferenceType>): string[] {
-    const name = getFullTypeName(type);
-    const escapedName = escapeName(name);
-
-    const code = new Array<string>();
-
-    code.push("class " + escapedName);
-    code.push("hide " + escapedName + " circle"); // hide the circle, because we don't know if it is really a class
-
-    return code;
-}
-
-/**
  * Class that generates PlantUML code.
  */
 export class PlantUmlCodeGenerator {
@@ -253,17 +62,21 @@ export class PlantUmlCodeGenerator {
         let siblingsBelow = 0;
 
         // add class/interface
-        const reflectionName = getFullReflectionName(reflection);
+        const reflectionName = PlantUmlCodeGenerator.getFullReflectionName(reflection);
         plantUmlLines = plantUmlLines.concat(this.createPlantUmlForReflection(reflection));
 
         // add classes/interfaces this type is extending
         const extendedTypes = TypeDocUtils.getExtendedTypesForReflection(reflection);
 
         for (const extendedType of extendedTypes) {
-            const extendedTypeName = getFullTypeName(extendedType);
+            const extendedTypeName = PlantUmlCodeGenerator.getFullTypeName(extendedType);
 
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedType));
-            plantUmlLines.push(escapeName(extendedTypeName) + " <|-- " + escapeName(reflectionName));
+            plantUmlLines.push(
+                PlantUmlCodeGenerator.escapeName(extendedTypeName) +
+                    " <|-- " +
+                    PlantUmlCodeGenerator.escapeName(reflectionName),
+            );
 
             ++siblingsAbove;
         }
@@ -272,10 +85,14 @@ export class PlantUmlCodeGenerator {
         const implementedTypes = TypeDocUtils.getImplementedTypesForReflection(reflection);
 
         for (const implementedType of implementedTypes) {
-            const implementedTypeName = getFullTypeName(implementedType);
+            const implementedTypeName = PlantUmlCodeGenerator.getFullTypeName(implementedType);
 
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedType));
-            plantUmlLines.push(escapeName(implementedTypeName) + " <|.. " + escapeName(reflectionName));
+            plantUmlLines.push(
+                PlantUmlCodeGenerator.escapeName(implementedTypeName) +
+                    " <|.. " +
+                    PlantUmlCodeGenerator.escapeName(reflectionName),
+            );
 
             ++siblingsAbove;
         }
@@ -284,10 +101,14 @@ export class PlantUmlCodeGenerator {
         const extendedBys = TypeDocUtils.getExtendedBysForReflection(reflection);
 
         for (const extendedBy of extendedBys) {
-            const extendedByName = getFullTypeName(extendedBy);
+            const extendedByName = PlantUmlCodeGenerator.getFullTypeName(extendedBy);
 
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(extendedBy));
-            plantUmlLines.push(escapeName(reflectionName) + " <|-- " + escapeName(extendedByName));
+            plantUmlLines.push(
+                PlantUmlCodeGenerator.escapeName(reflectionName) +
+                    " <|-- " +
+                    PlantUmlCodeGenerator.escapeName(extendedByName),
+            );
 
             ++siblingsBelow;
         }
@@ -296,10 +117,14 @@ export class PlantUmlCodeGenerator {
         const implementedBys = TypeDocUtils.getImplementedBysForReflection(reflection);
 
         for (const implementedBy of implementedBys) {
-            const implementedByName = getFullTypeName(implementedBy);
+            const implementedByName = PlantUmlCodeGenerator.getFullTypeName(implementedBy);
 
             plantUmlLines = plantUmlLines.concat(this.createPlantUmlForType(implementedBy));
-            plantUmlLines.push(escapeName(reflectionName) + " <|.. " + escapeName(implementedByName));
+            plantUmlLines.push(
+                PlantUmlCodeGenerator.escapeName(reflectionName) +
+                    " <|.. " +
+                    PlantUmlCodeGenerator.escapeName(implementedByName),
+            );
 
             ++siblingsBelow;
         }
@@ -407,7 +232,7 @@ export class PlantUmlCodeGenerator {
             return this.createPlantUmlForReflection(reflection, type.typeArguments, true);
         }
 
-        return createDummyPlantUmlForType(type);
+        return PlantUmlCodeGenerator.createDummyPlantUmlForType(type);
     }
 
     /**
@@ -428,13 +253,13 @@ export class PlantUmlCodeGenerator {
         // Build type parameter map used in the methods below
         const typeParamsMap =
             reflection.typeParameters && isType
-                ? createTypeParameterMapping(reflection.typeParameters, typeArguments)
+                ? PlantUmlCodeGenerator.createTypeParameterMapping(reflection.typeParameters, typeArguments)
                 : new Map<string, string>();
 
         // Build PlantUML code
         const plantUmlLines = new Array<string>();
 
-        plantUmlLines.push(createPlantUmlForClassOrInterface(reflection, typeParamsMap) + " {");
+        plantUmlLines.push(PlantUmlCodeGenerator.createPlantUmlForClassOrInterface(reflection, typeParamsMap) + " {");
 
         if (this.options.classDiagramType === ClassDiagramType.Detailed && reflection.children) {
             // Process properties
@@ -443,7 +268,7 @@ export class PlantUmlCodeGenerator {
                 .sort(this.classMemberCompareFunction);
 
             for (const prop of props) {
-                plantUmlLines.push(createPlantUmlForProperty(prop, typeParamsMap));
+                plantUmlLines.push(PlantUmlCodeGenerator.createPlantUmlForProperty(prop, typeParamsMap));
             }
 
             // Process method signatures
@@ -523,7 +348,9 @@ export class PlantUmlCodeGenerator {
             } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.OnlyTypes) {
                 plantUml += signature.parameters
                     .map((p: Readonly<ParameterReflection>) =>
-                        p.type ? getTypeNameWithReplacedTypeParameters(p.type, localTypeParamsMap) : "unknown",
+                        p.type
+                            ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(p.type, localTypeParamsMap)
+                            : "unknown",
                     )
                     .join(", ");
             } else if (this.options.classDiagramMethodParameterOutput === MethodParameterOutput.Complete) {
@@ -532,7 +359,12 @@ export class PlantUmlCodeGenerator {
                         (p: Readonly<ParameterReflection>) =>
                             p.name +
                             ": " +
-                            (p.type ? getTypeNameWithReplacedTypeParameters(p.type, localTypeParamsMap) : "unknown"),
+                            (p.type
+                                ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(
+                                      p.type,
+                                      localTypeParamsMap,
+                                  )
+                                : "unknown"),
                     )
                     .join(", ");
             }
@@ -542,11 +374,205 @@ export class PlantUmlCodeGenerator {
 
         // Return type
         if (signature.type) {
-            plantUml += " : " + getTypeNameWithReplacedTypeParameters(signature.type, localTypeParamsMap);
+            plantUml +=
+                " : " + PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(signature.type, localTypeParamsMap);
         } else {
             plantUml += " : void";
         }
 
         return plantUml;
+    }
+
+    /**
+     * Escapes the name by putting double quotes around it preventing a PlantUML syntax error.
+     * @param name The original name.
+     * @returns The escaped name.
+     */
+    private static escapeName(name: string): string {
+        return '"' + name + '"';
+    }
+
+    /**
+     * Creates a map which includes the type argument names for every type parameter name.
+     * @param typeParameters The type parameters.
+     * @param typeArguments The possible type arguments.
+     * @returns A map which includes the type argument names for every type parameter name.
+     */
+    protected static createTypeParameterMapping(
+        typeParameters: ReadonlyArray<TypeParameterReflection>,
+        typeArguments?: ReadonlyArray<Type>,
+    ): Map<string, string> {
+        const typeParamsMap = new Map<string, string>();
+
+        for (let i = 0; i < typeParameters.length; ++i) {
+            const typeArgument = typeArguments && typeArguments[i] ? typeArguments[i] : typeParameters[i].default;
+
+            if (typeArgument) {
+                const typeArgumentName = typeParameters[i].name;
+                const typeArgumentValue = typeArgument.toString();
+
+                typeParamsMap.set(typeArgumentName, typeArgumentValue);
+            }
+        }
+
+        return typeParamsMap;
+    }
+
+    /**
+     * Returns the name of a type. If the type includes template parameters those are replaced with their values
+     * using the second argument (typeParamsMap).
+     * @param type The type whos name is wanted.
+     * @param typeParamsMap Possible template parameter values.
+     * @returns The name of the type.
+     */
+    private static getTypeNameWithReplacedTypeParameters(
+        type: Readonly<Type>,
+        typeParamsMap: ReadonlyMap<string, string>,
+    ): string {
+        let name = type.toString();
+
+        // Replace type parameters with their arguments
+        for (const [key, value] of typeParamsMap.entries()) {
+            const regex = new RegExp("(?<![\\w])" + key + "(?![\\w])", "g"); // negative look-behind & look-ahead
+            name = name.replace(regex, value);
+        }
+
+        return name;
+    }
+
+    /**
+     * Returns the PlantUML line for generating the output for a given property.
+     * @param property The property for which the PlantUML should be generated.
+     * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
+     *                      the type parameters to their type arguments.
+     * @returns The PlantUML line for the given property.
+     */
+    private static createPlantUmlForProperty(
+        property: Readonly<DeclarationReflection>,
+        typeParamsMap: ReadonlyMap<string, string>,
+    ): string {
+        let plantUml = "    "; // indent
+
+        if (property.flags.isStatic) {
+            plantUml += "{static} ";
+        }
+
+        if (property.flags.isPrivate) {
+            plantUml += "-";
+        } else if (property.flags.isProtected) {
+            plantUml += "#";
+        } else {
+            plantUml += "+"; // default is public for JS/TS
+        }
+
+        plantUml +=
+            property.name +
+            " : " +
+            (property.type
+                ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(property.type, typeParamsMap)
+                : "unknown");
+
+        return plantUml;
+    }
+
+    /**
+     * Returns the full name of a given reflection. If the reflection is a template class and therefore has type
+     * parameters, these are included in the name as <A, B, C>. If the reflection is based on a template class and
+     * therefore has type arguments, these are included in the name as <string, number, any>.
+     * @param reflection The reflection whos full name is wanted.
+     * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
+     *                      the type parameters to their type arguments.
+     * @returns The full name of the reflection.
+     */
+    private static getFullReflectionName(
+        reflection: Readonly<DeclarationReflection>,
+        typeParamsMap?: ReadonlyMap<string, string>,
+    ): string {
+        let name = reflection.name;
+
+        if (reflection.typeParameters) {
+            name += "<";
+            if (typeParamsMap?.size) {
+                name += Array.from(typeParamsMap.values()).join(", ");
+            } else {
+                name += reflection.typeParameters.map((t: Readonly<TypeParameterReflection>) => t.name).join(", ");
+            }
+            name += ">";
+        }
+
+        return name;
+    }
+
+    /**
+     * Returns the PlantUML line for the introduction of a class or interface.
+     * @param reflection The class or interface for which the PlantUML should be generated.
+     * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
+     *                      the type parameters to their type arguments.
+     * @returns The PlantUML line for the given class or interface.
+     */
+    private static createPlantUmlForClassOrInterface(
+        reflection: Readonly<DeclarationReflection>,
+        typeParamsMap: ReadonlyMap<string, string>,
+    ): string {
+        let plantUml = "";
+
+        if (reflection.flags.isStatic) {
+            plantUml += "static ";
+        }
+
+        if (reflection.flags.isAbstract) {
+            plantUml += "abstract ";
+        }
+
+        if (reflection.kind === ReflectionKind.Class) {
+            plantUml += "class ";
+        } else {
+            plantUml += "interface ";
+        }
+
+        const name = PlantUmlCodeGenerator.getFullReflectionName(reflection, typeParamsMap);
+        plantUml += PlantUmlCodeGenerator.escapeName(name);
+
+        return plantUml;
+    }
+
+    /**
+     * Returns the full name of a given type. If the type has a reflection, the full name of that reflection is
+     * returned. If the type is based on a template class and therefore has type arguments, these are included
+     * in the name as <D, E, F>.
+     * @param type The type whos full name is wanted.
+     * @returns The full name of the type.
+     */
+    private static getFullTypeName(type: Readonly<ReferenceType>): string {
+        if (type.reflection instanceof DeclarationReflection) {
+            const typeParamsMap = type.reflection.typeParameters
+                ? PlantUmlCodeGenerator.createTypeParameterMapping(type.reflection.typeParameters, type.typeArguments)
+                : new Map<string, string>();
+            return PlantUmlCodeGenerator.getFullReflectionName(type.reflection, typeParamsMap);
+        } else if (type.typeArguments) {
+            let name = type.name + "<";
+            name += type.typeArguments.map((t: Readonly<Type>) => t.toString()).join(", ");
+            name += ">";
+            return name;
+        }
+
+        return type.toString();
+    }
+
+    /**
+     * Creates dummy PlantUML lines for the given type.
+     * @param type The type for which the PlantUML lines are generated.
+     * @returns The PlantUML lines for the given type.
+     */
+    private static createDummyPlantUmlForType(type: Readonly<ReferenceType>): string[] {
+        const name = PlantUmlCodeGenerator.getFullTypeName(type);
+        const escapedName = PlantUmlCodeGenerator.escapeName(name);
+
+        const code = new Array<string>();
+
+        code.push("class " + escapedName);
+        code.push("hide " + escapedName + " circle"); // hide the circle, because we don't know if it is really a class
+
+        return code;
     }
 }
