@@ -78,7 +78,17 @@
             "Undefined",
             "undefined"
         ],
-        "max-len": ["error", { "code": 120, "ignoreComments": false, "ignoreTrailingComments": false }], // length should match Prettier config
+        "max-len": [
+            "error",
+            {
+                "code": 120, // length should match Prettier config
+                "ignoreComments": false,
+                "ignoreTrailingComments": false,
+                "ignoreStrings": true,
+                "ignoreTemplateLiterals": true,
+                "ignoreRegExpLiterals": true
+            }
+        ],
         "no-lonely-if": "error",
         "no-nested-ternary": "error",
         "no-unneeded-ternary": "error",
