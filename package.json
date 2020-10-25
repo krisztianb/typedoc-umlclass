@@ -1,7 +1,7 @@
 {
     "name": "typedoc-umlclass",
     "version": "0.3.0",
-    "description": "Plugin for TypeDoc that generates uml class diagrams",
+    "description": "Plugin for TypeDoc that generates UML class diagrams",
     "author": {
         "name": "Krisztián Balla",
         "url": "https://github.com/krisztianb"
@@ -50,7 +50,7 @@
         "/dist"
     ],
     "scripts": {
-        "lint": "npx eslint --quiet ./src",
+        "lint": "npx eslint ./src",
         "format": "npx prettier --check ./src",
         "clean": "rimraf dist",
         "build": "npx tsc",
