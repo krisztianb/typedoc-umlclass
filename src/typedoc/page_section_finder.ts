@@ -30,11 +30,9 @@ export class PageSectionFinder {
         const regex = PageSectionFinder.getLookUpRegexpForSection(section);
         const match = regex.exec(content);
 
-        if (match) {
-            return { startIndex: match.index, endIndex: match.index + match[0].length };
-        } else {
-            return { startIndex: 0, endIndex: 0 };
-        }
+        return match
+            ? { startIndex: match.index, endIndex: match.index + match[0].length }
+            : { startIndex: 0, endIndex: 0 };
     }
 
     /**

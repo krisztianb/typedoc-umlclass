@@ -39,14 +39,12 @@ export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
                 : new Map<string, string>();
 
         if (reflection.typeParameters) {
-            if (typeParamsMap.size > 0) {
-                cacheKey += "<" + Array.from(typeParamsMap.values()).join(", ") + ">";
-            } else {
-                cacheKey +=
-                    "<" +
-                    reflection.typeParameters.map((t: Readonly<TypeParameterReflection>) => t.name).join(", ") +
-                    ">";
-            }
+            cacheKey +=
+                typeParamsMap.size > 0
+                    ? "<" + Array.from(typeParamsMap.values()).join(", ") + ">"
+                    : "<" +
+                      reflection.typeParameters.map((t: Readonly<TypeParameterReflection>) => t.name).join(", ") +
+                      ">";
         }
 
         // Cache reflection

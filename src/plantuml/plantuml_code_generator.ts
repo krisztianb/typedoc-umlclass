@@ -378,12 +378,9 @@ export class PlantUmlCodeGenerator {
         plantUml += ")";
 
         // Return type
-        if (signature.type) {
-            plantUml +=
-                " : " + PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(signature.type, localTypeParamsMap);
-        } else {
-            plantUml += " : void";
-        }
+        plantUml += signature.type
+            ? " : " + PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(signature.type, localTypeParamsMap)
+            : " : void";
 
         return plantUml;
     }
@@ -497,11 +494,9 @@ export class PlantUmlCodeGenerator {
 
         if (reflection.typeParameters) {
             name += "<";
-            if (typeParamsMap?.size) {
-                name += Array.from(typeParamsMap.values()).join(", ");
-            } else {
-                name += reflection.typeParameters.map((t: Readonly<TypeParameterReflection>) => t.name).join(", ");
-            }
+            name += typeParamsMap?.size
+                ? Array.from(typeParamsMap.values()).join(", ")
+                : reflection.typeParameters.map((t: Readonly<TypeParameterReflection>) => t.name).join(", ");
             name += ">";
         }
 
@@ -529,11 +524,7 @@ export class PlantUmlCodeGenerator {
             plantUml += "abstract ";
         }
 
-        if (reflection.kind === ReflectionKind.Class) {
-            plantUml += "class ";
-        } else {
-            plantUml += "interface ";
-        }
+        plantUml += reflection.kind === ReflectionKind.Class ? "class " : "interface ";
 
         const name = PlantUmlCodeGenerator.getFullReflectionName(reflection, typeParamsMap);
         plantUml += PlantUmlCodeGenerator.escapeName(name);

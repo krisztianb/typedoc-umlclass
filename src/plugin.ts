@@ -6,7 +6,7 @@ import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { createDiagramLegendForPlantUml, DiagramLegend } from "./diagram_legend";
 import { ClassDiagramType, FontStyle, LegendType } from "./enumerations";
-import { ImageUrlGenerator } from "./image_url_generator";
+import { createEmbeddedImageUrl, createLocalImageFileUrl, createPlantUmlServerUrl } from "./image_url_generator";
 import { Logger } from "./logger";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
 import { PlantUmlCodeGenerator } from "./plantuml/plantuml_code_generator";
@@ -32,7 +32,7 @@ import { reflectionIsPartOfClassHierarchy } from "./typedoc/typedoc_utils";
  */
 export class Plugin {
     /** The options of this plugin. */
-    private options = new PluginOptions();
+    private readonly options = new PluginOptions();
 
     /** The directory in which the plugin generates files. */
     private outputDirectory!: string;
@@ -48,9 +48,6 @@ export class Plugin {
         | PlantUmlDiagramGenerator<{ reflection: DeclarationReflection; pageFilePath: string }>
         | undefined;
 
-    /** Object that generates URLs for PlantUML diagrams.  */
-    private imageUrlGenerator = new ImageUrlGenerator();
-
     /** Progress bar shown when generating the diagrams. */
     private progressBar: ProgressBar | undefined;
 
@@ -58,13 +55,13 @@ export class Plugin {
     private log: Logger | undefined;
 
     /** Stores the legends for the diagram of every reflection. (KEY = ID of the reflection) */
-    private diagramLegends = new Map<number, DiagramLegend>();
+    private readonly diagramLegends = new Map<number, DiagramLegend>();
 
     /**
      * Checks if the plugin is active and should generate output.
      * @returns True if the plugin is active, otherwise false.
      */
-    get isActive(): boolean {
+    public get isActive(): boolean {
         return (
             this.options.classDiagramType === ClassDiagramType.Simple ||
             this.options.classDiagramType === ClassDiagramType.Detailed
@@ -75,7 +72,7 @@ export class Plugin {
      * Checks if the plugin has anything to do.
      * @returns True if the plugin needs to generate diagrams, otherwise false.
      */
-    get hasWork(): boolean {
+    public get hasWork(): boolean {
         return this.numberOfDiagramsToGenerate > 0;
     }
 
@@ -83,7 +80,7 @@ export class Plugin {
      * Checks if the plugin is generating images from the generated PlantUML code.
      * @returns True if the plugin is generating images, otherwise false.
      */
-    get isGeneratingImages(): boolean {
+    public get isGeneratingImages(): boolean {
         return (
             this.options.outputImageLocation === ImageLocation.Local ||
             this.options.outputImageLocation === ImageLocation.Embed
@@ -94,16 +91,16 @@ export class Plugin {
      * Checks if the plugin should generate diagram legends.
      * @returns True if the plugin should generate diagram legends, otherwise false.
      */
-    get shouldGenerateLegends(): boolean {
+    public get shouldGenerateLegends(): boolean {
         // The simple diagram type can only contain the circled chars.
         // If those are deactivated then it does not make sense to have any legends.
         if (this.options.classDiagramType === ClassDiagramType.Simple && this.options.classDiagramHideCircledChar) {
             return false;
         } else if (this.options.legendType === LegendType.OnlyIncluded || this.options.legendType === LegendType.Full) {
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -196,7 +193,7 @@ export class Plugin {
         for (const key in project.reflections) {
             const reflection = project.reflections[key];
 
-            if (reflection && this.shouldProcessReflection(reflection)) {
+            if (this.shouldProcessReflection(reflection)) {
                 ++count;
             }
         }
@@ -222,26 +219,28 @@ export class Plugin {
      */
     public onRendererEndPage(event: PageEvent): void {
         if (this.isActive && this.hasWork) {
-            if (this.shouldProcessPage(event.contents, event.model)) {
-                this.log?.info(`Processing page for reflection ${event.model?.name} ...`);
-                this.processPage(event);
-            } else {
-                this.log?.info(`Skipping page for reflection ${event.model?.name} ...`);
+            if (this.shouldProcessReflection(event.model)) {
+                if (this.shouldProcessPage(event.contents)) {
+                    this.log?.info(`Processing page for reflection ${event.model.name} ...`);
+                    this.processPage(event);
+                } else {
+                    this.log?.info(`Skipping page for reflection ${event.model.name} ...`);
+                }
             }
         }
     }
 
     /**
-     * Checks if the plugin should process a given page.
-     * @param pageContent The content of the page.
-     * @param pageModel The model for the page.
-     * @returns True, if the plugin should process the page, otherwise false.
+     * Checks if the plugin should process a given reflection.
+     * @param reflection The reflection in question.
+     * @returns True, if the plugin should process the reflection, otherwise false.
      */
-    private shouldProcessPage(pageContent: string | undefined, pageModel: unknown): boolean {
+    // eslint-disable-next-line class-methods-use-this
+    private shouldProcessReflection(reflection: unknown): reflection is DeclarationReflection {
         if (
-            pageContent &&
-            this.shouldProcessReflection(pageModel) &&
-            PageSectionFinder.hasSection(pageContent, PageSections.Hierarchy)
+            reflection instanceof DeclarationReflection &&
+            (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) &&
+            reflectionIsPartOfClassHierarchy(reflection)
         ) {
             return true;
         }
@@ -250,16 +249,13 @@ export class Plugin {
     }
 
     /**
-     * Checks if the plugin should process a given reflection.
-     * @param reflection The reflection in question.
-     * @returns True, if the plugin should process the reflection, otherwise false.
+     * Checks if the plugin should process a given page.
+     * @param pageContent The content of the page.
+     * @returns True, if the plugin should process the page, otherwise false.
      */
-    private shouldProcessReflection(reflection: unknown): boolean {
-        if (
-            reflection instanceof DeclarationReflection &&
-            (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface) &&
-            reflectionIsPartOfClassHierarchy(reflection)
-        ) {
+    // eslint-disable-next-line class-methods-use-this
+    private shouldProcessPage(pageContent?: string): boolean {
+        if (pageContent && PageSectionFinder.hasSection(pageContent, PageSections.Hierarchy)) {
             return true;
         }
 
@@ -292,7 +288,7 @@ export class Plugin {
             this.plantUmlDiagramGenerator.generate({ reflection, pageFilePath: event.filename }, plantUml + "\n");
         } else if (this.options.outputImageLocation === ImageLocation.Remote) {
             this.log?.info(`Creating remote image URL for reflection ${reflection.name} ...`);
-            const imageUrl = this.imageUrlGenerator.createPlantUmlServerUrl(plantUml, this.options.outputImageFormat);
+            const imageUrl = createPlantUmlServerUrl(plantUml, this.options.outputImageFormat);
 
             this.log?.info(`Inserting diagram into page of reflection ${reflection.name} ...`);
             event.contents = this.insertHierarchyDiagramIntoContent(event.contents as string, reflection, imageUrl);
@@ -315,10 +311,10 @@ export class Plugin {
             const absoluteImageFilePath = this.writeLocalImageFileForReflection(imageData, id.reflection);
 
             this.log?.info(`Creating local image URL for reflection ${id.reflection.name} ...`);
-            imageUrl = this.imageUrlGenerator.createLocalImageFileUrl(id.pageFilePath, absoluteImageFilePath);
+            imageUrl = createLocalImageFileUrl(id.pageFilePath, absoluteImageFilePath);
         } else {
             this.log?.info(`Creating embedded image URL for reflection ${id.reflection.name} ...`);
-            imageUrl = this.imageUrlGenerator.createEmbeddedImageUrl(imageData, this.options.outputImageFormat);
+            imageUrl = createEmbeddedImageUrl(imageData, this.options.outputImageFormat);
         }
 
         this.log?.info(`Inserting diagram into page for reflection ${id.reflection.name} ...`);
@@ -334,7 +330,7 @@ export class Plugin {
      * @returns The absolute path to the file that was created.
      */
     private writeLocalImageFileForReflection(imageData: Readonly<Buffer>, reflection: DeclarationReflection): string {
-        const filename = reflection.name + "-umlClassDiagram-" + reflection.id + "." + this.options.outputImageFormat;
+        const filename = `${reflection.name}-umlClassDiagram-${reflection.id}.${this.options.outputImageFormat}`;
         const absoluteFilePath = path.join(this.outputDirectory, filename);
 
         fs.writeFileSync(absoluteFilePath, imageData as Buffer);
@@ -347,7 +343,7 @@ export class Plugin {
      * @param reflection The reflection for which the file is written.
      */
     private writePlantUmlFileForReflection(plantUml: string, reflection: DeclarationReflection): void {
-        const filename = reflection.name + "-umlClassDiagram-" + reflection.id + ".puml";
+        const filename = `${reflection.name}-umlClassDiagram-${reflection.id}.puml`;
         const absoluteFilePath = path.join(this.outputDirectory, filename);
 
         fs.writeFileSync(absoluteFilePath, plantUml, "utf8");

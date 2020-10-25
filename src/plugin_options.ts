@@ -377,6 +377,7 @@ export class PluginOptions {
      * @param typedoc The TypeDoc application.
      */
     // prettier-ignore
+    /* eslint-disable max-len */
     public addToApplication(typedoc: Application): void {
         typedoc.options.addDeclaration(this.classDiagramTypeOption as MapDeclarationOption<ClassDiagramType>);
         typedoc.options.addDeclaration(this.outputImageLocationOption as MapDeclarationOption<ImageLocation>);
@@ -409,12 +410,14 @@ export class PluginOptions {
         typedoc.options.addDeclaration(this.createPlantUmlFilesOption as BooleanDeclarationOption);
         typedoc.options.addDeclaration(this.createVerboseOutputOption as BooleanDeclarationOption);
     }
+    /* eslint-enable max-len */
 
     /**
      * Reads the values of the plugin options from the application options.
      * @param appOptions The TypeDoc application.
      */
     // prettier-ignore
+    /* eslint-disable max-len */
     public readValuesFromApplication(typedoc: Application): void {
         this.classDiagramTypeOption.value = typedoc.options.getValue(this.classDiagramTypeOption.name) as ClassDiagramType;
         this.outputImageLocationOption.value = typedoc.options.getValue(this.outputImageLocationOption.name) as ImageLocation;
@@ -447,12 +450,13 @@ export class PluginOptions {
         this.createPlantUmlFilesOption.value = typedoc.options.getValue(this.createPlantUmlFilesOption.name) as boolean;
         this.createVerboseOutputOption.value = typedoc.options.getValue(this.createVerboseOutputOption.name) as boolean;
     }
+    /* eslint-enable max-len */
 
     /**
      * Returns how detailed the generated class diagrams should be.
      * @returns How detailed the generated class diagrams should be.
      */
-    get classDiagramType(): ClassDiagramType {
+    public get classDiagramType(): ClassDiagramType {
         return this.classDiagramTypeOption.value;
     }
 
@@ -460,7 +464,7 @@ export class PluginOptions {
      * Returns the location where the class diagrams should be stored.
      * @returns The location where the class diagrams should be stored.
      */
-    get outputImageLocation(): ImageLocation {
+    public get outputImageLocation(): ImageLocation {
         return this.outputImageLocationOption.value;
     }
 
@@ -468,7 +472,7 @@ export class PluginOptions {
      * Returns the image format used for the class diagrams.
      * @returns The image format used for the class diagrams.
      */
-    get outputImageFormat(): ImageFormat {
+    public get outputImageFormat(): ImageFormat {
         return this.outputImageFormatOption.value;
     }
 
@@ -476,7 +480,7 @@ export class PluginOptions {
      * Returns the title that should be used for the section that contains the class diagrams.
      * @returns The title that should be used for the section that contains the class diagrams.
      */
-    get sectionTitle(): string {
+    public get sectionTitle(): string {
         return this.sectionTitleOption.value;
     }
 
@@ -484,7 +488,7 @@ export class PluginOptions {
      * Returns where on the page the class diagrams should be put.
      * @returns Where on the page the class diagrams should be put.
      */
-    get classDiagramPosition(): ClassDiagramPosition {
+    public get classDiagramPosition(): ClassDiagramPosition {
         return this.classDiagramPositionOption.value;
     }
 
@@ -492,7 +496,7 @@ export class PluginOptions {
      * Returns the type of legend that should be generated for the class diagrams.
      * @returns The type of legend that should be generated for the class diagrams.
      */
-    get legendType(): LegendType {
+    public get legendType(): LegendType {
         return this.legendTypeOption.value;
     }
 
@@ -500,7 +504,7 @@ export class PluginOptions {
      * Returns how method parameters should be output in the class diagrams.
      * @returns How method parameters should be output in the class diagrams.
      */
-    get classDiagramMethodParameterOutput(): MethodParameterOutput {
+    public get classDiagramMethodParameterOutput(): MethodParameterOutput {
         return this.classDiagramMethodParameterOutputOption.value;
     }
 
@@ -508,7 +512,7 @@ export class PluginOptions {
      * Returns how class members should be ordered in the class diagrams.
      * @returns How class members should be ordered the class diagrams.
      */
-    get classDiagramMemberOrder(): MemberOrder {
+    public get classDiagramMemberOrder(): MemberOrder {
         return this.classDiagramMemberOrderOption.value;
     }
 
@@ -516,7 +520,7 @@ export class PluginOptions {
      * Returns whether to hide empty properties and methods in the class diagrams.
      * @returns Whether to hide empty properties and methods in the class diagrams.
      */
-    get classDiagramHideEmptyMembers(): boolean {
+    public get classDiagramHideEmptyMembers(): boolean {
         return this.classDiagramHideEmptyMembersOption.value;
     }
 
@@ -524,7 +528,7 @@ export class PluginOptions {
      * Returns the boundary before swiching from top->down to left->right direction for class diagrams.
      * @returns The boundary before swiching from top->down to left->right direction for class diagrams.
      */
-    get classDiagramTopDownLayoutMaxSiblings(): number {
+    public get classDiagramTopDownLayoutMaxSiblings(): number {
         return this.classDiagramTopDownLayoutMaxSiblingsOption.value;
     }
 
@@ -532,7 +536,7 @@ export class PluginOptions {
      * Returns how the member visibility is rendered in the class diagrams.
      * @returns How the member visibility is rendered in the class diagrams.
      */
-    get classDiagramMemberVisibilityStyle(): ClassDiagramMemberVisibilityStyle {
+    public get classDiagramMemberVisibilityStyle(): ClassDiagramMemberVisibilityStyle {
         return this.classDiagramMemberVisibilityStyleOption.value;
     }
 
@@ -540,7 +544,7 @@ export class PluginOptions {
      * Returns whether to hide the circled character in front of class names for class diagrams.
      * @returns Whether to hide the circled character in front of class names for class diagrams.
      */
-    get classDiagramHideCircledChar(): boolean {
+    public get classDiagramHideCircledChar(): boolean {
         return this.classDiagramHideCircledCharOption.value;
     }
 
@@ -548,7 +552,7 @@ export class PluginOptions {
      * Returns whether to hide the shadows in the class diagrams.
      * @returns Whether to hide the shadows in the class diagrams.
      */
-    get classDiagramHideShadow(): boolean {
+    public get classDiagramHideShadow(): boolean {
         return this.classDiagramHideShadowOption.value;
     }
 
@@ -558,7 +562,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    get classDiagramBoxBackgroundColor(): string {
+    public get classDiagramBoxBackgroundColor(): string {
         return this.classDiagramBoxBackgroundColorOption.value;
     }
 
@@ -568,7 +572,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    get classDiagramBoxBorderColor(): string {
+    public get classDiagramBoxBorderColor(): string {
         return this.classDiagramBoxBorderColorOption.value;
     }
 
@@ -576,7 +580,7 @@ export class PluginOptions {
      * Returns the border radius that should be used for boxes in the class diagrams.
      * @returns The border radius that should be used for boxes in the class diagrams.
      */
-    get classDiagramBoxBorderRadius(): number {
+    public get classDiagramBoxBorderRadius(): number {
         return this.classDiagramBoxBorderRadiusOption.value;
     }
 
@@ -586,7 +590,7 @@ export class PluginOptions {
      *          The value -1 if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    get classDiagramBoxBorderWidth(): number {
+    public get classDiagramBoxBorderWidth(): number {
         return this.classDiagramBoxBorderWidthOption.value;
     }
 
@@ -596,7 +600,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    get classDiagramArrowColor(): string {
+    public get classDiagramArrowColor(): string {
         return this.classDiagramArrowColorOption.value;
     }
 
@@ -606,7 +610,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    get classDiagramClassFontName(): string {
+    public get classDiagramClassFontName(): string {
         return this.classDiagramClassFontNameOption.value;
     }
 
@@ -616,7 +620,7 @@ export class PluginOptions {
      *          The value 0 if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    get classDiagramClassFontSize(): number {
+    public get classDiagramClassFontSize(): number {
         return this.classDiagramClassFontSizeOption.value;
     }
 
@@ -624,7 +628,7 @@ export class PluginOptions {
      * Returns the font style that should be used for the class name in the class diagrams.
      * @returns The font style that should be used for the class name in the class diagrams.
      */
-    get classDiagramClassFontStyle(): FontStyle {
+    public get classDiagramClassFontStyle(): FontStyle {
         return this.classDiagramClassFontStyleOption.value;
     }
 
@@ -634,7 +638,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    get classDiagramClassFontColor(): string {
+    public get classDiagramClassFontColor(): string {
         return this.classDiagramClassFontColorOption.value;
     }
 
@@ -644,7 +648,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    get classDiagramClassAttributeFontName(): string {
+    public get classDiagramClassAttributeFontName(): string {
         return this.classDiagramClassAttributeFontNameOption.value;
     }
 
@@ -654,7 +658,7 @@ export class PluginOptions {
      *          The value 0 if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    get classDiagramClassAttributeFontSize(): number {
+    public get classDiagramClassAttributeFontSize(): number {
         return this.classDiagramClassAttributeFontSizeOption.value;
     }
 
@@ -662,7 +666,7 @@ export class PluginOptions {
      * Returns the font style that should be used for the class attributes in the class diagrams.
      * @returns The font style that should be used for the class attributes in the class diagrams.
      */
-    get classDiagramClassAttributeFontStyle(): FontStyle {
+    public get classDiagramClassAttributeFontStyle(): FontStyle {
         return this.classDiagramClassAttributeFontStyleOption.value;
     }
 
@@ -672,7 +676,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    get classDiagramClassAttributeFontColor(): string {
+    public get classDiagramClassAttributeFontColor(): string {
         return this.classDiagramClassAttributeFontColorOption.value;
     }
 
@@ -680,7 +684,7 @@ export class PluginOptions {
      * Returns the number of PlantUML processes that should be used for generating the class diagrams.
      * @returns The number of PlantUML processes that should be used for generating the class diagrams.
      */
-    get generatorProcessCount(): number {
+    public get generatorProcessCount(): number {
         return this.generatorProcessCountOption.value;
     }
 
@@ -688,7 +692,7 @@ export class PluginOptions {
      * Returns whether to hide the progress bar while generating the class diagrams.
      * @returns True, if the progress bar should not be displayed while generating the class diagrams, otherwise false.
      */
-    get hideProgressBar(): boolean {
+    public get hideProgressBar(): boolean {
         return this.hideProgressBarOption.value;
     }
 
@@ -696,7 +700,7 @@ export class PluginOptions {
      * Returns whether to create files containing the PlantUML code for the class diagrams.
      * @returns True, if files with the PlantUML code should be created, otherwise false.
      */
-    get createPlantUmlFiles(): boolean {
+    public get createPlantUmlFiles(): boolean {
         return this.createPlantUmlFilesOption.value;
     }
 
@@ -704,7 +708,7 @@ export class PluginOptions {
      * Returns whether the plugin should output verbose info during its work.
      * @returns True, if plugin should create verbose output, otherwise false.
      */
-    get createVerboseOutput(): boolean {
+    public get createVerboseOutput(): boolean {
         return this.createVerboseOutputOption.value;
     }
 }
