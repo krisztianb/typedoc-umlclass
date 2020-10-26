@@ -1,6 +1,6 @@
 {
     "env": {
-        "browser": true,
+        "node": true,
         "es2021": true
     },
     "extends": [
@@ -14,7 +14,7 @@
         "sourceType": "module",
         "project": "tsconfig.json"
     },
-    "plugins": ["@typescript-eslint", "ordered-imports", "unicorn"],
+    "plugins": ["@typescript-eslint", "ordered-imports", "unicorn", "jsdoc"],
     "rules": {
         // Possible errors
         "no-await-in-loop": "error",
@@ -160,6 +160,21 @@
         ],
 
         // plugin: unicorn
-        "unicorn/prefer-ternary": "error"
+        "unicorn/prefer-ternary": "error",
+
+        // plugin: jsdoc
+        "jsdoc/check-param-names": ["error"],
+        "jsdoc/check-tag-names": ["error"],
+        "jsdoc/empty-tags": ["error"],
+        "jsdoc/no-types": ["error"],
+        "jsdoc/require-description-complete-sentence": ["error"],
+        "jsdoc/require-jsdoc": ["error"],
+        "jsdoc/require-param-description": ["error"],
+        "jsdoc/require-param-name": ["error"],
+        "jsdoc/require-param": ["error"],
+        "jsdoc/require-returns-check": ["error"],
+        "jsdoc/require-returns-description": ["error"],
+        "jsdoc/require-returns": ["error"],
+        "jsdoc/require-throws": ["error"]
     }
 }

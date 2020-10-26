@@ -54,7 +54,7 @@ export class Plugin {
     /** Logger for verbose output in debug mode. */
     private log: Logger | undefined;
 
-    /** Stores the legends for the diagram of every reflection. (KEY = ID of the reflection) */
+    /** Stores the legends for the diagram of every reflection (KEY = ID of the reflection). */
     private readonly diagramLegends = new Map<number, DiagramLegend>();
 
     /**
@@ -161,7 +161,7 @@ export class Plugin {
                 this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
 
                 if (this.isGeneratingImages) {
-                    this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
+                    this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator<ReflectionPageId>(
                         this.options.generatorProcessCount,
                         this.options.outputImageFormat,
                         this.onImageGenerated,
@@ -297,13 +297,10 @@ export class Plugin {
 
     /**
      * Called by the PlantUmlDiagramGenerator when a diagram images has been generated.
-     * @param id The reflection for which the image was generated.
+     * @param id ID info for the reflection for which the image was generated.
      * @param imageData The data of the generated image.
      */
-    private readonly onImageGenerated = (
-        id: { reflection: DeclarationReflection; pageFilePath: string },
-        imageData: Readonly<Buffer>,
-    ): void => {
+    private readonly onImageGenerated = (id: ReflectionPageId, imageData: Readonly<Buffer>): void => {
         let imageUrl = "";
 
         if (this.options.outputImageLocation === ImageLocation.Local) {
@@ -449,3 +446,13 @@ export class Plugin {
         }
     }
 }
+
+/**
+ * Type with information required to ID a reflection and its output file.
+ */
+type ReflectionPageId = {
+    /** The reflection. */
+    reflection: DeclarationReflection;
+    /** Path to the output file of the reflection's doc page. */
+    pageFilePath: string;
+};

@@ -8,8 +8,8 @@ import { PlantUmlCodeGenerator } from "./plantuml_code_generator";
 export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
     /**
      * Caches the PlantUML generated for the reflections (= class or interface).
-     * KEY = ID of the reflection (and possible type arguments)
-     * VALUE = PlantUML lines
+     * KEY = ID of the reflection (and possible type arguments).
+     * VALUE = PlantUML lines.
      */
     private readonly reflectionPlantUmlCache = new Map<string, string[]>();
 

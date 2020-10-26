@@ -3,6 +3,7 @@ import Queue = require("queue-fifo");
 
 /**
  * Type that groups data for a PlantUML process.
+ * @template DiagramId The type of the diagram identifier data.
  */
 type PlantUmlProcessInfo<DiagramId> = {
     /** The object that encapsulates the PlantUML process. */
@@ -15,7 +16,7 @@ type PlantUmlProcessInfo<DiagramId> = {
 /**
  * Class for generating diagrams from PlantUML code.
  * This class can spawn multiple PlantUML processes and evenly schedules the work between them.
- * @typeparam The type of the diagram identifier data.
+ * @template DiagramId The type of the diagram identifier data.
  */
 export class PlantUmlDiagramGenerator<DiagramId> {
     /** Number of PlantUML processes used to schedule the diagram generation. */
