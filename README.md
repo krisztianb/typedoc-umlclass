@@ -13,6 +13,10 @@ Example:
 
 ![Example default style](https://krisztianb.github.io/typedoc-umlclass/docs/human-default-layout.png)
 
+## Prerequisite
+
+You will need [openjdk](https://openjdk.java.net/).
+
 ## Installation
 
 The plugin can then be installed using [npm](https://www.npmjs.com/package/typedoc-umlclass):
