@@ -48,26 +48,26 @@ The following options are added to TypeDoc when the plugin is installed.
 
 | Name & Format | Description | Default |
 | ------------- | ----------- | ------- |
-| **umlClassDiagramMethodParameterOutput** `<none|only-names|only-types|complete>`| Specifies how method parameters should be included in the class diagram. Use `none` to completely omit parameters, `only-names` to include only parameter names, `only-types` to include only parameter types and `complete` to include names and types. | `complete` |
-| **umlClassDiagramMemberOrder** `<abc|public-to-private|private-to-public>` | Specifies the order of properties and methods within the boxes in the class diagram. Use `abc` to sort them alphabetically, `public-to-private` to have public properties/methods before protected and private ones or `private-to-public` to have private properties/methods before protected and public ones. | `public-to-private` |
-| **umlClassDiagramHideEmptyMembers** `<true|false>` | If this option is set to true properties and methods are hidden if they are empty. | `true` |
+| **umlClassDiagramMethodParameterOutput** `<none\|only-names\|only-types\|complete>`| Specifies how method parameters should be included in the class diagram. Use `none` to completely omit parameters, `only-names` to include only parameter names, `only-types` to include only parameter types and `complete` to include names and types. | `complete` |
+| **umlClassDiagramMemberOrder** `<abc\|public-to-private\|private-to-public>` | Specifies the order of properties and methods within the boxes in the class diagram. Use `abc` to sort them alphabetically, `public-to-private` to have public properties/methods before protected and private ones or `private-to-public` to have private properties/methods before protected and public ones. | `public-to-private` |
+| **umlClassDiagramHideEmptyMembers** `<true\|false>` | If this option is set to true properties and methods are hidden if they are empty. | `true` |
 | **umlClassDiagramTopDownLayoutMaxSiblings** `<integer>` | Specifies the maximum number of allowed siblings above (extended types and implemented interfaces) and below (extending types and implementing interfaces) the current type. If this number is exceeded the PlantUML layout is switched from top/down to left/right to allow a better readability of the resulting class diagram. | `6` |
-| **umlClassDiagramMemberVisibilityStyle** `<text|icon>` | Specifies how the visibility (private, protected or public) of class members (properties and methods) should be rendered in the class diagrams. | `icon` |
-| **umlClassDiagramHideCircledChar** `<true|false>` | If this option is set to true the circled char in front of class and interface names is omitted. | `false` |
-| **umlClassDiagramHideShadow** `<true|false>` | If this option is set to true the shadowing in the class diagrams is disabled. | `false` |
-| **umlClassDiagramBoxBackgroundColor** `<transparent|#RGBHEX>` | Specifies the background color of the boxes within the class diagram. | PlantUML default value |
-| **umlClassDiagramBoxBorderColor** `<transparent|#RGBHEX>` | Specifies the border color of the boxes within the class diagram. | PlantUML default value |
+| **umlClassDiagramMemberVisibilityStyle** `<text\|icon>` | Specifies how the visibility (private, protected or public) of class members (properties and methods) should be rendered in the class diagrams. | `icon` |
+| **umlClassDiagramHideCircledChar** `<true\|false>` | If this option is set to true the circled char in front of class and interface names is omitted. | `false` |
+| **umlClassDiagramHideShadow** `<true\|false>` | If this option is set to true the shadowing in the class diagrams is disabled. | `false` |
+| **umlClassDiagramBoxBackgroundColor** `<transparent\|#RGBHEX>` | Specifies the background color of the boxes within the class diagram. | PlantUML default value |
+| **umlClassDiagramBoxBorderColor** `<transparent\|#RGBHEX>` | Specifies the border color of the boxes within the class diagram. | PlantUML default value |
 | **umlClassDiagramBoxBorderRadius** `<integer>` | Specifies the border radius of the boxes within the class diagram. Unit is pixel. | `0` |
 | **umlClassDiagramBoxBorderWidth** `<integer>` | Specifies the border width of the boxes within the class diagram. Unit is pixel. | PlantUML default value |
-| **umlClassDiagramArrowColor** `<transparent|#RGBHEX>` | Specifies the color of the arrows within the class diagram. | PlantUML default value |
+| **umlClassDiagramArrowColor** `<transparent\|#RGBHEX>` | Specifies the color of the arrows within the class diagram. | PlantUML default value |
 | **umlClassDiagramClassFontName** `<font-name>` | Specifies the name of the font used for the class names within the class diagram. **The PlantUML site remarks:** _Please note the fontname is highly system dependent, so do not over use it, if you look for portability. Helvetica and Courier should be available on all system._ | PlantUML default value |
 | **umlClassDiagramClassFontSize** `<integer>` | Specifies the font size of the class names within the class diagram. Unit is pixel. | PlantUML default value |
-| **umlClassDiagramClassFontStyle** `<normal|plain|italic|bold>` | Specifies the style of the font used for the class names within the class diagram. | PlantUML default value |
-| **umlClassDiagramClassFontColor** `<transparent|#RGBHEX>` | Specifies the color of the class names within the class diagram. | PlantUML default value |
+| **umlClassDiagramClassFontStyle** `<normal\|plain\|italic\|bold>` | Specifies the style of the font used for the class names within the class diagram. | PlantUML default value |
+| **umlClassDiagramClassFontColor** `<transparent\|#RGBHEX>` | Specifies the color of the class names within the class diagram. | PlantUML default value |
 | **umlClassDiagramClassAttributeFontName** `<font-name>` | Specifies the name of the font used for class attributes within the class diagram. **The PlantUML site remarks:** _Please note the fontname is highly system dependent, so do not over use it, if you look for portability. Helvetica and Courier should be available on all system._ | PlantUML default value |
 | **umlClassDiagramClassAttributeFontSize** `<integer>` | Specifies the font size of the class attributes within the class diagram. Unit is pixel. | PlantUML default value |
-| **umlClassDiagramClassAttributeFontStyle** `<normal|plain|italic|bold>` | Specifies the style of the font used for the class attributes within the class diagram. | PlantUML default value |
-| **umlClassDiagramClassAttributeFontColor** `<transparent|#RGBHEX>` | Specifies the color of the class attributes within the class diagram. | PlantUML default value |
+| **umlClassDiagramClassAttributeFontStyle** `<normal\|plain\|italic\|bold>` | Specifies the style of the font used for the class attributes within the class diagram. | PlantUML default value |
+| **umlClassDiagramClassAttributeFontColor** `<transparent\|#RGBHEX>` | Specifies the color of the class attributes within the class diagram. | PlantUML default value |
 
 ### Other settings
 
