@@ -32,17 +32,17 @@ The following options are added to TypeDoc when the plugin is installed.
 
 | Name & Format | Description | Default |
 | ------------- | ----------- | ------- |
-| `umlClassDiagramType <none\|simple\|detailed>` | You can use this option to disable the plugin by passing the value `none`. Otherwise a class diagram is generated for every class and interface that is involved in inheritance and/or implementation. The class diagram includes one level of base and sub classes. Use the value `simple` to only render the name of the class or interface. Use the value `detailed` to also render properties and methods. | `detailed` |
-| `umlClassDiagramLocation <local\|remote\|embed>` | Specifies the location of the generated images. If `local` then local image files are created in the assets directory of the generated documentation. If `remote` then the image tag uses an encoded link to the [plantuml server](http://www.plantuml.com/plantuml/). If `embed` then the image is directly embedded into the HTML as a base64 encoded string. | `local` |
-| `umlClassDiagramFormat <png\|svg>` | Specifies the format the generated images should have. You can choose between `png` and `svg`. | `svg` |
+| **umlClassDiagramType** `<none\|simple\|detailed>` | You can use this option to disable the plugin by passing the value `none`. Otherwise a class diagram is generated for every class and interface that is involved in inheritance and/or implementation. The class diagram includes one level of base and sub classes. Use the value `simple` to only render the name of the class or interface. Use the value `detailed` to also render properties and methods. | `detailed` |
+| **umlClassDiagramLocation** `<local\|remote\|embed>` | Specifies the location of the generated images. If `local` then local image files are created in the assets directory of the generated documentation. If `remote` then the image tag uses an encoded link to the [plantuml server](http://www.plantuml.com/plantuml/). If `embed` then the image is directly embedded into the HTML as a base64 encoded string. | `local` |
+| **umlClassDiagramFormat** `<png\|svg>` | Specifies the format the generated images should have. You can choose between `png` and `svg`. | `svg` |
 
 ### HTML output
 
 | Name & Format | Description | Default |
 | ------------- | ----------- | ------- |
-| `umlClassDiagramSectionTitle <string>` | Specifies the title of the section on the TypeDoc page which includes the class diagram. | `Hierarchy-Diagram` |
-| `umlClassDiagramPosition <above\|below>` | Specifies if the class diagram should be inserted `above` or `below` the default hierarchy section on the TypeDoc page. | `above` |
-| `umlClassDiagramLegendType <none\|only-included\|full>` | Use this option to add a legend below each class diagram explaining the icons (eg: visibility of properties and methods) used in it. If `full` every legend contains every possible icon in a class diagram. If `only-included` every legend contains only the icons that are included in the class diagram. The content of the legends is affected     by the options `umlClassDiagramMemberVisibilityStyle` and `umlClassDiagramHideCircledChar`. | `only-included` |
+| **umlClassDiagramSectionTitle** `<string>` | Specifies the title of the section on the TypeDoc page which includes the class diagram. | `Hierarchy-Diagram` |
+| **umlClassDiagramPosition** `<above\|below>` | Specifies if the class diagram should be inserted `above` or `below` the default hierarchy section on the TypeDoc page. | `above` |
+| **umlClassDiagramLegendType** `<none\|only-included\|full>` | Use this option to add a legend below each class diagram explaining the icons (eg: visibility of properties and methods) used in it. If `full` every legend contains every possible icon in a class diagram. If `only-included` every legend contains only the icons that are included in the class diagram. | `only-included` |
 
 ### Class diagram formating
 
