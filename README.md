@@ -32,16 +32,9 @@ The following options are added to TypeDoc when the plugin is installed.
 
 | Name | Description | Default |
 | ---- | ----------- | ------- |
-| `umlClassDiagramType` | You can use this option to disable the plugin by passing the value `none`. Otherwise a class
-diagram is generated for every class and interface that is involved in inheritance and/or implementation. The class
-diagram includes one level of base and sub classes. Use the value `simple` to only render the name of the class or
-interface. Use the value `detailed` to also render properties and methods. | `detailed` |
-| `umlClassDiagramLocation` | Specifies the location of the generated uml images. If `local` then local image files are
-created in the assets directory of the generated documentation. If `remote` then the image tag uses an encoded link to
-the [plantuml server](http://www.plantuml.com/plantuml/). If `embed` then the image is directly embedded into the HTML
-as a base64 encoded string. | `local` |
-| `umlClassDiagramFormat` | Specifies the format the generated images should have. You can choose between `png` and
-`svg`. | `svg` |
+| `umlClassDiagramType` | You can use this option to disable the plugin by passing the value `none`. Otherwise a class diagram is generated for every class and interface that is involved in inheritance and/or implementation. The class diagram includes one level of base and sub classes. Use the value `simple` to only render the name of the class or interface. Use the value `detailed` to also render properties and methods. | `detailed` |
+| `umlClassDiagramLocation` | Specifies the location of the generated uml images. If `local` then local image files are created in the assets directory of the generated documentation. If `remote` then the image tag uses an encoded link to the [plantuml server](http://www.plantuml.com/plantuml/). If `embed` then the image is directly embedded into the HTML as a base64 encoded string. | `local` |
+| `umlClassDiagramFormat` | Specifies the format the generated images should have. You can choose between `png` and `svg`. | `svg` |
 
 ### HTML output
 
