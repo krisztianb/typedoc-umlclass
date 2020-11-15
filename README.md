@@ -71,26 +71,12 @@ The following options are added to TypeDoc when the plugin is installed.
 
 ### Other settings
 
--   `--umlClassDiagramGeneratorProcessCount <integer>`<br>
-    Generating many diagrams can take several minutes. You can use this option to define how many PlantUML JAVA
-    processes should be used to generate the diagrams. The work is evenly scheduled among these processes. To increase
-    the performance of the plugin, it is a good idea to set this value to the number of CPUs that are available.
-    Default is `1`.
--   `--umlClassDiagramHideProgressBar <true|false>`<br>
-    Since generating many diagrams can take several minutes the plugin displays a progress bar when the diagrams are
-    created as local files or embedded into the HTML. No progress bar is displayed when generating remote URLs. If other
-    plugins also output information to the console then the progress bar can disturb that output. If this is the case
-    you can disable the progress bar of this plugin using the value `true`.
-    Default is `false`.
--   `--umlClassDiagramCreatePlantUmlFiles <true|false>`<br>
-    If this option is set to `true` the plugin creates a text file for every class or interface for which a class
-    diagram is generated. The file contains the PlantUML code that was used to create the diagram. The files are stored
-    in the assets directory of the generated documentation.
-    Default is `false`.
--   `--umlClassDiagramVerboseOutput <true|false>`<br>
-    If this option is set to `true` the plugin outputs messages to the console during its work. Use this option to
-    debug possible plugin issues.
-    Default is `false`.
+| Name & Format | Description | Default |
+| ------------- | ----------- | ------- |
+**umlClassDiagramGeneratorProcessCount** `<integer>` | Generating many diagrams can take several minutes. You can use this option to define how many PlantUML JAVA processes should be used to generate the diagrams. The work is evenly scheduled among these processes. To increase the performance of the plugin, it is a good idea to set this value to the number of CPUs that are available. | `1` |
+**umlClassDiagramHideProgressBar** `<true\|false>` | Since generating many diagrams can take several minutes the plugin displays a progress bar when the diagrams are created as local files or embedded into the HTML. No progress bar is displayed when generating remote URLs. If other plugins also output information to the console then the progress bar can disturb that output. If this is the case you can disable the progress bar of this plugin using the value `true`. | `false` |
+**umlClassDiagramCreatePlantUmlFiles** `<true\|false>` | If this option is set to `true` the plugin creates a text file for every class or interface for which a class diagram is generated. The file contains the PlantUML code that was used to create the diagram. The files are stored in the assets directory of the generated documentation. | `false` |
+**umlClassDiagramVerboseOutput** `<true\|false>` | If this option is set to `true` the plugin outputs messages to the console during its work. Use this option to debug possible plugin issues. | `false` |
 
 ## Bugs
 
