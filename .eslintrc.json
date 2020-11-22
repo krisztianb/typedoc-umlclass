@@ -160,7 +160,18 @@
         ],
 
         // plugin: unicorn
-        "unicorn/prefer-ternary": "error",
+        "unicorn/custom-error-definition": ["error"],
+        "unicorn/explicit-length-check": ["error"],
+        "unicorn/filename-case": ["error", { "case": "snakeCase" }],
+        "unicorn/new-for-builtins": ["error"],
+        "unicorn/no-abusive-eslint-disable": ["error"],
+        "unicorn/no-array-instanceof": ["error"],
+        "unicorn/no-null": ["error"],
+        "unicorn/no-unused-properties": ["error"],
+        "unicorn/prefer-includes": ["error"],
+        "unicorn/prefer-starts-ends-with": ["error"],
+        "unicorn/prefer-ternary": ["error"],
+        "unicorn/prefer-text-content": ["error"],
 
         // plugin: jsdoc
         "jsdoc/check-param-names": ["error"],

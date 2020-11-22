@@ -242,8 +242,8 @@ export function createDiagramLegendForPlantUml(plantUml: readonly string[]): Dia
     const hasPublicMethodItem = plantUml.some((str) => / \+\w+\(/.test(str));
     const hasProtectedMethodItem = plantUml.some((str) => / #\w+\(/.test(str));
     const hasPrivateMethodItem = plantUml.some((str) => / -\w+\(/.test(str));
-    const hasStaticMemberItem = plantUml.some((str) => str.indexOf("{static}") !== -1);
-    const hasAbstractMemberItem = plantUml.some((str) => str.indexOf("{abstract}") !== -1);
+    const hasStaticMemberItem = plantUml.some((str) => str.includes("{static}"));
+    const hasAbstractMemberItem = plantUml.some((str) => str.includes("{abstract}"));
 
     return new DiagramLegend(
         hasClassItem,
