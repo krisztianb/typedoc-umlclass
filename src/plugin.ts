@@ -6,7 +6,7 @@ import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { createDiagramLegendForPlantUml, DiagramLegend } from "./diagram_legend";
 import { ClassDiagramType, FontStyle, LegendType } from "./enumerations";
-import { createEmbeddedImageUrl, createLocalImageFileUrl, createPlantUmlServerUrl } from "./image_url_generator";
+import { createEmbeddedImageUrl, createLocalImageFileUrl, createRemoteImageUrl } from "./image_url_generator";
 import { Logger } from "./logger";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
 import { PlantUmlCodeGenerator } from "./plantuml/plantuml_code_generator";
@@ -288,7 +288,11 @@ export class Plugin {
             this.plantUmlDiagramGenerator.generate({ reflection, pageFilePath: event.filename }, plantUml + "\n");
         } else if (this.options.outputImageLocation === ImageLocation.Remote) {
             this.log?.info(`Creating remote image URL for reflection ${reflection.name} ...`);
-            const imageUrl = createPlantUmlServerUrl(plantUml, this.options.outputImageFormat);
+            const imageUrl = createRemoteImageUrl(
+                this.options.outputRemoteBaseUrl,
+                plantUml,
+                this.options.outputImageFormat,
+            );
 
             this.log?.info(`Inserting diagram into page of reflection ${reflection.name} ...`);
             event.contents = this.insertHierarchyDiagramIntoContent(event.contents as string, reflection, imageUrl);

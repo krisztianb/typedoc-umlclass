@@ -24,12 +24,13 @@ export function createEmbeddedImageUrl(imageData: Readonly<Buffer>, imageFormat:
 }
 
 /**
- * Creates a PlantUML server URL that generates an image.
+ * Creates a remote server URL that generates an image.
+ * @param baseUrl The base URL for the image URL.
  * @param plantUmlCode The PlantUML code for the image.
  * @param imageFormat The format for the image.
- * @returns The PlantUML server URL for the image.
+ * @returns The remote server URL for the image.
  */
-export function createPlantUmlServerUrl(plantUmlCode: string, imageFormat: string): string {
+export function createRemoteImageUrl(baseUrl: string, plantUmlCode: string, imageFormat: string): string {
     const encodedPlantUml = plantUmlEncoder.encode(plantUmlCode);
-    return "http://www.plantuml.com/plantuml/" + imageFormat + "/" + encodedPlantUml;
+    return baseUrl + "/plantuml/" + imageFormat + "/" + encodedPlantUml;
 }

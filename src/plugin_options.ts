@@ -72,6 +72,15 @@ export class PluginOptions {
         value: ImageLocation.Local,
     };
 
+    /** The base URL when generating remote images. */
+    private outputRemoteBaseUrlOption = {
+        type: ParameterType.String,
+        name: "umlClassDiagramRemoteBaseUrl",
+        help: "The base URL when generating remote images.",
+        defaultValue: "http://www.plantuml.com",
+        value: "http://www.plantuml.com",
+    };
+
     /** The image format used for the class diagrams. */
     private outputImageFormatOption = {
         type: ParameterType.Map,
@@ -381,6 +390,7 @@ export class PluginOptions {
     public addToApplication(typedoc: Application): void {
         typedoc.options.addDeclaration(this.classDiagramTypeOption as MapDeclarationOption<ClassDiagramType>);
         typedoc.options.addDeclaration(this.outputImageLocationOption as MapDeclarationOption<ImageLocation>);
+        typedoc.options.addDeclaration(this.outputRemoteBaseUrlOption as StringDeclarationOption);
         typedoc.options.addDeclaration(this.outputImageFormatOption as MapDeclarationOption<ImageFormat>);
         typedoc.options.addDeclaration(this.sectionTitleOption as StringDeclarationOption);
         typedoc.options.addDeclaration(this.classDiagramPositionOption as MapDeclarationOption<ClassDiagramPosition>);
@@ -421,6 +431,7 @@ export class PluginOptions {
     public readValuesFromApplication(typedoc: Application): void {
         this.classDiagramTypeOption.value = typedoc.options.getValue(this.classDiagramTypeOption.name) as ClassDiagramType;
         this.outputImageLocationOption.value = typedoc.options.getValue(this.outputImageLocationOption.name) as ImageLocation;
+        this.outputRemoteBaseUrlOption.value = typedoc.options.getValue(this.outputRemoteBaseUrlOption.name) as string;
         this.outputImageFormatOption.value = typedoc.options.getValue(this.outputImageFormatOption.name) as ImageFormat;
         this.sectionTitleOption.value = typedoc.options.getValue(this.sectionTitleOption.name) as string;
         this.classDiagramPositionOption.value = typedoc.options.getValue(this.classDiagramPositionOption.name) as ClassDiagramPosition;
@@ -466,6 +477,14 @@ export class PluginOptions {
      */
     public get outputImageLocation(): ImageLocation {
         return this.outputImageLocationOption.value;
+    }
+
+    /**
+     * Returns the base URL used when generating remote images.
+     * @returns The base URL used when generating remote images.
+     */
+    public get outputRemoteBaseUrl(): string {
+        return this.outputRemoteBaseUrlOption.value;
     }
 
     /**
