@@ -68,8 +68,8 @@ export const publicToPrivate: TypeDocMemberCompareFunction = (
  * @returns -1 if (a < b), 0 if (a === b) or 1 if (a > b).
  */
 export const privateToPublic: TypeDocMemberCompareFunction = (
-    a: DeclarationReflection,
-    b: DeclarationReflection,
+    a: Readonly<DeclarationReflection>,
+    b: Readonly<DeclarationReflection>,
 ): number => {
     if (a.flags.isProtected) {
         if (b.flags.isProtected) {
