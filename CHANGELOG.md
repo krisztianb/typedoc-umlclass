@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2021-01-05
+### Added
+- Add support for TypeDoc 0.20.x
+
 ## [0.3.1] - 2020-12-22
 ### Added
 - New option to specify the server for remote image URLs
@@ -80,7 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.3.2
 [0.3.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.3.1
 [0.3.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.3.0
 [0.2.2]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.2.2
