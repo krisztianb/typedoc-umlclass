@@ -333,7 +333,7 @@ export class PlantUmlCodeGenerator {
         // Type-parameters
         const localTypeParamsMap = new Map(typeParamsMap);
 
-        if (signature.typeParameters) {
+        if (signature.typeParameters && signature.typeParameters.length > 0) {
             plantUml += "<";
             plantUml += signature.typeParameters.map((p: Readonly<TypeParameterReflection>) => p.name).join(", ");
             plantUml += ">";
@@ -492,7 +492,7 @@ export class PlantUmlCodeGenerator {
     ): string {
         let name = reflection.name;
 
-        if (reflection.typeParameters) {
+        if (reflection.typeParameters && reflection.typeParameters.length > 0) {
             name += "<";
             name += typeParamsMap?.size
                 ? Array.from(typeParamsMap.values()).join(", ")
@@ -545,7 +545,7 @@ export class PlantUmlCodeGenerator {
                 ? PlantUmlCodeGenerator.createTypeParameterMapping(type.reflection.typeParameters, type.typeArguments)
                 : new Map<string, string>();
             return PlantUmlCodeGenerator.getFullReflectionName(type.reflection, typeParamsMap);
-        } else if (type.typeArguments) {
+        } else if (type.typeArguments && type.typeArguments.length > 0) {
             let name = type.name + "<";
             name += type.typeArguments.map((t: Readonly<Type>) => t.toString()).join(", ");
             name += ">";

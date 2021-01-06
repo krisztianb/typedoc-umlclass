@@ -34,11 +34,11 @@ export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
         let cacheKey = String(reflection.id);
 
         const typeParamsMap =
-            reflection.typeParameters && isType
+            reflection.typeParameters && reflection.typeParameters.length > 0 && isType
                 ? PlantUmlCodeGenerator.createTypeParameterMapping(reflection.typeParameters, typeArguments)
                 : new Map<string, string>();
 
-        if (reflection.typeParameters) {
+        if (reflection.typeParameters && reflection.typeParameters.length > 0) {
             cacheKey +=
                 typeParamsMap.size > 0
                     ? "<" + Array.from(typeParamsMap.values()).join(", ") + ">"
