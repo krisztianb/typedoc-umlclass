@@ -21,8 +21,13 @@ The plugin can then be installed using [npm](https://www.npmjs.com/package/typed
 $ npm install --save-dev typedoc-umlclass
 ```
 
-**Note:** This plugin requires [JAVA](https://www.java.com/) and [Graphviz](https://graphviz.org/) to be installed on
-your system.
+### Requirements
+
+The plugin requires the following software to be installed on your system:
+
+* [JAVA](https://www.java.com/)
+* [Graphviz](https://graphviz.org/)
+* [TypeDoc](https://typedoc.org/) version 0.17.x, 0.18.x, 0.19.x or 0.20.14 and above.
 
 ## Options
 

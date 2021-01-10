@@ -6,9 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.2] - 2021-01-05
+## [0.3.2] - 2021-01-10
 ### Added
-- Add support for TypeDoc 0.20.x
+- Add support for newer TypeDoc versions: 0.20.14 and above (see: https://github.com/TypeStrong/typedoc/pull/1461)
+- Add support for older TypeDoc versions: 0.17.x and 0.18.x
 
 ## [0.3.1] - 2020-12-22
 ### Added
