@@ -31,8 +31,9 @@ The plugin requires the following software to be installed on your system:
 
 ## Options
 
-The option `umlClass` is added to TypeDoc when the plugin is installed. The option is an object whose properties can be
-used to configure the plugin within your [TypeDoc JSON option file](https://typedoc.org/guides/options/). For example:
+The option `umlClassDiagram` is added to TypeDoc when the plugin is installed. The option is an object whose properties
+can be used to configure the plugin within your [TypeDoc JSON option file](https://typedoc.org/guides/options/).
+For example:
 
 ```json
 {
