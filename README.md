@@ -74,7 +74,7 @@ For example:
 | **memberOrder** `<abc\|public-to-private\|private-to-public>` | Specifies the order of properties and methods within the boxes in the class diagram. Use `abc` to sort them alphabetically, `public-to-private` to have public properties/methods before protected and private ones or `private-to-public` to have private properties/methods before protected and public ones. | `public-to-private` |
 | **hideEmptyMembers** `<true\|false>` | If this option is set to true properties and methods are hidden if they are empty. | `true` |
 | **topDownLayoutMaxSiblings** `<integer>` | Specifies the maximum number of allowed siblings above (extended types and implemented interfaces) and below (extending types and implementing interfaces) the current type. If this number is exceeded the PlantUML layout is switched from top/down to left/right to allow a better readability of the resulting class diagram. | `6` |
-| **memberVisibilityStyle** `<text\|icon>` | Specifies how the visibility (private, protected or public) of class members (properties and methods) should be rendered in the class diagrams. | `icon` |
+| **visibilityStyle** `<text\|icon>` | Specifies how the visibility (private, protected or public) of class members (properties and methods) should be rendered in the class diagrams. | `icon` |
 | **hideCircledChar** `<true\|false>` | If this option is set to true the circled char in front of class and interface names is omitted. | `false` |
 | **hideShadow** `<true\|false>` | If this option is set to true the shadowing in the class diagrams is disabled. | `false` |
 | **boxBackgroundColor** `<transparent\|#RGBHEX>` | Specifies the background color of the boxes within the class diagram. | PlantUML default value |
@@ -86,10 +86,10 @@ For example:
 | **classFontSize** `<integer>` | Specifies the font size of the class names within the class diagram. Unit is pixel. | PlantUML default value |
 | **classFontStyle** `<normal\|plain\|italic\|bold>` | Specifies the style of the font used for the class names within the class diagram. | PlantUML default value |
 | **classFontColor** `<transparent\|#RGBHEX>` | Specifies the color of the class names within the class diagram. | PlantUML default value |
-| **classAttributeFontName** `<font-name>` | Specifies the name of the font used for class attributes within the class diagram. **The PlantUML site remarks:** _Please note the fontname is highly system dependent, so do not over use it, if you look for portability. Helvetica and Courier should be available on all system._ | PlantUML default value |
-| **classAttributeFontSize** `<integer>` | Specifies the font size of the class attributes within the class diagram. Unit is pixel. | PlantUML default value |
-| **classAttributeFontStyle** `<normal\|plain\|italic\|bold>` | Specifies the style of the font used for the class attributes within the class diagram. | PlantUML default value |
-| **classAttributeFontColor** `<transparent\|#RGBHEX>` | Specifies the color of the class attributes within the class diagram. | PlantUML default value |
+| **attributeFontName** `<font-name>` | Specifies the name of the font used for class attributes within the class diagram. **The PlantUML site remarks:** _Please note the fontname is highly system dependent, so do not over use it, if you look for portability. Helvetica and Courier should be available on all system._ | PlantUML default value |
+| **attributeFontSize** `<integer>` | Specifies the font size of the class attributes within the class diagram. Unit is pixel. | PlantUML default value |
+| **attributeFontStyle** `<normal\|plain\|italic\|bold>` | Specifies the style of the font used for the class attributes within the class diagram. | PlantUML default value |
+| **attributeFontColor** `<transparent\|#RGBHEX>` | Specifies the color of the class attributes within the class diagram. | PlantUML default value |
 
 ### Other settings
 
