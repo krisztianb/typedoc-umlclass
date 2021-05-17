@@ -5,13 +5,12 @@ import { Application, DeclarationReflection, ProjectReflection, ReflectionKind }
 import { Context, Converter } from "typedoc/dist/lib/converter";
 import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
 import { createDiagramLegendForPlantUml, DiagramLegend } from "./diagram_legend";
-import { ClassDiagramType, FontStyle, LegendType } from "./enumerations";
 import { createEmbeddedImageUrl, createLocalImageFileUrl, createRemoteImageUrl } from "./image_url_generator";
 import { Logger } from "./logger";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
 import { PlantUmlCodeGenerator } from "./plantuml/plantuml_code_generator";
 import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator";
-import { ClassDiagramPosition, ImageLocation, PluginOptions } from "./plugin_options";
+import { PluginOptions } from "./plugin_options";
 import { PageProcessor } from "./typedoc/page_processor";
 import { createHierarchyDiagramSection, PageSections } from "./typedoc/page_section";
 import { PageSectionFinder } from "./typedoc/page_section_finder";
@@ -62,10 +61,7 @@ export class Plugin {
      * @returns True if the plugin is active, otherwise false.
      */
     public get isActive(): boolean {
-        return (
-            this.options.classDiagramType === ClassDiagramType.Simple ||
-            this.options.classDiagramType === ClassDiagramType.Detailed
-        );
+        return this.options.type === "simple" || this.options.type === "detailed";
     }
 
     /**
@@ -81,10 +77,7 @@ export class Plugin {
      * @returns True if the plugin is generating images, otherwise false.
      */
     public get isGeneratingImages(): boolean {
-        return (
-            this.options.outputImageLocation === ImageLocation.Local ||
-            this.options.outputImageLocation === ImageLocation.Embed
-        );
+        return this.options.location === "local" || this.options.location === "embed";
     }
 
     /**
@@ -94,9 +87,9 @@ export class Plugin {
     public get shouldGenerateLegends(): boolean {
         // The simple diagram type can only contain the circled chars.
         // If those are deactivated then it does not make sense to have any legends.
-        if (this.options.classDiagramType === ClassDiagramType.Simple && this.options.classDiagramHideCircledChar) {
+        if (this.options.type === "simple" && this.options.hideCircledChar) {
             return false;
-        } else if (this.options.legendType === LegendType.OnlyIncluded || this.options.legendType === LegendType.Full) {
+        } else if (this.options.legendType === "only-included" || this.options.legendType === "full") {
             return true;
         }
 
@@ -163,7 +156,7 @@ export class Plugin {
                 if (this.isGeneratingImages) {
                     this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator<ReflectionPageId>(
                         this.options.generatorProcessCount,
-                        this.options.outputImageFormat,
+                        this.options.format,
                         this.onImageGenerated,
                     );
 
@@ -286,13 +279,9 @@ export class Plugin {
         if (this.isGeneratingImages && this.plantUmlDiagramGenerator) {
             this.log?.info(`Creating diagram image for reflection ${reflection.name} ...`);
             this.plantUmlDiagramGenerator.generate({ reflection, pageFilePath: event.filename }, plantUml + "\n");
-        } else if (this.options.outputImageLocation === ImageLocation.Remote) {
+        } else if (this.options.location === "remote") {
             this.log?.info(`Creating remote image URL for reflection ${reflection.name} ...`);
-            const imageUrl = createRemoteImageUrl(
-                this.options.outputRemoteBaseUrl,
-                plantUml,
-                this.options.outputImageFormat,
-            );
+            const imageUrl = createRemoteImageUrl(this.options.remoteBaseUrl, plantUml, this.options.format);
 
             this.log?.info(`Inserting diagram into page of reflection ${reflection.name} ...`);
             event.contents = this.insertHierarchyDiagramIntoContent(event.contents as string, reflection, imageUrl);
@@ -307,7 +296,7 @@ export class Plugin {
     private readonly onImageGenerated = (id: ReflectionPageId, imageData: Readonly<Buffer>): void => {
         let imageUrl = "";
 
-        if (this.options.outputImageLocation === ImageLocation.Local) {
+        if (this.options.location === "local") {
             this.log?.info(`Writing local image file for reflection ${id.reflection.name} ...`);
             const absoluteImageFilePath = this.writeLocalImageFileForReflection(imageData, id.reflection);
 
@@ -315,7 +304,7 @@ export class Plugin {
             imageUrl = createLocalImageFileUrl(id.pageFilePath, absoluteImageFilePath);
         } else {
             this.log?.info(`Creating embedded image URL for reflection ${id.reflection.name} ...`);
-            imageUrl = createEmbeddedImageUrl(imageData, this.options.outputImageFormat);
+            imageUrl = createEmbeddedImageUrl(imageData, this.options.format);
         }
 
         this.log?.info(`Inserting diagram into page for reflection ${id.reflection.name} ...`);
@@ -331,7 +320,7 @@ export class Plugin {
      * @returns The absolute path to the file that was created.
      */
     private writeLocalImageFileForReflection(imageData: Readonly<Buffer>, reflection: DeclarationReflection): string {
-        const filename = `${reflection.name}-umlClassDiagram-${reflection.id}.${this.options.outputImageFormat}`;
+        const filename = `${reflection.name}-umlClassDiagram-${reflection.id}.${this.options.format}`;
         const absoluteFilePath = path.join(this.outputDirectory, filename);
 
         fs.writeFileSync(absoluteFilePath, imageData as Buffer);
@@ -357,15 +346,15 @@ export class Plugin {
      */
     private createLegendForReflection(reflection: DeclarationReflection, plantUmlLines: string[]): void {
         const legend =
-            this.options.legendType === LegendType.OnlyIncluded
+            this.options.legendType === "only-included"
                 ? createDiagramLegendForPlantUml(plantUmlLines)
                 : new DiagramLegend();
 
-        if (this.options.classDiagramHideCircledChar) {
+        if (this.options.hideCircledChar) {
             legend.hideTypeIcons();
         }
 
-        if (this.options.classDiagramClassAttributeFontStyle === FontStyle.Italic) {
+        if (this.options.attributeFontStyle === "italic") {
             legend.hideAbstractMemberItem();
         }
 
@@ -409,10 +398,10 @@ export class Plugin {
             this.options.sectionTitle,
             imageUrl,
             reflection.name,
-            legend && !legend.isEmpty ? legend.getHtml(this.options.classDiagramMemberVisibilityStyle) : "",
+            legend && !legend.isEmpty ? legend.getHtml(this.options.visibilityStyle) : "",
         );
 
-        if (this.options.classDiagramPosition === ClassDiagramPosition.Above) {
+        if (this.options.position === "above") {
             page.insertAboveSection(PageSections.Hierarchy, hierarchyDiagramSection);
         } else {
             page.insertBelowSection(PageSections.Hierarchy, hierarchyDiagramSection);
