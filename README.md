@@ -42,9 +42,7 @@ For example:
     "umlClassDiagram": {
         "type": "detailed",
         "location": "local",
-        "format": "svg",
-        "hideProgressBar": false,
-        "generatorProcessCount": 4
+        "format": "svg"
     }
 }
 ```

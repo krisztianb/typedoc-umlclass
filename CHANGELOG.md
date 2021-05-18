@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2021-??-??
+### Breaking Changes
+- Moved all options into a single option object
+  (see: [How to migrate from older versions to 0.4](https://github.com/krisztianb/typedoc-umlclass/docs/migration/0.4.md))
+### Added
+- Automatic detection of CPU count
+### Changed
+- Updated dependencies
+- Default value of option `generatorProcessCount` changed from `1` to number of available CPUs
+
 ## [0.3.2] - 2021-01-10
 ### Added
 - Add support for newer TypeDoc versions: 0.20.14 and above (see: https://github.com/TypeStrong/typedoc/pull/1461)
@@ -85,7 +95,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.3.2...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.4.0
 [0.3.2]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.3.2
 [0.3.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.3.1
 [0.3.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.3.0
