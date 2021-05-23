@@ -163,7 +163,7 @@ export class Plugin {
                     if (!this.options.hideProgressBar) {
                         this.log?.info("Setting up progress bar ...");
                         this.progressBar = new ProgressBar(
-                            `Adding ${this.numberOfDiagramsToGenerate} class diagrams [:bar] :percent`,
+                            `Using ${this.options.generatorProcessCount} process(es) to add ${this.numberOfDiagramsToGenerate} class diagrams [:bar] :percent`,
                             {
                                 total: this.numberOfDiagramsToGenerate,
                                 width: 40,

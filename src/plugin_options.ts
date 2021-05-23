@@ -1,3 +1,4 @@
+import * as os from "os";
 import { Application, ParameterType } from "typedoc";
 
 /**
@@ -86,7 +87,7 @@ export class PluginOptions {
         attributeFontSize: 0,
         attributeFontStyle: "normal",
         attributeFontColor: "",
-        generatorProcessCount: 1,
+        generatorProcessCount: os.cpus().length,
         hideProgressBar: false,
         createPlantUmlFiles: false,
         verboseOutput: false,
