@@ -6,9 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.4.0] - 2021-??-??
+## [0.4.0] - 2021-05-23
 ### Breaking Changes
-- Moved all options into a single option object
+- Moved options to a single option object
   (see: [How to migrate from older versions to 0.4](https://github.com/krisztianb/typedoc-umlclass/docs/migration/0.4.md))
 ### Added
 - Automatic detection of CPU count
