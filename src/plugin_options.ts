@@ -355,7 +355,8 @@ export class PluginOptions {
      * @returns The number of PlantUML processes that should be used for generating the class diagrams.
      */
     public get generatorProcessCount(): RequiredPluginOptionsType["generatorProcessCount"] {
-        return this.userValues?.generatorProcessCount ?? this.defaultValues.generatorProcessCount;
+        const processCount = this.userValues?.generatorProcessCount ?? -1;
+        return processCount <= 0 ? this.defaultValues.generatorProcessCount : processCount;
     }
 
     /**
