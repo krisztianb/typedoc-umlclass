@@ -25,7 +25,7 @@ export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
      *               reflection stands for a template class.
      * @returns The PlantUML lines for the reflection.
      */
-    protected createPlantUmlForReflection(
+    protected override createPlantUmlForReflection(
         reflection: Readonly<DeclarationReflection>,
         typeArguments?: ReadonlyArray<Type>,
         isType = false,
