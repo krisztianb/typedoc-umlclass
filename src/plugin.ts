@@ -133,7 +133,7 @@ export class Plugin {
      * @param context Describes the current state the converter is in.
      */
     public onConverterResolveBegin(context: Context): void {
-        this.options.readValuesFromApplication(context.converter.owner.application);
+        this.options.readValuesFromApplication(context.converter.owner);
     }
 
     /**
