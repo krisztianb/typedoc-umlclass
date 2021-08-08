@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.0] - 2021-08-08
 ### Breaking Changes
-- Support changed to TypeDoc verions >=0.21.0 due to a breaking change in TypeDoc's API.
+- Support changed to TypeDoc versions >=0.21.0 due to a breaking change in TypeDoc's API.
 
 ## [0.4.0] - 2021-05-23
 ### Breaking Changes
