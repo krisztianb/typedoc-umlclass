@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2021-09-21
+### Breaking Changes
+- Support changed to TypeDoc versions 0.22.x due to a breaking change in TypeDoc's output folder structure.
+### Added
+- New option "backgroundColor" to specify the background color of all class diagrams.
+### Changed
+- Background color of class diagrams defaults to "transparent" to better integrate with TypeDoc's new dark theme.
+
 ## [0.5.0] - 2021-08-08
 ### Breaking Changes
 - Support changed to TypeDoc versions >=0.21.0 due to a breaking change in TypeDoc's API.
@@ -99,7 +107,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.6.0
 [0.5.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.5.0
 [0.4.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.4.0
 [0.3.2]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.3.2
