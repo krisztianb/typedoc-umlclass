@@ -208,7 +208,7 @@ export class Plugin {
      */
     public onRendererBegin(event: RendererEvent): void {
         if (this.isActive && this.hasWork) {
-            this.outputDirectory = path.join(event.outputDirectory, "assets/images/");
+            this.outputDirectory = path.join(event.outputDirectory, "assets/");
         }
     }
 
