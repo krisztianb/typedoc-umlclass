@@ -7,7 +7,7 @@ import {
     SignatureReflection,
     Type,
     TypeParameterReflection,
-} from "typedoc/dist/lib/models/index";
+} from "typedoc";
 import {
     nameAbc,
     privateToPublic,

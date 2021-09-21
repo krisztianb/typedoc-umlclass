@@ -1,5 +1,4 @@
-import { DeclarationReflection } from "typedoc";
-import { Type, TypeParameterReflection } from "typedoc/dist/lib/models";
+import { DeclarationReflection, Type, TypeParameterReflection } from "typedoc";
 import { PlantUmlCodeGenerator } from "./plantuml_code_generator";
 
 /**

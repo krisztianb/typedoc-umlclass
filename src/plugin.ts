@@ -1,9 +1,16 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as ProgressBar from "progress";
-import { Application, DeclarationReflection, ProjectReflection, ReflectionKind } from "typedoc";
-import { Context, Converter } from "typedoc/dist/lib/converter";
-import { PageEvent, RendererEvent } from "typedoc/dist/lib/output/events";
+import {
+    Application,
+    Context,
+    Converter,
+    DeclarationReflection,
+    PageEvent,
+    ProjectReflection,
+    ReflectionKind,
+    RendererEvent,
+} from "typedoc";
 import { createDiagramLegendForPlantUml, DiagramLegend } from "./diagram_legend";
 import { createEmbeddedImageUrl, createLocalImageFileUrl, createRemoteImageUrl } from "./image_url_generator";
 import { Logger } from "./logger";
@@ -417,9 +424,9 @@ export class Plugin {
      */
     public onRendererEnd(event: RendererEvent): void {
         if (this.isActive && this.hasWork) {
-            this.log?.info("Attaching content to main.css file ...");
+            this.log?.info("Attaching content to CSS file ...");
 
-            const filename = path.join(event.outputDirectory, "assets/css/main.css");
+            const filename = path.join(event.outputDirectory, "assets/style.css");
 
             let data =
                 fs.readFileSync(filename, "utf8") +

@@ -1,4 +1,4 @@
-import { DeclarationReflection, ReferenceType } from "typedoc/dist/lib/models/index";
+import { DeclarationReflection, ReferenceType } from "typedoc";
 
 /**
  * Removes duplicates from an array of types.
