@@ -75,6 +75,7 @@ For example:
 | **visibilityStyle** `<text\|icon>` | Specifies how the visibility (private, protected or public) of class members (properties and methods) should be rendered in the class diagrams. | `icon` |
 | **hideCircledChar** `<true\|false>` | If this option is set to true the circled char in front of class and interface names is omitted. | `false` |
 | **hideShadow** `<true\|false>` | If this option is set to true the shadowing in the class diagrams is disabled. | `false` |
+| **backgroundColor** `<transparent\|#RGBHEX>` | Specifies the color used for the background of all class diagrams. | `transparent` |
 | **boxBackgroundColor** `<transparent\|#RGBHEX>` | Specifies the background color of the boxes within the class diagram. | PlantUML default value |
 | **boxBorderColor** `<transparent\|#RGBHEX>` | Specifies the border color of the boxes within the class diagram. | PlantUML default value |
 | **boxBorderRadius** `<integer>` | Specifies the border radius of the boxes within the class diagram. Unit is pixel. | `0` |

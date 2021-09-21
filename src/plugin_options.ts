@@ -19,6 +19,7 @@ type PluginOptionsType = {
     visibilityStyle?: "text" | "icon";
     hideCircledChar?: boolean;
     hideShadow?: boolean;
+    backgroundColor?: string;
     boxBackgroundColor?: string;
     boxBorderColor?: string;
     boxBorderRadius?: number;
@@ -74,6 +75,7 @@ export class PluginOptions {
         visibilityStyle: "icon",
         hideCircledChar: false,
         hideShadow: false,
+        backgroundColor: "transparent",
         boxBackgroundColor: "",
         boxBorderColor: "",
         boxBorderRadius: 0,
@@ -224,6 +226,14 @@ export class PluginOptions {
      */
     public get hideShadow(): RequiredPluginOptionsType["hideShadow"] {
         return this.userValues?.hideShadow ?? this.defaultValues.hideShadow;
+    }
+
+    /**
+     * Returns the color that should be used for the background of all class diagrams.
+     * @returns The color that should be used for the background of all class diagrams.
+     */
+    public get backgroundColor(): RequiredPluginOptionsType["backgroundColor"] {
+        return this.userValues?.backgroundColor ?? this.defaultValues.backgroundColor;
     }
 
     /**

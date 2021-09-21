@@ -33,6 +33,7 @@ export type PlantUmlCodeGeneratorOptions = {
     visibilityStyle: "text" | "icon";
     hideCircledChar: boolean;
     hideShadow: boolean;
+    backgroundColor: string;
     boxBackgroundColor: string;
     boxBorderColor: string;
     boxBorderRadius: number;
@@ -177,8 +178,8 @@ export class PlantUmlCodeGenerator {
             plantUmlLines.unshift("skinparam Shadowing false");
         }
 
-        if (this.options.boxBorderRadius) {
-            plantUmlLines.unshift(`skinparam RoundCorner ${this.options.boxBorderRadius}`);
+        if (this.options.backgroundColor) {
+            plantUmlLines.unshift("skinparam BackgroundColor " + this.options.backgroundColor);
         }
 
         if (this.options.boxBackgroundColor) {
@@ -187,6 +188,10 @@ export class PlantUmlCodeGenerator {
 
         if (this.options.boxBorderColor) {
             plantUmlLines.unshift("skinparam ClassBorderColor " + this.options.boxBorderColor);
+        }
+
+        if (this.options.boxBorderRadius) {
+            plantUmlLines.unshift(`skinparam RoundCorner ${this.options.boxBorderRadius}`);
         }
 
         if (this.options.boxBorderWidth >= 0) {
