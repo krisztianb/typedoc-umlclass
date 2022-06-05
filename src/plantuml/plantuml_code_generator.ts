@@ -238,25 +238,6 @@ export class PlantUmlCodeGenerator {
     }
 
     /**
-     * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a type.
-     * @param type The type for which the PlantUML should be generated.
-     * @returns The PlantUML lines for the type.
-     */
-    private createPlantUmlForType(type: Readonly<ReferenceType>): string[] {
-        const reflection = type.reflection;
-
-        if (
-            reflection &&
-            reflection instanceof DeclarationReflection &&
-            (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface)
-        ) {
-            return this.createPlantUmlForReflection(reflection, type.typeArguments, true);
-        }
-
-        return PlantUmlCodeGenerator.createDummyPlantUmlForType(type);
-    }
-
-    /**
      * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a reflection.
      * @param reflection The reflection for which the PlantUML should be generated.
      * @param typeArguments Possible type arguments if the reflection is based on a template class.
@@ -311,6 +292,25 @@ export class PlantUmlCodeGenerator {
         plantUmlLines.push("}");
 
         return plantUmlLines;
+    }
+
+    /**
+     * Creates an array of PlantUML lines for generating the box (including its properties and methods) of a type.
+     * @param type The type for which the PlantUML should be generated.
+     * @returns The PlantUML lines for the type.
+     */
+    private createPlantUmlForType(type: Readonly<ReferenceType>): string[] {
+        const reflection = type.reflection;
+
+        if (
+            reflection &&
+            reflection instanceof DeclarationReflection &&
+            (reflection.kind === ReflectionKind.Class || reflection.kind === ReflectionKind.Interface)
+        ) {
+            return this.createPlantUmlForReflection(reflection, type.typeArguments, true);
+        }
+
+        return PlantUmlCodeGenerator.createDummyPlantUmlForType(type);
     }
 
     /**
@@ -402,15 +402,6 @@ export class PlantUmlCodeGenerator {
     }
 
     /**
-     * Escapes the name by putting double quotes around it preventing a PlantUML syntax error.
-     * @param name The original name.
-     * @returns The escaped name.
-     */
-    private static escapeName(name: string): string {
-        return '"' + name + '"';
-    }
-
-    /**
      * Creates a map which includes the type argument names for every type parameter name.
      * @param typeParameters The type parameters.
      * @param typeArguments The possible type arguments.
@@ -434,6 +425,15 @@ export class PlantUmlCodeGenerator {
         }
 
         return typeParamsMap;
+    }
+
+    /**
+     * Escapes the name by putting double quotes around it preventing a PlantUML syntax error.
+     * @param name The original name.
+     * @returns The escaped name.
+     */
+    private static escapeName(name: string): string {
+        return '"' + name + '"';
     }
 
     /**

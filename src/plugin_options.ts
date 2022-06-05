@@ -96,27 +96,6 @@ export class PluginOptions {
     };
 
     /**
-     * Adds the command line options of the plugin to the TypeDoc application.
-     * @param typedoc The TypeDoc application.
-     */
-    // eslint-disable-next-line class-methods-use-this
-    public addToApplication(typedoc: Application): void {
-        typedoc.options.addDeclaration({
-            type: ParameterType.Mixed,
-            name: "umlClassDiagram",
-            help: "The object defining the options of the typedoc-umlclass plugin.",
-        });
-    }
-
-    /**
-     * Reads the values of the plugin options from the application options.
-     * @param typedoc The TypeDoc application.
-     */
-    public readValuesFromApplication(typedoc: Application): void {
-        this.userValues = typedoc.options.getValue("umlClassDiagram");
-    }
-
-    /**
      * Returns how detailed the generated class diagrams should be.
      * @returns How detailed the generated class diagrams should be.
      */
@@ -391,5 +370,26 @@ export class PluginOptions {
      */
     public get createVerboseOutput(): RequiredPluginOptionsType["verboseOutput"] {
         return this.userValues?.verboseOutput ?? this.defaultValues.verboseOutput;
+    }
+
+    /**
+     * Adds the command line options of the plugin to the TypeDoc application.
+     * @param typedoc The TypeDoc application.
+     */
+    // eslint-disable-next-line class-methods-use-this
+    public addToApplication(typedoc: Application): void {
+        typedoc.options.addDeclaration({
+            type: ParameterType.Mixed,
+            name: "umlClassDiagram",
+            help: "The object defining the options of the typedoc-umlclass plugin.",
+        });
+    }
+
+    /**
+     * Reads the values of the plugin options from the application options.
+     * @param typedoc The TypeDoc application.
+     */
+    public readValuesFromApplication(typedoc: Application): void {
+        this.userValues = typedoc.options.getValue("umlClassDiagram");
     }
 }

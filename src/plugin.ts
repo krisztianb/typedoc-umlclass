@@ -113,28 +113,6 @@ export class Plugin {
     }
 
     /**
-     * Adds the plugin's options to the application's options.
-     * @param typedoc The TypeDoc application.
-     */
-    private addOptionsToApplication(typedoc: Application): void {
-        this.options.addToApplication(typedoc);
-    }
-
-    /**
-     * Subscribes to events of the application so that the plugin can do its work
-     * in the particular doc generation phases.
-     * @param typedoc The TypeDoc application.
-     */
-    private subscribeToApplicationEvents(typedoc: Application): void {
-        typedoc.converter.on(Converter.EVENT_RESOLVE_BEGIN, (c: Context) => this.onConverterResolveBegin(c));
-        typedoc.converter.on(Converter.EVENT_RESOLVE_END, (c: Context) => this.onConverterResolveEnd(c));
-
-        typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => this.onRendererBegin(e));
-        typedoc.renderer.on(PageEvent.END, (e: PageEvent) => this.onRendererEndPage(e));
-        typedoc.renderer.on(RendererEvent.END, (e: RendererEvent) => this.onRendererEnd(e));
-    }
-
-    /**
      * Triggered when the TypeDoc converter begins resolving a project.
      * Reads plugin parameter values.
      * @param context Describes the current state the converter is in.
@@ -183,25 +161,6 @@ export class Plugin {
     }
 
     /**
-     * Computes how many diagrams the plugin must generate.
-     * @param project The project containing the reflections for which the diagrams are generated.
-     * @returns The number of diagrams to generate.
-     */
-    private computeDiagramCount(project: ProjectReflection): number {
-        let count = 0;
-
-        for (const key in project.reflections) {
-            const reflection = project.reflections[key];
-
-            if (this.shouldProcessReflection(reflection)) {
-                ++count;
-            }
-        }
-
-        return count;
-    }
-
-    /**
      * Triggered before the renderer starts rendering a project.
      * Setup image generator output directory and progress bar.
      * @param event The event emitted by the renderer class.
@@ -228,6 +187,76 @@ export class Plugin {
                 }
             }
         }
+    }
+
+    /**
+     * Triggered after the renderer has written all documents.
+     * Appends style data to the main CSS file.
+     * @param event The event emitted by the renderer class.
+     */
+    public onRendererEnd(event: RendererEvent): void {
+        if (this.isActive && this.hasWork) {
+            this.log?.info("Attaching content to CSS file ...");
+
+            const filename = path.join(event.outputDirectory, "assets/style.css");
+
+            let data =
+                fs.readFileSync(filename, "utf8") +
+                "\n.tsd-hierarchy-diagram .diagram { max-width: 100%; display: block; margin: 0 auto; text-align: center; }\n";
+
+            if (this.shouldGenerateLegends) {
+                data += DiagramLegend.getCss();
+            }
+
+            fs.writeFileSync(filename, data, "utf8");
+
+            this.log?.info("DONE");
+
+            if (this.isGeneratingImages && this.plantUmlDiagramGenerator) {
+                this.plantUmlDiagramGenerator.shutdown();
+            }
+        }
+    }
+
+    /**
+     * Adds the plugin's options to the application's options.
+     * @param typedoc The TypeDoc application.
+     */
+    private addOptionsToApplication(typedoc: Application): void {
+        this.options.addToApplication(typedoc);
+    }
+
+    /**
+     * Subscribes to events of the application so that the plugin can do its work
+     * in the particular doc generation phases.
+     * @param typedoc The TypeDoc application.
+     */
+    private subscribeToApplicationEvents(typedoc: Application): void {
+        typedoc.converter.on(Converter.EVENT_RESOLVE_BEGIN, (c: Context) => this.onConverterResolveBegin(c));
+        typedoc.converter.on(Converter.EVENT_RESOLVE_END, (c: Context) => this.onConverterResolveEnd(c));
+
+        typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => this.onRendererBegin(e));
+        typedoc.renderer.on(PageEvent.END, (e: PageEvent) => this.onRendererEndPage(e));
+        typedoc.renderer.on(RendererEvent.END, (e: RendererEvent) => this.onRendererEnd(e));
+    }
+
+    /**
+     * Computes how many diagrams the plugin must generate.
+     * @param project The project containing the reflections for which the diagrams are generated.
+     * @returns The number of diagrams to generate.
+     */
+    private computeDiagramCount(project: ProjectReflection): number {
+        let count = 0;
+
+        for (const key in project.reflections) {
+            const reflection = project.reflections[key];
+
+            if (this.shouldProcessReflection(reflection)) {
+                ++count;
+            }
+        }
+
+        return count;
     }
 
     /**
@@ -415,35 +444,6 @@ export class Plugin {
         }
 
         return page.content;
-    }
-
-    /**
-     * Triggered after the renderer has written all documents.
-     * Appends style data to the main CSS file.
-     * @param event The event emitted by the renderer class.
-     */
-    public onRendererEnd(event: RendererEvent): void {
-        if (this.isActive && this.hasWork) {
-            this.log?.info("Attaching content to CSS file ...");
-
-            const filename = path.join(event.outputDirectory, "assets/style.css");
-
-            let data =
-                fs.readFileSync(filename, "utf8") +
-                "\n.tsd-hierarchy-diagram .diagram { max-width: 100%; display: block; margin: 0 auto; text-align: center; }\n";
-
-            if (this.shouldGenerateLegends) {
-                data += DiagramLegend.getCss();
-            }
-
-            fs.writeFileSync(filename, data, "utf8");
-
-            this.log?.info("DONE");
-
-            if (this.isGeneratingImages && this.plantUmlDiagramGenerator) {
-                this.plantUmlDiagramGenerator.shutdown();
-            }
-        }
     }
 }
 

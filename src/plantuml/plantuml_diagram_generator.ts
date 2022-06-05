@@ -67,6 +67,15 @@ export class PlantUmlDiagramGenerator<DiagramId> {
     }
 
     /**
+     * Notifies the PlantUML diagram generator processes that there is no more job to do.
+     */
+    public shutdown(): void {
+        for (const process of this.plantUmlProcesses) {
+            process.pipe.in.end();
+        }
+    }
+
+    /**
      * Returns an object which encapsulates a PlantUML process that should generate the next diagram.
      * @returns An object for the process that should generate the next diagram.
      */
@@ -105,15 +114,6 @@ export class PlantUmlDiagramGenerator<DiagramId> {
 
         if (this.nextProcessToGetWorkIndex === this.processCount) {
             this.nextProcessToGetWorkIndex = 0;
-        }
-    }
-
-    /**
-     * Notifies the PlantUML diagram generator processes that there is no more job to do.
-     */
-    public shutdown(): void {
-        for (const process of this.plantUmlProcesses) {
-            process.pipe.in.end();
         }
     }
 }
