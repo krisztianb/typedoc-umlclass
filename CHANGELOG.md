@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2022-06-05
+### Changed
+- Updated dependencies to resolve their security vulnerabilities
+
 ## [0.6.0] - 2021-09-21
 ### Breaking Changes
 - Support changed to TypeDoc versions 0.22.x due to a breaking change in TypeDoc's output folder structure.
@@ -107,7 +111,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.6.1
 [0.6.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.6.0
 [0.5.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.5.0
 [0.4.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.4.0
