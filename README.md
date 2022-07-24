@@ -27,7 +27,7 @@ The plugin requires the following software to be installed on your system:
 
 * [JAVA](https://www.java.com/) (latest version)
 * [Graphviz](https://graphviz.org/) (latest version)
-* [TypeDoc](https://typedoc.org/) (supported versions: 0.22.0 and above)
+* [TypeDoc](https://typedoc.org/) (supported versions: 0.23.0 and above)
 
 ## Options
 

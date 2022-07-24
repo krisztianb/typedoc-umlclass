@@ -57,6 +57,6 @@ export class PageSectionFinder {
      * @returns The regular expression to match the section.
      */
     private static createLookUpRegexpForSection(sectionName: string): RegExp {
-        return new RegExp('<section class="tsd-panel[^"<>]*?">\\s*<h3>' + sectionName + "</h3>[^]*?</section>");
+        return new RegExp('<section class="tsd-panel[^"<>]*?">\\s*<h\\d>' + sectionName + "</h\\d>[^]*?</section>");
     }
 }
