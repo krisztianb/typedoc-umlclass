@@ -111,7 +111,7 @@ export class DiagramLegend {
      * @returns The HTML for the diagram legend.
      */
     public getHtml(memberVisbilityStyle: "text" | "icon"): string {
-        let legend = `<h4>Legend</h4>
+        let legend = `<h5>Legend</h5>
                       <div class="legend">`;
 
         if (this.hasClassIcon) {
@@ -215,7 +215,7 @@ export class DiagramLegend {
      */
     public static getCss(): string {
         return (
-            ".tsd-hierarchy-diagram h4 { margin: 10px -20px 5px -20px; border-top: 1px solid #eee; padding: 10px 20px; }\n" +
+            ".tsd-hierarchy-diagram h5 { margin: 10px 0 5px 0; padding: 10px 0; }\n" +
             ".tsd-hierarchy-diagram .legend { display: flex; flex-flow: row wrap; align-items: center; font-size: 10px; }\n" +
             ".tsd-hierarchy-diagram .legend div { width: 185px; display: flex; flex-flow: row nowrap; align-items: center; height: 34px; }\n" +
             ".tsd-hierarchy-diagram .legend div span.dt { display: block; width: 55px; text-align: center; margin-right: 5px; }\n" +

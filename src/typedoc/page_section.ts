@@ -22,7 +22,7 @@ export function createHierarchyDiagramSection(
     // URLs with data are not clickable in browsers for security concerns => just output an image tag
     if (imageUrl.startsWith("data:")) {
         return `<section class="tsd-panel tsd-hierarchy-diagram">
-                    <h3>${title}</h3>
+                    <h4>${title}</h4>
                     <img class="diagram" src="${imageUrl}"
                             alt="UML class diagram of ${reflectionName}"
                             title="Right click and select 'View image' to enlarge" />
@@ -30,7 +30,7 @@ export function createHierarchyDiagramSection(
                 </section>\n`;
     }
     return `<section class="tsd-panel tsd-hierarchy-diagram">
-                <h3>${title}</h3>
+                <h4>${title}</h4>
                 <a class="diagram" href="${imageUrl}" title="Click to enlarge">
                     <img src="${imageUrl}"
                             alt="UML class diagram of ${reflectionName}" />
