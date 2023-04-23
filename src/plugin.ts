@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as ProgressBar from "progress";
+import ProgressBar from "progress";
 import {
     Application,
     Context,

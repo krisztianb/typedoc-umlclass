@@ -143,7 +143,6 @@
 
                     "private-decorated-field",
                     "private-instance-field",
-                    "private-abstract-field",
                     "private-field",
 
                     "instance-field",
@@ -170,7 +169,6 @@
 
                     "private-decorated-get",
                     "private-instance-get",
-                    "private-abstract-get",
                     "private-get",
 
                     "instance-get",
@@ -191,7 +189,6 @@
 
                     "private-decorated-set",
                     "private-instance-set",
-                    "private-abstract-set",
                     "private-set",
 
                     "instance-set",
@@ -212,7 +209,6 @@
 
                     "private-decorated-method",
                     "private-instance-method",
-                    "private-abstract-method",
                     "private-method",
 
                     "instance-method",
