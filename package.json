@@ -1,6 +1,6 @@
 {
     "name": "typedoc-umlclass",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "description": "Plugin for TypeDoc that generates UML class diagrams",
     "author": {
         "name": "Krisztián Balla",
@@ -42,7 +42,8 @@
     },
     "main": "dist/index.js",
     "files": [
-        "/dist"
+        "/dist",
+        "CHANGELOG.md"
     ],
     "scripts": {
         "lint": "eslint ./src",
