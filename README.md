@@ -27,29 +27,31 @@ The plugin requires the following software to be installed on your system:
 
 * [JAVA](https://www.java.com/) (latest version)
 * [Graphviz](https://graphviz.org/) (latest version)
-* [TypeDoc](https://typedoc.org/) (supported versions: 0.23.x and 0.24.x)
+* [TypeDoc](https://typedoc.org/) (supported versions: 0.23.x and above)
 
 Version **0.23.x** of TypeDoc automatically detects plugins installed via npm.
-If you are using version **0.24.x** of TypeDoc you need to [activate the plugin with a command line argument](https://typedoc.org/options/configuration/#plugin).
+If you are using version **0.24.x** or above you need to [activate the plugin with a command line argument](https://typedoc.org/options/configuration/#plugin).
 
 After installation TypeDoc can be used normally and you can configure this plugin as described below.
 
 ## Options
 
 The option `umlClassDiagram` is added to TypeDoc when the plugin is installed. The option is an object whose properties
-can be used to configure the plugin within your [TypeDoc JSON option file](https://typedoc.org/guides/options/).
-For example:
+can be used to configure the plugin within your [TypeDoc config file](https://typedoc.org/guides/options/).
+Here is an example using a strictly-typed JavaScript config file:
 
-```json
-{
-    "entryPoints": ["./src/index.ts"],
-    "out": "doc",
-    "umlClassDiagram": {
-        "type": "detailed",
-        "location": "local",
-        "format": "svg"
+```js
+/** @type { import('typedoc').TypeDocOptionMap & import('typedoc-umlclass').Config } */
+module.exports = {
+    entryPoints: ["./src/index.ts"],
+    out: "doc",
+    plugin: ["typedoc-umlclass"],
+    umlClassDiagram: {
+        type: "detailed",
+        location: "local",
+        format: "svg"
     }
-}
+};
 ```
 
 ### Basic settings

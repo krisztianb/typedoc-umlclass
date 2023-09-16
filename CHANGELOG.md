@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2023-09-??
+### Added
+-   Added support for latest TypeDoc version 0.25.x.
+-   The plugin now includes typings for its configuation that you can use in your TypeDoc config. (see README)
+
 ## [0.7.1] - 2023-04-23
 ### Changes
 -   Added support for latest TypeDoc version 0.24.x.
@@ -121,7 +126,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.7.2...HEAD
+[0.7.2]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.7.2
 [0.7.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.7.1
 [0.7.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.7.0
 [0.6.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.6.1
