@@ -37,6 +37,9 @@ import { reflectionIsPartOfClassHierarchy } from "./typedoc/typedoc_utils";
  * 3. The plugin adds a section with the image to the page of each class and interface.
  */
 export class Plugin {
+    /** The TypeDoc application instance that loaded the plugin. */
+    private typedoc!: Application;
+
     /** The options of this plugin. */
     private readonly options = new PluginOptions();
 
@@ -50,9 +53,7 @@ export class Plugin {
     private plantUmlCodeGenerator!: PlantUmlCodeGenerator;
 
     /** Object that uses PlantUML code to generate PlantUML diagrams. */
-    private plantUmlDiagramGenerator!:
-        | PlantUmlDiagramGenerator<{ reflection: DeclarationReflection; pageFilePath: string }>
-        | undefined;
+    private plantUmlDiagramGenerator!: PlantUmlDiagramGenerator | undefined;
 
     /** Progress bar shown when generating the diagrams. */
     private progressBar: ProgressBar | undefined;
@@ -108,8 +109,10 @@ export class Plugin {
      * @param typedoc The TypeDoc application.
      */
     public initialize(typedoc: Application): void {
-        this.addOptionsToApplication(typedoc);
-        this.subscribeToApplicationEvents(typedoc);
+        this.typedoc = typedoc;
+
+        this.addOptionsToApplication();
+        this.subscribeToApplicationEvents();
     }
 
     /**
@@ -139,10 +142,9 @@ export class Plugin {
                 this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
 
                 if (this.isGeneratingImages) {
-                    this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator<ReflectionPageId>(
+                    this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
                         this.options.generatorProcessCount,
                         this.options.format,
-                        this.onImageGenerated,
                     );
 
                     if (!this.options.hideProgressBar) {
@@ -220,24 +222,22 @@ export class Plugin {
 
     /**
      * Adds the plugin's options to the application's options.
-     * @param typedoc The TypeDoc application.
      */
-    private addOptionsToApplication(typedoc: Application): void {
-        this.options.addToApplication(typedoc);
+    private addOptionsToApplication(): void {
+        this.options.addToApplication(this.typedoc);
     }
 
     /**
      * Subscribes to events of the application so that the plugin can do its work
      * in the particular doc generation phases.
-     * @param typedoc The TypeDoc application.
      */
-    private subscribeToApplicationEvents(typedoc: Application): void {
-        typedoc.converter.on(Converter.EVENT_RESOLVE_BEGIN, (c: Context) => this.onConverterResolveBegin(c));
-        typedoc.converter.on(Converter.EVENT_RESOLVE_END, (c: Context) => this.onConverterResolveEnd(c));
+    private subscribeToApplicationEvents(): void {
+        this.typedoc.converter.on(Converter.EVENT_RESOLVE_BEGIN, (c: Context) => this.onConverterResolveBegin(c));
+        this.typedoc.converter.on(Converter.EVENT_RESOLVE_END, (c: Context) => this.onConverterResolveEnd(c));
 
-        typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => this.onRendererBegin(e));
-        typedoc.renderer.on(PageEvent.END, (e: PageEvent) => this.onRendererEndPage(e));
-        typedoc.renderer.on(RendererEvent.END, (e: RendererEvent) => this.onRendererEnd(e));
+        this.typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => this.onRendererBegin(e));
+        this.typedoc.renderer.on(PageEvent.END, (e: PageEvent) => this.onRendererEndPage(e));
+        this.typedoc.renderer.on(RendererEvent.END, (e: RendererEvent) => this.onRendererEnd(e));
     }
 
     /**
@@ -314,7 +314,14 @@ export class Plugin {
 
         if (this.isGeneratingImages && this.plantUmlDiagramGenerator) {
             this.log?.info(`Creating diagram image for reflection ${reflection.name} ...`);
-            this.plantUmlDiagramGenerator.generate({ reflection, pageFilePath: event.filename }, plantUml + "\n");
+
+            const job = this.plantUmlDiagramGenerator.generate(plantUml + "\n").then((imageData) => {
+                this.processImageData(reflection, event.filename, imageData);
+            });
+
+            this.typedoc.renderer.postRenderAsyncJobs.push(async () => {
+                return job;
+            });
         } else if (this.options.location === "remote") {
             this.log?.info(`Creating remote image URL for reflection ${reflection.name} ...`);
             const imageUrl = createRemoteImageUrl(this.options.remoteBaseUrl, plantUml, this.options.format);
@@ -325,26 +332,31 @@ export class Plugin {
     }
 
     /**
-     * Called by the PlantUmlDiagramGenerator when a diagram images has been generated.
-     * @param id ID info for the reflection for which the image was generated.
+     * Processes the image data of a generated diagram by creating an image URL and adding it to the reflection's page.
+     * @param reflection The reflection for which the image was generated.
+     * @param pageFilePath Path to the output file of the reflection's doc page.
      * @param imageData The data of the generated image.
      */
-    private readonly onImageGenerated = (id: ReflectionPageId, imageData: Readonly<Buffer>): void => {
+    private readonly processImageData = (
+        reflection: DeclarationReflection,
+        pageFilePath: string,
+        imageData: Readonly<Buffer>,
+    ): void => {
         let imageUrl = "";
 
         if (this.options.location === "local") {
-            this.log?.info(`Writing local image file for reflection ${id.reflection.name} ...`);
-            const absoluteImageFilePath = this.writeLocalImageFileForReflection(imageData, id.reflection);
+            this.log?.info(`Writing local image file for reflection ${reflection.name} ...`);
+            const absoluteImageFilePath = this.writeLocalImageFileForReflection(imageData, reflection);
 
-            this.log?.info(`Creating local image URL for reflection ${id.reflection.name} ...`);
-            imageUrl = createLocalImageFileUrl(id.pageFilePath, absoluteImageFilePath);
+            this.log?.info(`Creating local image URL for reflection ${reflection.name} ...`);
+            imageUrl = createLocalImageFileUrl(pageFilePath, absoluteImageFilePath);
         } else {
-            this.log?.info(`Creating embedded image URL for reflection ${id.reflection.name} ...`);
+            this.log?.info(`Creating embedded image URL for reflection ${reflection.name} ...`);
             imageUrl = createEmbeddedImageUrl(imageData, this.options.format);
         }
 
-        this.log?.info(`Inserting diagram into page for reflection ${id.reflection.name} ...`);
-        this.insertHierarchyDiagramIntoFile(id.pageFilePath, id.reflection, imageUrl);
+        this.log?.info(`Inserting diagram into page for reflection ${reflection.name} ...`);
+        this.insertHierarchyDiagramIntoFile(pageFilePath, reflection, imageUrl);
 
         this.progressBar?.tick();
     };
@@ -446,13 +458,3 @@ export class Plugin {
         return page.content;
     }
 }
-
-/**
- * Type with information required to ID a reflection and its output file.
- */
-type ReflectionPageId = {
-    /** The reflection. */
-    reflection: DeclarationReflection;
-    /** Path to the output file of the reflection's doc page. */
-    pageFilePath: string;
-};
