@@ -319,9 +319,9 @@ export class Plugin {
                 this.processImageData(reflection, event.filename, imageData);
             });
 
-            this.typedoc.renderer.postRenderAsyncJobs.push(async () => {
-                return job;
-            });
+            // Notify TypeDoc of the async job so that it can await it before shutting itself down.
+            // Without this the generator processes are killed when the TypeDoc process ends.
+            this.typedoc.renderer.postRenderAsyncJobs.push(async () => job);
         } else if (this.options.location === "remote") {
             this.log?.info(`Creating remote image URL for reflection ${reflection.name} ...`);
             const imageUrl = createRemoteImageUrl(this.options.remoteBaseUrl, plantUml, this.options.format);

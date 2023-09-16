@@ -27,12 +27,11 @@ The plugin requires the following software to be installed on your system:
 
 * [JAVA](https://www.java.com/) (latest version)
 * [Graphviz](https://graphviz.org/) (latest version)
-* [TypeDoc](https://typedoc.org/) (supported versions: 0.23.x and above)
+* [TypeDoc](https://typedoc.org/) (supported versions: 0.24.x and above)
 
-Version **0.23.x** of TypeDoc automatically detects plugins installed via npm.
-If you are using version **0.24.x** or above you need to [activate the plugin with a command line argument](https://typedoc.org/options/configuration/#plugin).
+You need to activate the plugin with a [TypeDoc command line argument](https://typedoc.org/options/configuration/#plugin) or the `plugin` option in your TypeDoc config file (see example below).
 
-After installation TypeDoc can be used normally and you can configure this plugin as described below.
+After this step TypeDoc can be used normally and you can configure this plugin as described below.
 
 ## Options
 
