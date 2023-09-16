@@ -6,6 +6,7 @@
         "lib": ["ES2015", "DOM"],
         "module": "commonjs",
         "declaration": true,
+        "baseUrl": "./",
         "strict": true,
         "noImplicitOverride": true,
         "exactOptionalPropertyTypes": true,

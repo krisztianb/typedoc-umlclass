@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-import { contentSelector } from "../cypress/support/constants";
+import { diagramSelector } from "../cypress/support/constants";
 
 describe("classes/super.Super.html", () => {
     beforeEach(() => {
@@ -7,7 +7,7 @@ describe("classes/super.Super.html", () => {
     });
 
     it("has a class diagram in the PNG format", () => {
-        cy.contains(contentSelector, "TODO"); // TODO
+        cy.get(diagramSelector).find("a").should("have.attr", "href").and("include", ".png");
     });
 });
 
@@ -17,6 +17,6 @@ describe("classes/sub.Sub.html", () => {
     });
 
     it("has a class diagram in the PNG format", () => {
-        cy.contains(contentSelector, "TODO"); // TODO
+        cy.get(diagramSelector).find("a").should("have.attr", "href").and("include", ".png");
     });
 });

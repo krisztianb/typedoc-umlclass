@@ -1,1 +1,1 @@
-export const contentSelector = ".col-content";
+export const diagramSelector = ".tsd-hierarchy-diagram";
