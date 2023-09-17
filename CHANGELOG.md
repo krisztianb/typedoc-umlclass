@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed support for TypeDoc versions 0.23.x due to a change in TypeDoc's handling of asynchronous tasks.
 ### Added
 - Added support for latest TypeDoc version 0.25.x.
-- The plugin now includes typings for its configuation that you can use in your TypeDoc config. (see README)
+- The plugin now includes typings for its configuation that you can use in your TypeDoc config. (see example in README)
 
 ## [0.7.1] - 2023-04-23
 ### Changes

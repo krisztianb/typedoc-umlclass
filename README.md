@@ -2,12 +2,7 @@
 
 # typedoc-umlclass
 
-**Plugin for TypeDoc that generates UML class diagrams**
-
-## Usage
-
-TypeDoc automatically detects plugins installed via npm. After installation TypeDoc can be used normally and
-this plugin is going to create a UML class diagram for every class and interface within your project.
+This is a plugin for [TypeDoc](https://github.com/TypeStrong/typedoc) that automatically inserts a UML class diagrams into the doc pages of your classes and interfaces.
 
 Example:
 
@@ -15,7 +10,7 @@ Example:
 
 ## Installation
 
-The plugin can then be installed using [npm](https://www.npmjs.com/package/typedoc-umlclass):
+This plugin should be installed as a dev dependency using [npm](https://www.npmjs.com/package/typedoc-umlclass):
 
 ```sh
 $ npm install --save-dev typedoc-umlclass
@@ -23,11 +18,11 @@ $ npm install --save-dev typedoc-umlclass
 
 ## Requirements
 
-The plugin requires the following software to be installed on your system:
+This plugin requires the following software to be installed on your system:
 
 * [JAVA](https://www.java.com/) (latest version)
 * [Graphviz](https://graphviz.org/) (latest version)
-* [TypeDoc](https://typedoc.org/) (supported versions: 0.24.x and above)
+* [TypeDoc](https://typedoc.org/) (supported versions: 0.24.x and 0.25.x)
 
 You need to activate the plugin with a [TypeDoc command line argument](https://typedoc.org/options/configuration/#plugin) or the `plugin` option in your TypeDoc config file (see example below).
 
@@ -57,7 +52,7 @@ module.exports = {
 
 | Name & Format | Description | Default |
 | ------------- | ----------- | ------- |
-| **type** `<none\|simple\|detailed>` | You can use this option to disable the plugin by passing the value `none`. Otherwise a class diagram is generated for every class and interface that is involved in inheritance and/or implementation. The class diagram includes one level of base and sub classes. Use the value `simple` to only render the name of the class or interface. Use the value `detailed` to also render properties and methods. | `detailed` |
+| **type** `<none\|simple\|detailed>` | You can disable the plugin by passing the value `none`. Otherwise a class diagram is generated for every class and interface that is involved in inheritance and/or implementation. The class diagram includes one level of base and sub classes. Use the value `simple` to only render the name of the class or interface. Use the value `detailed` to also render properties and methods. | `detailed` |
 | **location** `<local\|remote\|embed>` | Specifies the location of the generated images. If `local` then local image files are created in the assets directory of the generated documentation. If `remote` then the image tag uses an encoded link to a PlantUML web server that you can specify using the `remoteBaseUrl` option. If `embed` then the image is directly embedded into the HTML as a base64 encoded string. | `local` |
 | **remoteBaseUrl** `<string>` | Specifies the base URL that is used when generating remote image URLs. An example image URL is `http://www.plantuml.com/plantuml/svg/SyfFKj2rKt3CoKnELR1Io4ZDoSa70000` from which `http://www.plantuml.com` is the base URL. You can use this option if you are running your own [PlantUML PicoWeb Server](https://plantuml.com/picoweb). | `http://www.plantuml.com` |
 | **format** `<png\|svg>` | Specifies the format the generated images should have. You can choose between `png` and `svg`. | `svg` |
@@ -111,7 +106,7 @@ Please report bugs [here](https://github.com/krisztianb/typedoc-umlclass/issues)
 
 ## Credits
 
-I would like to thank the following people that influenced this project:
+I thank the following people that influenced this project:
 
 -   [Meir Gottlieb](https://github.com/meirgottlieb) for his
     [typedoc-plantuml](https://github.com/artifacthealth/typedoc-plantuml/) plugin of which this plugin first was a
@@ -123,7 +118,7 @@ I would like to thank the following people that influenced this project:
 
 ## Donate
 
-If you find this piece of software helpful, please consider a donation. Any amount is greatly appreciated.
+If you find this plugin helpful, please consider a donation. Any amount is greatly appreciated and motivates me to keep this project up to date.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=67UU75EUH4S8A)
 

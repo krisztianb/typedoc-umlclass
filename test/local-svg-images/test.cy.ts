@@ -6,8 +6,8 @@ describe("classes/super.Super.html", () => {
         cy.visit("./local-svg-images/output/classes/super.Super.html");
     });
 
-    it("has a class diagram in the SVG format", () => {
-        cy.get(diagramSelector).find("a").should("have.attr", "href").and("include", ".svg");
+    it("has a local class diagram image in the SVG format", () => {
+        cy.get(diagramSelector).find("img").should("have.attr", "src").and("include", ".svg");
     });
 });
 
@@ -16,7 +16,7 @@ describe("classes/sub.Sub.html", () => {
         cy.visit("./local-svg-images/output/classes/sub.Sub.html");
     });
 
-    it("has a class diagram in the SVG format", () => {
-        cy.get(diagramSelector).find("a").should("have.attr", "href").and("include", ".svg");
+    it("has a local class diagram image in the SVG format", () => {
+        cy.get(diagramSelector).find("img").should("have.attr", "src").and("include", ".svg");
     });
 });

@@ -4,5 +4,4 @@ node_modules
 
 test/cypress/screenshots
 test/cypress/videos
-test/local-png-images/output
-test/local-svg-images/output
+test/**/output/*
