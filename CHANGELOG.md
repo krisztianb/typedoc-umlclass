@@ -6,22 +6,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2023-09-17
+### BREAKING CHANGES
+- Removed support for TypeDoc versions 0.23.x due to a change in TypeDoc's handling of asynchronous tasks.
+### Added
+- Added support for latest TypeDoc version 0.25.x.
+- The plugin now includes typings for its configuation that you can use in your TypeDoc config. (see example in README)
+
 ## [0.7.1] - 2023-04-23
 ### Changes
--   Added support for latest TypeDoc version 0.24.x.
+- Added support for latest TypeDoc version 0.24.x.
 
 ## [0.7.0] - 2022-07-24
+### BREAKING CHANGES
+- Support changed to TypeDoc versions 0.23.x due to a change in TypeDoc's HTML output.
 ### Changed
 - Updated to TypeDoc version 0.23
-### Breaking Changes
-- Support changed to TypeDoc versions 0.23.x due to a change in TypeDoc's HTML output.
 
 ## [0.6.1] - 2022-06-05
 ### Changed
 - Updated dependencies to resolve their security vulnerabilities
 
 ## [0.6.0] - 2021-09-21
-### Breaking Changes
+### BREAKING CHANGES
 - Support changed to TypeDoc versions 0.22.x due to a breaking change in TypeDoc's output folder structure.
 ### Added
 - New option "backgroundColor" to specify the background color of all class diagrams.
@@ -29,11 +36,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Background color of class diagrams defaults to "transparent" to better integrate with TypeDoc's new dark theme.
 
 ## [0.5.0] - 2021-08-08
-### Breaking Changes
+### BREAKING CHANGES
 - Support changed to TypeDoc versions >=0.21.0 due to a breaking change in TypeDoc's API.
 
 ## [0.4.0] - 2021-05-23
-### Breaking Changes
+### BREAKING CHANGES
 - Moved options to a single option object
   (see: [How to migrate from older versions to 0.4](https://github.com/krisztianb/typedoc-umlclass/blob/master/docs/migration/0.4.md))
 ### Added
@@ -121,7 +128,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.8.0
 [0.7.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.7.1
 [0.7.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.7.0
 [0.6.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.6.1

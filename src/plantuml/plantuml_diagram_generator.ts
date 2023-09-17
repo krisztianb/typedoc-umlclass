@@ -1,35 +1,36 @@
 import { PlantUmlPipe } from "plantuml-pipe";
 import Queue = require("queue-fifo");
 
+/** Type that holds a reference to a function which resolves a promise that a diagram has been generated. */
+type DiagramResolver = { resolve: (imageData: Readonly<Buffer>) => void };
+
 /**
  * Type that groups data for a PlantUML process.
- * @template DiagramId The type of the diagram identifier data.
  */
-type PlantUmlProcessInfo<DiagramId> = {
+type PlantUmlProcessInfo = {
     /** The object that encapsulates the PlantUML process. */
     pipe: PlantUmlPipe;
 
-    /** Stores the ID and the order of the diagrams that the process is generating. */
-    diagramIdQueue: Queue<DiagramId>;
+    /**
+     * Stores functions that are used to resolve generated promise objects
+     * in the order of the diagrams that the process is generating.
+     */
+    diagramQueue: Queue<DiagramResolver>;
 };
 
 /**
  * Class for generating diagrams from PlantUML code.
  * This class can spawn multiple PlantUML processes and evenly schedules the work between them.
- * @template DiagramId The type of the diagram identifier data.
  */
-export class PlantUmlDiagramGenerator<DiagramId> {
+export class PlantUmlDiagramGenerator {
     /** Number of PlantUML processes used to schedule the diagram generation. */
     private readonly processCount: number;
 
     /** The format for the generated diagrams. */
     private readonly outputFormat: "png" | "svg";
 
-    /** Callback that should be called whenever a diagram has been generated. */
-    private readonly imageGeneratedHandler: (id: DiagramId, imageData: Readonly<Buffer>) => unknown;
-
     /** The object which encapsulates the PlantUML processes. */
-    private readonly plantUmlProcesses = new Array<PlantUmlProcessInfo<DiagramId>>();
+    private readonly plantUmlProcesses = new Array<PlantUmlProcessInfo>();
 
     /** Index of the process that should generate the next diagram. */
     private nextProcessToGetWorkIndex = 0;
@@ -38,32 +39,37 @@ export class PlantUmlDiagramGenerator<DiagramId> {
      * Creates a new PlantUML generator object.
      * @param processCount Number of PlantUML processes used to schedule the diagram generation.
      * @param format The format for the generated diagrams.
-     * @param imageGeneratedHandler Callback called whenever a diagram has been generated.
      */
-    public constructor(
-        processCount: number,
-        format: "png" | "svg",
-        imageGeneratedHandler: (id: DiagramId, imageData: Readonly<Buffer>) => unknown,
-    ) {
+    public constructor(processCount: number, format: "png" | "svg") {
         if (processCount <= 0) {
             throw new Error("processCount must be > 0");
         }
 
         this.processCount = processCount;
         this.outputFormat = format;
-        this.imageGeneratedHandler = imageGeneratedHandler;
     }
 
     /**
      * Writes the PlantUML code to a PlantUML process that generates the diagram.
-     * @param id The identifier for the diagram.
      * @param plantUml The PlantUML code for the diagram.
+     * @returns A promise that the diagram has been generated.
      */
-    public generate(id: DiagramId, plantUml: string): void {
+    public async generate(plantUml: string): Promise<Readonly<Buffer>> {
         const process = this.getNextProcess();
 
-        process.diagramIdQueue.enqueue(id);
+        // Here we create a promise that is resolved once the diagram has been generated
+        let resolver: DiagramResolver["resolve"] | undefined;
+        const promise = new Promise<Readonly<Buffer>>((resolve) => {
+            resolver = resolve;
+        });
+
+        process.diagramQueue.enqueue({
+            resolve: resolver ?? ((): void => {}),
+        });
+
         process.pipe.in.write(plantUml);
+
+        return promise;
     }
 
     /**
@@ -79,7 +85,7 @@ export class PlantUmlDiagramGenerator<DiagramId> {
      * Returns an object which encapsulates a PlantUML process that should generate the next diagram.
      * @returns An object for the process that should generate the next diagram.
      */
-    private getNextProcess(): PlantUmlProcessInfo<DiagramId> {
+    private getNextProcess(): PlantUmlProcessInfo {
         const processToWorkIndex = this.nextProcessToGetWorkIndex;
 
         this.maybeSpawnNewProcess();
@@ -95,14 +101,14 @@ export class PlantUmlDiagramGenerator<DiagramId> {
     private maybeSpawnNewProcess(): void {
         if (this.nextProcessToGetWorkIndex >= this.plantUmlProcesses.length) {
             const newPipe = new PlantUmlPipe({ outputFormat: this.outputFormat });
-            const newQueue = new Queue<DiagramId>();
+            const newQueue = new Queue<DiagramResolver>();
 
             newPipe.out.on("data", (imageData: Readonly<Buffer>) => {
-                const id = newQueue.dequeue() as DiagramId;
-                this.imageGeneratedHandler(id, imageData);
+                const diagram = newQueue.dequeue() as DiagramResolver;
+                diagram.resolve(imageData);
             });
 
-            this.plantUmlProcesses.push({ pipe: newPipe, diagramIdQueue: newQueue });
+            this.plantUmlProcesses.push({ pipe: newPipe, diagramQueue: newQueue });
         }
     }
 

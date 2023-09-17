@@ -1,3 +1,7 @@
 .vscode
 dist
 node_modules
+
+test/cypress/screenshots
+test/cypress/videos
+test/**/output/*

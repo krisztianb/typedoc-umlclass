@@ -4,7 +4,7 @@ import { Application, ParameterType } from "typedoc";
 /**
  * Type defining all options and their possible values of the plugin.
  */
-type PluginOptionsType = {
+export type PluginConfig = {
     type?: "none" | "simple" | "detailed";
     location?: "local" | "remote" | "embed";
     remoteBaseUrl?: string;
@@ -40,7 +40,7 @@ type PluginOptionsType = {
 };
 
 /** Plugin options type without nullables. */
-type RequiredPluginOptionsType = Required<PluginOptionsType>;
+type RequiredPluginConfig = Required<PluginConfig>;
 
 /**
  * Extend typedoc's options with the plugin's option using declaration merging.
@@ -48,7 +48,7 @@ type RequiredPluginOptionsType = Required<PluginOptionsType>;
 declare module "typedoc" {
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- This is not a separate type.
     export interface TypeDocOptionMap {
-        umlClassDiagram?: PluginOptionsType;
+        umlClassDiagram?: PluginConfig;
     }
 }
 
@@ -57,10 +57,10 @@ declare module "typedoc" {
  */
 export class PluginOptions {
     /** Plugin option values as provided by the user. */
-    private userValues: PluginOptionsType | undefined;
+    private userValues: PluginConfig | undefined;
 
     /** Plugin option default values. */
-    private readonly defaultValues: RequiredPluginOptionsType = {
+    private readonly defaultValues: RequiredPluginConfig = {
         type: "detailed",
         location: "local",
         remoteBaseUrl: "http://www.plantuml.com",
@@ -99,7 +99,7 @@ export class PluginOptions {
      * Returns how detailed the generated class diagrams should be.
      * @returns How detailed the generated class diagrams should be.
      */
-    public get type(): RequiredPluginOptionsType["type"] {
+    public get type(): RequiredPluginConfig["type"] {
         return this.userValues?.type ?? this.defaultValues.type;
     }
 
@@ -107,7 +107,7 @@ export class PluginOptions {
      * Returns the location where the class diagrams should be stored.
      * @returns The location where the class diagrams should be stored.
      */
-    public get location(): RequiredPluginOptionsType["location"] {
+    public get location(): RequiredPluginConfig["location"] {
         return this.userValues?.location ?? this.defaultValues.location;
     }
 
@@ -115,7 +115,7 @@ export class PluginOptions {
      * Returns the base URL used when generating remote images.
      * @returns The base URL used when generating remote images.
      */
-    public get remoteBaseUrl(): RequiredPluginOptionsType["remoteBaseUrl"] {
+    public get remoteBaseUrl(): RequiredPluginConfig["remoteBaseUrl"] {
         return this.userValues?.remoteBaseUrl ?? this.defaultValues.remoteBaseUrl;
     }
 
@@ -123,7 +123,7 @@ export class PluginOptions {
      * Returns the image format used for the class diagrams.
      * @returns The image format used for the class diagrams.
      */
-    public get format(): RequiredPluginOptionsType["format"] {
+    public get format(): RequiredPluginConfig["format"] {
         return this.userValues?.format ?? this.defaultValues.format;
     }
 
@@ -131,7 +131,7 @@ export class PluginOptions {
      * Returns the title that should be used for the section that contains the class diagrams.
      * @returns The title that should be used for the section that contains the class diagrams.
      */
-    public get sectionTitle(): RequiredPluginOptionsType["sectionTitle"] {
+    public get sectionTitle(): RequiredPluginConfig["sectionTitle"] {
         return this.userValues?.sectionTitle ?? this.defaultValues.sectionTitle;
     }
 
@@ -139,7 +139,7 @@ export class PluginOptions {
      * Returns where on the page the class diagrams should be put.
      * @returns Where on the page the class diagrams should be put.
      */
-    public get position(): RequiredPluginOptionsType["position"] {
+    public get position(): RequiredPluginConfig["position"] {
         return this.userValues?.position ?? this.defaultValues.position;
     }
 
@@ -147,7 +147,7 @@ export class PluginOptions {
      * Returns the type of legend that should be generated for the class diagrams.
      * @returns The type of legend that should be generated for the class diagrams.
      */
-    public get legendType(): RequiredPluginOptionsType["legendType"] {
+    public get legendType(): RequiredPluginConfig["legendType"] {
         return this.userValues?.legendType ?? this.defaultValues.legendType;
     }
 
@@ -155,7 +155,7 @@ export class PluginOptions {
      * Returns how method parameters should be output in the class diagrams.
      * @returns How method parameters should be output in the class diagrams.
      */
-    public get methodParameterOutput(): RequiredPluginOptionsType["methodParameterOutput"] {
+    public get methodParameterOutput(): RequiredPluginConfig["methodParameterOutput"] {
         return this.userValues?.methodParameterOutput ?? this.defaultValues.methodParameterOutput;
     }
 
@@ -163,7 +163,7 @@ export class PluginOptions {
      * Returns how class members should be ordered in the class diagrams.
      * @returns How class members should be ordered the class diagrams.
      */
-    public get memberOrder(): RequiredPluginOptionsType["memberOrder"] {
+    public get memberOrder(): RequiredPluginConfig["memberOrder"] {
         return this.userValues?.memberOrder ?? this.defaultValues.memberOrder;
     }
 
@@ -171,7 +171,7 @@ export class PluginOptions {
      * Returns whether to hide empty properties and methods in the class diagrams.
      * @returns Whether to hide empty properties and methods in the class diagrams.
      */
-    public get hideEmptyMembers(): RequiredPluginOptionsType["hideEmptyMembers"] {
+    public get hideEmptyMembers(): RequiredPluginConfig["hideEmptyMembers"] {
         return this.userValues?.hideEmptyMembers ?? this.defaultValues.hideEmptyMembers;
     }
 
@@ -179,7 +179,7 @@ export class PluginOptions {
      * Returns the boundary before swiching from top->down to left->right direction for class diagrams.
      * @returns The boundary before swiching from top->down to left->right direction for class diagrams.
      */
-    public get topDownLayoutMaxSiblings(): RequiredPluginOptionsType["topDownLayoutMaxSiblings"] {
+    public get topDownLayoutMaxSiblings(): RequiredPluginConfig["topDownLayoutMaxSiblings"] {
         return this.userValues?.topDownLayoutMaxSiblings ?? this.defaultValues.topDownLayoutMaxSiblings;
     }
 
@@ -187,7 +187,7 @@ export class PluginOptions {
      * Returns how the member visibility is rendered in the class diagrams.
      * @returns How the member visibility is rendered in the class diagrams.
      */
-    public get visibilityStyle(): RequiredPluginOptionsType["visibilityStyle"] {
+    public get visibilityStyle(): RequiredPluginConfig["visibilityStyle"] {
         return this.userValues?.visibilityStyle ?? this.defaultValues.visibilityStyle;
     }
 
@@ -195,7 +195,7 @@ export class PluginOptions {
      * Returns whether to hide the circled character in front of class names for class diagrams.
      * @returns Whether to hide the circled character in front of class names for class diagrams.
      */
-    public get hideCircledChar(): RequiredPluginOptionsType["hideCircledChar"] {
+    public get hideCircledChar(): RequiredPluginConfig["hideCircledChar"] {
         return this.userValues?.hideCircledChar ?? this.defaultValues.hideCircledChar;
     }
 
@@ -203,7 +203,7 @@ export class PluginOptions {
      * Returns whether to hide the shadows in the class diagrams.
      * @returns Whether to hide the shadows in the class diagrams.
      */
-    public get hideShadow(): RequiredPluginOptionsType["hideShadow"] {
+    public get hideShadow(): RequiredPluginConfig["hideShadow"] {
         return this.userValues?.hideShadow ?? this.defaultValues.hideShadow;
     }
 
@@ -211,7 +211,7 @@ export class PluginOptions {
      * Returns the color that should be used for the background of all class diagrams.
      * @returns The color that should be used for the background of all class diagrams.
      */
-    public get backgroundColor(): RequiredPluginOptionsType["backgroundColor"] {
+    public get backgroundColor(): RequiredPluginConfig["backgroundColor"] {
         return this.userValues?.backgroundColor ?? this.defaultValues.backgroundColor;
     }
 
@@ -221,7 +221,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    public get boxBackgroundColor(): RequiredPluginOptionsType["boxBackgroundColor"] {
+    public get boxBackgroundColor(): RequiredPluginConfig["boxBackgroundColor"] {
         return this.userValues?.boxBackgroundColor ?? this.defaultValues.boxBackgroundColor;
     }
 
@@ -231,7 +231,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    public get boxBorderColor(): RequiredPluginOptionsType["boxBorderColor"] {
+    public get boxBorderColor(): RequiredPluginConfig["boxBorderColor"] {
         return this.userValues?.boxBorderColor ?? this.defaultValues.boxBorderColor;
     }
 
@@ -239,7 +239,7 @@ export class PluginOptions {
      * Returns the border radius that should be used for boxes in the class diagrams.
      * @returns The border radius that should be used for boxes in the class diagrams.
      */
-    public get boxBorderRadius(): RequiredPluginOptionsType["boxBorderRadius"] {
+    public get boxBorderRadius(): RequiredPluginConfig["boxBorderRadius"] {
         return this.userValues?.boxBorderRadius ?? this.defaultValues.boxBorderRadius;
     }
 
@@ -249,7 +249,7 @@ export class PluginOptions {
      *          The value -1 if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    public get boxBorderWidth(): RequiredPluginOptionsType["boxBorderWidth"] {
+    public get boxBorderWidth(): RequiredPluginConfig["boxBorderWidth"] {
         return this.userValues?.boxBorderWidth ?? this.defaultValues.boxBorderWidth;
     }
 
@@ -259,7 +259,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    public get arrowColor(): RequiredPluginOptionsType["arrowColor"] {
+    public get arrowColor(): RequiredPluginConfig["arrowColor"] {
         return this.userValues?.arrowColor ?? this.defaultValues.arrowColor;
     }
 
@@ -269,7 +269,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    public get classFontName(): RequiredPluginOptionsType["classFontName"] {
+    public get classFontName(): RequiredPluginConfig["classFontName"] {
         return this.userValues?.classFontName ?? this.defaultValues.classFontName;
     }
 
@@ -279,7 +279,7 @@ export class PluginOptions {
      *          The value 0 if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    public get classFontSize(): RequiredPluginOptionsType["classFontSize"] {
+    public get classFontSize(): RequiredPluginConfig["classFontSize"] {
         return this.userValues?.classFontSize ?? this.defaultValues.classFontSize;
     }
 
@@ -287,7 +287,7 @@ export class PluginOptions {
      * Returns the font style that should be used for the class name in the class diagrams.
      * @returns The font style that should be used for the class name in the class diagrams.
      */
-    public get classFontStyle(): RequiredPluginOptionsType["classFontStyle"] {
+    public get classFontStyle(): RequiredPluginConfig["classFontStyle"] {
         return this.userValues?.classFontStyle ?? this.defaultValues.classFontStyle;
     }
 
@@ -297,7 +297,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    public get classFontColor(): RequiredPluginOptionsType["classFontColor"] {
+    public get classFontColor(): RequiredPluginConfig["classFontColor"] {
         return this.userValues?.classFontColor ?? this.defaultValues.classFontColor;
     }
 
@@ -307,7 +307,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    public get attributeFontName(): RequiredPluginOptionsType["attributeFontName"] {
+    public get attributeFontName(): RequiredPluginConfig["attributeFontName"] {
         return this.userValues?.attributeFontName ?? this.defaultValues.attributeFontName;
     }
 
@@ -317,7 +317,7 @@ export class PluginOptions {
      *          The value 0 if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    public get attributeFontSize(): RequiredPluginOptionsType["attributeFontSize"] {
+    public get attributeFontSize(): RequiredPluginConfig["attributeFontSize"] {
         return this.userValues?.attributeFontSize ?? this.defaultValues.attributeFontSize;
     }
 
@@ -325,7 +325,7 @@ export class PluginOptions {
      * Returns the font style that should be used for the class attributes in the class diagrams.
      * @returns The font style that should be used for the class attributes in the class diagrams.
      */
-    public get attributeFontStyle(): RequiredPluginOptionsType["attributeFontStyle"] {
+    public get attributeFontStyle(): RequiredPluginConfig["attributeFontStyle"] {
         return this.userValues?.attributeFontStyle ?? this.defaultValues.attributeFontStyle;
     }
 
@@ -335,7 +335,7 @@ export class PluginOptions {
      *          An empty string if no value was specified by the caller.
      *          In this case the PlantUML default value should be used.
      */
-    public get attributeFontColor(): RequiredPluginOptionsType["attributeFontColor"] {
+    public get attributeFontColor(): RequiredPluginConfig["attributeFontColor"] {
         return this.userValues?.attributeFontColor ?? this.defaultValues.attributeFontColor;
     }
 
@@ -343,7 +343,7 @@ export class PluginOptions {
      * Returns the number of PlantUML processes that should be used for generating the class diagrams.
      * @returns The number of PlantUML processes that should be used for generating the class diagrams.
      */
-    public get generatorProcessCount(): RequiredPluginOptionsType["generatorProcessCount"] {
+    public get generatorProcessCount(): RequiredPluginConfig["generatorProcessCount"] {
         const processCount = this.userValues?.generatorProcessCount ?? -1;
         return processCount <= 0 ? this.defaultValues.generatorProcessCount : processCount;
     }
@@ -352,7 +352,7 @@ export class PluginOptions {
      * Returns whether to hide the progress bar while generating the class diagrams.
      * @returns True, if the progress bar should not be displayed while generating the class diagrams, otherwise false.
      */
-    public get hideProgressBar(): RequiredPluginOptionsType["hideProgressBar"] {
+    public get hideProgressBar(): RequiredPluginConfig["hideProgressBar"] {
         return this.userValues?.hideProgressBar ?? this.defaultValues.hideProgressBar;
     }
 
@@ -360,7 +360,7 @@ export class PluginOptions {
      * Returns whether to create files containing the PlantUML code for the class diagrams.
      * @returns True, if files with the PlantUML code should be created, otherwise false.
      */
-    public get createPlantUmlFiles(): RequiredPluginOptionsType["createPlantUmlFiles"] {
+    public get createPlantUmlFiles(): RequiredPluginConfig["createPlantUmlFiles"] {
         return this.userValues?.createPlantUmlFiles ?? this.defaultValues.createPlantUmlFiles;
     }
 
@@ -368,7 +368,7 @@ export class PluginOptions {
      * Returns whether the plugin should output verbose info during its work.
      * @returns True, if plugin should create verbose output, otherwise false.
      */
-    public get createVerboseOutput(): RequiredPluginOptionsType["verboseOutput"] {
+    public get createVerboseOutput(): RequiredPluginConfig["verboseOutput"] {
         return this.userValues?.verboseOutput ?? this.defaultValues.verboseOutput;
     }
 

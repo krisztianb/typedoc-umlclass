@@ -12,8 +12,9 @@
     "parserOptions": {
         "ecmaVersion": 2021,
         "sourceType": "module",
-        "project": "tsconfig.json"
+        "project": ".eslint.tsconfig.json"
     },
+    "ignorePatterns": ["test/**/input", "test/**/output"],
     "plugins": ["@typescript-eslint", "ordered-imports", "unicorn", "jsdoc"],
     "rules": {
         // Possible errors
@@ -240,13 +241,12 @@
             }
         ],
         "@typescript-eslint/no-confusing-non-null-assertion": ["error"],
-        "@typescript-eslint/no-implicit-any-catch": ["error"],
         "@typescript-eslint/no-invalid-void-type": ["error"],
-        "@typescript-eslint/no-parameter-properties": ["error"],
         "@typescript-eslint/no-unnecessary-boolean-literal-compare": ["error"],
         "@typescript-eslint/no-unnecessary-condition": ["error"],
         "@typescript-eslint/no-unnecessary-qualifier": ["error"],
         "@typescript-eslint/no-unnecessary-type-arguments": ["error"],
+        "@typescript-eslint/parameter-properties": ["error"],
         "@typescript-eslint/prefer-enum-initializers": ["error"],
         "@typescript-eslint/prefer-for-of": ["error"],
         "@typescript-eslint/prefer-literal-enum-member": ["error"],
