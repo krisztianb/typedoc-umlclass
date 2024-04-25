@@ -116,6 +116,10 @@
                 "format": ["PascalCase"]
             },
             {
+                "selector": "import",
+                "format": ["camelCase", "PascalCase"]
+            },
+            {
                 "selector": "enumMember",
                 "format": ["PascalCase"]
             }
@@ -270,8 +274,6 @@
         "ordered-imports/ordered-imports": [
             "error",
             {
-                "symbols-first": false,
-                "declaration-ordering": ["source", "case-insensitive"],
                 "specifier-ordering": "case-insensitive"
             }
         ],
