@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2024-04-25
+### Fixed
+- Plugin was not inserting diagrams into the documentation when using TypeDoc version 0.25.5 or above.
+### Changes
+- Updated dependencies
+
 ## [0.8.0] - 2023-09-17
 ### BREAKING CHANGES
 - Removed support for TypeDoc versions 0.23.x due to a change in TypeDoc's handling of asynchronous tasks.
@@ -128,7 +134,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.8.1
 [0.8.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.8.0
 [0.7.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.7.1
 [0.7.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.7.0
