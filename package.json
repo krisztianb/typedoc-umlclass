@@ -14,25 +14,25 @@
     ],
     "dependencies": {
         "plantuml-encoder": "^1.4.0",
-        "plantuml-pipe": "^1.5.0",
+        "plantuml-pipe": "^1.6.0",
         "progress": "^2.0.3",
         "queue-fifo": "^0.2.6"
     },
     "devDependencies": {
-        "@types/node": "18.16.17",
-        "@types/plantuml-encoder": "1.4.0",
-        "@types/progress": "2.0.5",
-        "@typescript-eslint/eslint-plugin": "6.7.0",
-        "@typescript-eslint/parser": "6.7.0",
-        "cypress": "13.1.0",
-        "eslint": "8.49.0",
-        "eslint-plugin-jsdoc": "46.8.1",
+        "@types/node": "20.12.7",
+        "@types/plantuml-encoder": "1.4.2",
+        "@types/progress": "2.0.7",
+        "@typescript-eslint/eslint-plugin": "7.7.1",
+        "@typescript-eslint/parser": "7.7.1",
+        "cypress": "13.8.1",
+        "eslint": "8.57.0",
+        "eslint-plugin-jsdoc": "48.2.3",
         "eslint-plugin-ordered-imports": "0.6.0",
-        "eslint-plugin-unicorn": "48.0.1",
-        "prettier": "3.0.3",
-        "rimraf": "5.0.1",
-        "typedoc": "0.25.1",
-        "typescript": "5.2.2"
+        "eslint-plugin-unicorn": "52.0.0",
+        "prettier": "3.2.5",
+        "rimraf": "5.0.5",
+        "typedoc": "0.25.13",
+        "typescript": "5.4.5"
     },
     "peerDependencies": {
         "typedoc": "0.24.x || 0.25.x"
