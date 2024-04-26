@@ -13,6 +13,7 @@
         "typedocplugin"
     ],
     "dependencies": {
+        "decorator-cache-getter": "^1.0.0",
         "plantuml-encoder": "^1.4.0",
         "plantuml-pipe": "^1.6.0",
         "progress": "^2.0.3",
