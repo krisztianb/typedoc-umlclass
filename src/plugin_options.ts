@@ -1,6 +1,20 @@
 import * as os from "os";
 import { Application, ParameterType } from "typedoc";
 
+/** Type for specifying the style of a text. */
+type TextStyle = {
+    font?: {
+        family?: string;
+        size?: number;
+        bold?: boolean;
+        italic?: boolean;
+        underline?: boolean;
+        strikeout?: boolean;
+    };
+    color?: string;
+    backgroundColor?: string;
+};
+
 /**
  * Type defining all options and their possible values of the plugin.
  */
@@ -14,25 +28,44 @@ export type PluginConfig = {
     legendType?: "none" | "only-included" | "full";
     methodParameterOutput?: "none" | "only-names" | "only-types" | "complete";
     memberOrder?: "abc" | "public-to-private" | "private-to-public";
-    hideEmptyMembers?: boolean;
     topDownLayoutMaxSiblings?: number;
     visibilityStyle?: "text" | "icon";
+    hideEmptyMembers?: boolean;
     hideCircledChar?: boolean;
     hideShadow?: boolean;
-    backgroundColor?: string;
-    boxBackgroundColor?: string;
-    boxBorderColor?: string;
-    boxBorderRadius?: number;
-    boxBorderWidth?: number;
-    arrowColor?: string;
-    classFontName?: string;
-    classFontSize?: number;
-    classFontStyle?: "normal" | "plain" | "italic" | "bold";
-    classFontColor?: string;
-    attributeFontName?: string;
-    attributeFontSize?: number;
-    attributeFontStyle?: "normal" | "plain" | "italic" | "bold";
-    attributeFontColor?: string;
+    style?: {
+        backgroundColor?: string;
+        box?: {
+            backgroundColor?: string;
+            border?: {
+                width?: number;
+                color?: string;
+                radius?: number;
+            };
+        };
+        arrow?: {
+            color?: string;
+        };
+        text?: TextStyle;
+        class?: {
+            name?: TextStyle;
+        };
+        interface?: {
+            name?: TextStyle;
+        };
+        property?: {
+            name?: TextStyle;
+            type?: TextStyle;
+        };
+        method?: {
+            name?: TextStyle;
+            parameter?: {
+                name?: TextStyle;
+                type?: TextStyle;
+            };
+            returnType?: TextStyle;
+        };
+    };
     generatorProcessCount?: number;
     hideProgressBar?: boolean;
     createPlantUmlFiles?: boolean;
