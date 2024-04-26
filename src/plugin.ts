@@ -402,7 +402,9 @@ export class Plugin {
             legend.hideTypeIcons();
         }
 
-        if (this.options.attributeFontStyle === "italic") {
+        if (this.options.isAnythingStyledItalic) {
+            // PlantUML uses an italic font for abstract members. If the user specified an italic font for anything
+            // then this is no longer reasonable and we hide this entry in the legend to avoid confusion.
             legend.hideAbstractMemberItem();
         }
 

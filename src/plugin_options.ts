@@ -455,6 +455,24 @@ export class PluginOptions {
     }
 
     /**
+     * Returns whether any text should be styled with an italic font.
+     * @returns True if anything should be styled with an italic font, otherwise false.
+     */
+    @cache
+    public get isAnythingStyledItalic(): boolean {
+        return (
+            (this.userValues?.style?.text?.font?.italic ?? false) ||
+            (this.class?.name?.font?.italic ?? false) ||
+            (this.interface?.name?.font?.italic ?? false) ||
+            (this.property?.name?.font?.italic ?? false) ||
+            (this.property?.type?.font?.italic ?? false) ||
+            (this.method?.name?.font?.italic ?? false) ||
+            (this.method?.parameter?.name?.font?.italic ?? false) ||
+            (this.method?.parameter?.type?.font?.italic ?? false) ||
+            (this.method?.returnType?.font?.italic ?? false)
+        );
+    }
+    /**
      * Adds the command line options of the plugin to the TypeDoc application.
      * @param typedoc The TypeDoc application.
      */
