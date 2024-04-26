@@ -28,25 +28,81 @@ export type PlantUmlCodeGeneratorOptions = {
     type: "none" | "simple" | "detailed";
     methodParameterOutput: "none" | "only-names" | "only-types" | "complete";
     memberOrder: "abc" | "public-to-private" | "private-to-public";
-    hideEmptyMembers: boolean;
     topDownLayoutMaxSiblings: number;
     visibilityStyle: "text" | "icon";
+    hideEmptyMembers: boolean;
     hideCircledChar: boolean;
     hideShadow: boolean;
-    backgroundColor: string;
+    diagramBackgroundColor: string;
     boxBackgroundColor: string;
+    boxBorderWidth: number;
     boxBorderColor: string;
     boxBorderRadius: number;
-    boxBorderWidth: number;
     arrowColor: string;
-    classFontName: string;
-    classFontSize: number;
-    classFontStyle: "normal" | "plain" | "italic" | "bold";
-    classFontColor: string;
-    attributeFontName: string;
-    attributeFontSize: number;
-    attributeFontStyle: "normal" | "plain" | "italic" | "bold";
-    attributeFontColor: string;
+    classNameFontFamily: string;
+    classNameFontSize: number;
+    classNameFontIsBold: boolean;
+    classNameFontIsItalic: boolean;
+    classNameFontIsUnderline: boolean;
+    classNameFontIsStrikeOut: boolean;
+    classNameColor: string;
+    classNamebackgroundColor: string;
+    interfaceNameFontFamily: string;
+    interfaceNameFontSize: number;
+    interfaceNameFontIsBold: boolean;
+    interfaceNameFontIsItalic: boolean;
+    interfaceNameFontIsUnderline: boolean;
+    interfaceNameFontIsStrikeOut: boolean;
+    interfaceNameColor: string;
+    interfaceNamebackgroundColor: string;
+    propertyNameFontFamily: string;
+    propertyNameFontSize: number;
+    propertyNameFontIsBold: boolean;
+    propertyNameFontIsItalic: boolean;
+    propertyNameFontIsUnderline: boolean;
+    propertyNameFontIsStrikeOut: boolean;
+    propertyNameColor: string;
+    propertyNamebackgroundColor: string;
+    propertyTypeFontFamily: string;
+    propertyTypeFontSize: number;
+    propertyTypeFontIsBold: boolean;
+    propertyTypeFontIsItalic: boolean;
+    propertyTypeFontIsUnderline: boolean;
+    propertyTypeFontIsStrikeOut: boolean;
+    propertyTypeColor: string;
+    propertyTypebackgroundColor: string;
+    methodNameFontFamily: string;
+    methodNameFontSize: number;
+    methodNameFontIsBold: boolean;
+    methodNameFontIsItalic: boolean;
+    methodNameFontIsUnderline: boolean;
+    methodNameFontIsStrikeOut: boolean;
+    methodNameColor: string;
+    methodNamebackgroundColor: string;
+    methodParameterNameFontFamily: string;
+    methodParameterNameFontSize: number;
+    methodParameterNameFontIsBold: boolean;
+    methodParameterNameFontIsItalic: boolean;
+    methodParameterNameFontIsUnderline: boolean;
+    methodParameterNameFontIsStrikeOut: boolean;
+    methodParameterNameColor: string;
+    methodParameterNamebackgroundColor: string;
+    methodParameterTypeFontFamily: string;
+    methodParameterTypeFontSize: number;
+    methodParameterTypeFontIsBold: boolean;
+    methodParameterTypeFontIsItalic: boolean;
+    methodParameterTypeFontIsUnderline: boolean;
+    methodParameterTypeFontIsStrikeOut: boolean;
+    methodParameterTypeColor: string;
+    methodParameterTypebackgroundColor: string;
+    methodReturnTypeFontFamily: string;
+    methodReturnTypeFontSize: number;
+    methodReturnTypeFontIsBold: boolean;
+    methodReturnTypeFontIsItalic: boolean;
+    methodReturnTypeFontIsUnderline: boolean;
+    methodReturnTypeFontIsStrikeOut: boolean;
+    methodReturnTypeColor: string;
+    methodReturnTypebackgroundColor: string;
 };
 
 /**
@@ -178,8 +234,8 @@ export class PlantUmlCodeGenerator {
             plantUmlLines.unshift("skinparam Shadowing false");
         }
 
-        if (this.options.backgroundColor) {
-            plantUmlLines.unshift("skinparam BackgroundColor " + this.options.backgroundColor);
+        if (this.options.diagramBackgroundColor) {
+            plantUmlLines.unshift("skinparam BackgroundColor " + this.options.diagramBackgroundColor);
         }
 
         if (this.options.boxBackgroundColor) {
@@ -200,38 +256,6 @@ export class PlantUmlCodeGenerator {
 
         if (this.options.arrowColor) {
             plantUmlLines.unshift("skinparam ClassArrowColor " + this.options.arrowColor);
-        }
-
-        if (this.options.classFontName) {
-            plantUmlLines.unshift("skinparam ClassFontName " + this.options.classFontName);
-        }
-
-        if (this.options.classFontSize) {
-            plantUmlLines.unshift(`skinparam ClassFontSize ${this.options.classFontSize}`);
-        }
-
-        if (this.options.classFontStyle !== "normal") {
-            plantUmlLines.unshift("skinparam ClassFontStyle " + this.options.classFontStyle);
-        }
-
-        if (this.options.classFontColor) {
-            plantUmlLines.unshift("skinparam ClassFontColor " + this.options.classFontColor);
-        }
-
-        if (this.options.attributeFontName) {
-            plantUmlLines.unshift("skinparam ClassAttributeFontName " + this.options.attributeFontName);
-        }
-
-        if (this.options.attributeFontSize) {
-            plantUmlLines.unshift(`skinparam ClassAttributeFontSize ${this.options.attributeFontSize}`);
-        }
-
-        if (this.options.attributeFontStyle !== "normal") {
-            plantUmlLines.unshift("skinparam ClassAttributeFontStyle " + this.options.attributeFontStyle);
-        }
-
-        if (this.options.attributeFontColor) {
-            plantUmlLines.unshift("skinparam ClassAttributeFontColor " + this.options.attributeFontColor);
         }
 
         return ["@startuml", ...plantUmlLines, "@enduml"];

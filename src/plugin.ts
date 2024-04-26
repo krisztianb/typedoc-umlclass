@@ -15,7 +15,7 @@ import { createDiagramLegendForPlantUml, DiagramLegend } from "./diagram_legend"
 import { createEmbeddedImageUrl, createLocalImageFileUrl, createRemoteImageUrl } from "./image_url_generator";
 import { Logger } from "./logger";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
-import { PlantUmlCodeGenerator } from "./plantuml/plantuml_code_generator";
+import { PlantUmlCodeGenerator, PlantUmlCodeGeneratorOptions } from "./plantuml/plantuml_code_generator";
 import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator";
 import { PluginOptions } from "./plugin_options";
 import { PageProcessor } from "./typedoc/page_processor";
@@ -139,7 +139,9 @@ export class Plugin {
             this.log?.info("The result is: " + this.numberOfDiagramsToGenerate.toString());
 
             if (this.hasWork) {
-                this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
+                this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(
+                    this.createPlantUmlCodeGeneratorOptions(),
+                );
 
                 if (this.isGeneratingImages) {
                     this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
@@ -238,6 +240,93 @@ export class Plugin {
         this.typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => this.onRendererBegin(e));
         this.typedoc.renderer.on(PageEvent.END, (e: PageEvent) => this.onRendererEndPage(e));
         this.typedoc.renderer.on(RendererEvent.END, (e: RendererEvent) => this.onRendererEnd(e));
+    }
+
+    /**
+     * Creates the PlantUML code generator options using the current plugin options.
+     * @returns The options for the PlantUML code generator.
+     */
+    private createPlantUmlCodeGeneratorOptions(): PlantUmlCodeGeneratorOptions {
+        return {
+            type: this.options.type,
+            methodParameterOutput: this.options.methodParameterOutput,
+            memberOrder: this.options.memberOrder,
+            topDownLayoutMaxSiblings: this.options.topDownLayoutMaxSiblings,
+            visibilityStyle: this.options.visibilityStyle,
+            hideEmptyMembers: this.options.hideEmptyMembers,
+            hideCircledChar: this.options.hideCircledChar,
+            hideShadow: this.options.hideShadow,
+            diagramBackgroundColor: this.options.backgroundColor,
+            boxBackgroundColor: this.options.box.backgroundColor,
+            boxBorderWidth: this.options.box.border.width,
+            boxBorderColor: this.options.box.border.color,
+            boxBorderRadius: this.options.box.border.radius,
+            arrowColor: this.options.arrow.color,
+            classNameFontFamily: this.options.class.name.font.family,
+            classNameFontSize: this.options.class.name.font.size,
+            classNameFontIsBold: this.options.class.name.font.bold,
+            classNameFontIsItalic: this.options.class.name.font.italic,
+            classNameFontIsUnderline: this.options.class.name.font.underline,
+            classNameFontIsStrikeOut: this.options.class.name.font.strikeout,
+            classNameColor: this.options.class.name.color,
+            classNamebackgroundColor: this.options.class.name.backgroundColor,
+            interfaceNameFontFamily: this.options.interface.name.font.family,
+            interfaceNameFontSize: this.options.interface.name.font.size,
+            interfaceNameFontIsBold: this.options.interface.name.font.bold,
+            interfaceNameFontIsItalic: this.options.interface.name.font.italic,
+            interfaceNameFontIsUnderline: this.options.interface.name.font.underline,
+            interfaceNameFontIsStrikeOut: this.options.interface.name.font.strikeout,
+            interfaceNameColor: this.options.interface.name.color,
+            interfaceNamebackgroundColor: this.options.interface.name.backgroundColor,
+            propertyNameFontFamily: this.options.property.name.font.family,
+            propertyNameFontSize: this.options.property.name.font.size,
+            propertyNameFontIsBold: this.options.property.name.font.bold,
+            propertyNameFontIsItalic: this.options.property.name.font.italic,
+            propertyNameFontIsUnderline: this.options.property.name.font.underline,
+            propertyNameFontIsStrikeOut: this.options.property.name.font.strikeout,
+            propertyNameColor: this.options.property.name.color,
+            propertyNamebackgroundColor: this.options.property.name.backgroundColor,
+            propertyTypeFontFamily: this.options.property.type.font.family,
+            propertyTypeFontSize: this.options.property.type.font.size,
+            propertyTypeFontIsBold: this.options.property.type.font.bold,
+            propertyTypeFontIsItalic: this.options.property.type.font.italic,
+            propertyTypeFontIsUnderline: this.options.property.type.font.underline,
+            propertyTypeFontIsStrikeOut: this.options.property.type.font.strikeout,
+            propertyTypeColor: this.options.property.type.color,
+            propertyTypebackgroundColor: this.options.property.type.backgroundColor,
+            methodNameFontFamily: this.options.method.name.font.family,
+            methodNameFontSize: this.options.method.name.font.size,
+            methodNameFontIsBold: this.options.method.name.font.bold,
+            methodNameFontIsItalic: this.options.method.name.font.italic,
+            methodNameFontIsUnderline: this.options.method.name.font.underline,
+            methodNameFontIsStrikeOut: this.options.method.name.font.strikeout,
+            methodNameColor: this.options.method.name.color,
+            methodNamebackgroundColor: this.options.method.name.backgroundColor,
+            methodParameterNameFontFamily: this.options.method.parameter.name.font.family,
+            methodParameterNameFontSize: this.options.method.parameter.name.font.size,
+            methodParameterNameFontIsBold: this.options.method.parameter.name.font.bold,
+            methodParameterNameFontIsItalic: this.options.method.parameter.name.font.italic,
+            methodParameterNameFontIsUnderline: this.options.method.parameter.name.font.underline,
+            methodParameterNameFontIsStrikeOut: this.options.method.parameter.name.font.strikeout,
+            methodParameterNameColor: this.options.method.parameter.name.color,
+            methodParameterNamebackgroundColor: this.options.method.parameter.name.backgroundColor,
+            methodParameterTypeFontFamily: this.options.method.parameter.type.font.family,
+            methodParameterTypeFontSize: this.options.method.parameter.type.font.size,
+            methodParameterTypeFontIsBold: this.options.method.parameter.type.font.bold,
+            methodParameterTypeFontIsItalic: this.options.method.parameter.type.font.italic,
+            methodParameterTypeFontIsUnderline: this.options.method.parameter.type.font.underline,
+            methodParameterTypeFontIsStrikeOut: this.options.method.parameter.type.font.strikeout,
+            methodParameterTypeColor: this.options.method.parameter.type.color,
+            methodParameterTypebackgroundColor: this.options.method.parameter.type.backgroundColor,
+            methodReturnTypeFontFamily: this.options.method.returnType.font.family,
+            methodReturnTypeFontSize: this.options.method.returnType.font.size,
+            methodReturnTypeFontIsBold: this.options.method.returnType.font.bold,
+            methodReturnTypeFontIsItalic: this.options.method.returnType.font.italic,
+            methodReturnTypeFontIsUnderline: this.options.method.returnType.font.underline,
+            methodReturnTypeFontIsStrikeOut: this.options.method.returnType.font.strikeout,
+            methodReturnTypeColor: this.options.method.returnType.color,
+            methodReturnTypebackgroundColor: this.options.method.returnType.backgroundColor,
+        };
     }
 
     /**

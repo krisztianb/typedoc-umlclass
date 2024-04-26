@@ -2,6 +2,9 @@ import { cache } from "decorator-cache-getter";
 import * as os from "os";
 import { Application, ParameterType } from "typedoc";
 
+// Custom utility type for nested required. Taken from: https://stackoverflow.com/a/67833840
+type DeepRequired<T> = { [K in keyof T]: DeepRequired<T[K]> } & Required<T>;
+
 /** Type for specifying the style of a text. */
 type TextStyle = {
     font?: {
@@ -74,7 +77,7 @@ export type PluginConfig = {
 };
 
 /** Plugin options type without nullables. */
-type RequiredPluginConfig = Required<PluginConfig>;
+type RequiredPluginConfig = DeepRequired<PluginConfig>;
 
 /**
  * Extend typedoc's options with the plugin's option using declaration merging.
@@ -462,14 +465,14 @@ export class PluginOptions {
     public get isAnythingStyledItalic(): boolean {
         return (
             (this.userValues?.style?.text?.font?.italic ?? false) ||
-            (this.class?.name?.font?.italic ?? false) ||
-            (this.interface?.name?.font?.italic ?? false) ||
-            (this.property?.name?.font?.italic ?? false) ||
-            (this.property?.type?.font?.italic ?? false) ||
-            (this.method?.name?.font?.italic ?? false) ||
-            (this.method?.parameter?.name?.font?.italic ?? false) ||
-            (this.method?.parameter?.type?.font?.italic ?? false) ||
-            (this.method?.returnType?.font?.italic ?? false)
+            this.class.name.font.italic ||
+            this.interface.name.font.italic ||
+            this.property.name.font.italic ||
+            this.property.type.font.italic ||
+            this.method.name.font.italic ||
+            this.method.parameter.name.font.italic ||
+            this.method.parameter.type.font.italic ||
+            this.method.returnType.font.italic
         );
     }
     /**
