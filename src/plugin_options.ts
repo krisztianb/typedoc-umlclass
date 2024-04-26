@@ -92,57 +92,6 @@ export class PluginOptions {
     /** Plugin option values as provided by the user. */
     private userValues: PluginConfig | undefined;
 
-    // /** Plugin option default values. */
-    // private readonly defaultValues: RequiredPluginConfig = {
-
-    //     style?: {
-
-    //         arrow: {
-    //             color: "",
-    //         },
-    //         text: {
-    //             font?: {
-    //                 family?: string;
-    //                 size?: number;
-    //                 bold?: boolean;
-    //                 italic?: boolean;
-    //                 underline?: boolean;
-    //                 strikeout?: boolean;
-    //             };
-    //             color?: string;
-    //             backgroundColor?: string;
-    //         };
-    //         class?: {
-    //             name?: TextStyle;
-    //         };
-    //         interface?: {
-    //             name?: TextStyle;
-    //         };
-    //         property?: {
-    //             name?: TextStyle;
-    //             type?: TextStyle;
-    //         };
-    //         method?: {
-    //             name?: TextStyle;
-    //             parameter?: {
-    //                 name?: TextStyle;
-    //                 type?: TextStyle;
-    //             };
-    //             returnType?: TextStyle;
-    //         };
-
-    //     };
-
-    //     classFontName: "",
-    //     classFontSize: 0,
-    //     classFontStyle: "normal",
-    //     classFontColor: "",
-    //     attributeFontName: "",
-    //     attributeFontSize: 0,
-    //     attributeFontStyle: "normal",
-    //     attributeFontColor: "",
-    // };
-
     /**
      * Returns how detailed the generated class diagrams should be.
      * @returns How detailed the generated class diagrams should be.
@@ -291,8 +240,8 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the style that should be used for the class names in the class diagrams.
-     * @returns The style that should be used for the class names in the class diagrams.
+     * Returns the style that should be used for classes in the class diagrams.
+     * @returns The style that should be used for classes in the class diagrams.
      */
     public get class(): RequiredPluginConfig["style"]["class"] {
         const userTextStyle = this.userValues?.style?.text;
@@ -314,41 +263,136 @@ export class PluginOptions {
     }
 
     /**
-     * Returns the name of the font that should be used for class attributes in the class diagrams.
-     * @returns The name of the font that should be used for class attributes in the class diagrams.
-     *          An empty string if no value was specified by the caller.
-     *          In this case the PlantUML default value should be used.
+     * Returns the style that should be used for interfaces in the class diagrams.
+     * @returns The style that should be used for interfaces in the class diagrams.
      */
-    public get attributeFontName(): RequiredPluginConfig["attributeFontName"] {
-        return this.userValues?.attributeFontName ?? this.defaultValues.attributeFontName;
+    public get interface(): RequiredPluginConfig["style"]["interface"] {
+        const userTextStyle = this.userValues?.style?.text;
+        const userInterfaceStyle = this.userValues?.style?.interface;
+        return {
+            name: {
+                font: {
+                    family: userInterfaceStyle?.name?.font?.family ?? userTextStyle?.font?.family ?? "",
+                    size: userInterfaceStyle?.name?.font?.size ?? userTextStyle?.font?.size ?? 0,
+                    bold: userInterfaceStyle?.name?.font?.bold ?? userTextStyle?.font?.bold ?? false,
+                    italic: userInterfaceStyle?.name?.font?.italic ?? userTextStyle?.font?.italic ?? false,
+                    underline: userInterfaceStyle?.name?.font?.underline ?? userTextStyle?.font?.underline ?? false,
+                    strikeout: userInterfaceStyle?.name?.font?.strikeout ?? userTextStyle?.font?.strikeout ?? false,
+                },
+                color: userInterfaceStyle?.name?.color ?? userTextStyle?.color ?? "",
+                backgroundColor: userInterfaceStyle?.name?.backgroundColor ?? userTextStyle?.backgroundColor ?? "",
+            },
+        };
     }
 
     /**
-     * Returns the font size that should be used for class attributes in the class diagrams.
-     * @returns The font size that should be used for class attributes in the class diagrams.
-     *          The value 0 if no value was specified by the caller.
-     *          In this case the PlantUML default value should be used.
+     * Returns the style that should be used for properties in the class diagrams.
+     * @returns The style that should be used for properties in the class diagrams.
      */
-    public get attributeFontSize(): RequiredPluginConfig["attributeFontSize"] {
-        return this.userValues?.attributeFontSize ?? this.defaultValues.attributeFontSize;
+    public get property(): RequiredPluginConfig["style"]["property"] {
+        const userTextStyle = this.userValues?.style?.text;
+        const userPropertyStyle = this.userValues?.style?.property;
+        return {
+            name: {
+                font: {
+                    family: userPropertyStyle?.name?.font?.family ?? userTextStyle?.font?.family ?? "",
+                    size: userPropertyStyle?.name?.font?.size ?? userTextStyle?.font?.size ?? 0,
+                    bold: userPropertyStyle?.name?.font?.bold ?? userTextStyle?.font?.bold ?? false,
+                    italic: userPropertyStyle?.name?.font?.italic ?? userTextStyle?.font?.italic ?? false,
+                    underline: userPropertyStyle?.name?.font?.underline ?? userTextStyle?.font?.underline ?? false,
+                    strikeout: userPropertyStyle?.name?.font?.strikeout ?? userTextStyle?.font?.strikeout ?? false,
+                },
+                color: userPropertyStyle?.name?.color ?? userTextStyle?.color ?? "",
+                backgroundColor: userPropertyStyle?.name?.backgroundColor ?? userTextStyle?.backgroundColor ?? "",
+            },
+            type: {
+                font: {
+                    family: userPropertyStyle?.type?.font?.family ?? userTextStyle?.font?.family ?? "",
+                    size: userPropertyStyle?.type?.font?.size ?? userTextStyle?.font?.size ?? 0,
+                    bold: userPropertyStyle?.type?.font?.bold ?? userTextStyle?.font?.bold ?? false,
+                    italic: userPropertyStyle?.type?.font?.italic ?? userTextStyle?.font?.italic ?? false,
+                    underline: userPropertyStyle?.type?.font?.underline ?? userTextStyle?.font?.underline ?? false,
+                    strikeout: userPropertyStyle?.type?.font?.strikeout ?? userTextStyle?.font?.strikeout ?? false,
+                },
+                color: userPropertyStyle?.type?.color ?? userTextStyle?.color ?? "",
+                backgroundColor: userPropertyStyle?.type?.backgroundColor ?? userTextStyle?.backgroundColor ?? "",
+            },
+        };
     }
 
     /**
-     * Returns the font style that should be used for the class attributes in the class diagrams.
-     * @returns The font style that should be used for the class attributes in the class diagrams.
+     * Returns the style that should be used for properties in the class diagrams.
+     * @returns The style that should be used for properties in the class diagrams.
      */
-    public get attributeFontStyle(): RequiredPluginConfig["attributeFontStyle"] {
-        return this.userValues?.attributeFontStyle ?? this.defaultValues.attributeFontStyle;
-    }
-
-    /**
-     * Returns the font color that should be used for the class attributes in the class diagrams.
-     * @returns The font color that should be used for the class attributes in the class diagrams.
-     *          An empty string if no value was specified by the caller.
-     *          In this case the PlantUML default value should be used.
-     */
-    public get attributeFontColor(): RequiredPluginConfig["attributeFontColor"] {
-        return this.userValues?.attributeFontColor ?? this.defaultValues.attributeFontColor;
+    public get method(): RequiredPluginConfig["style"]["method"] {
+        const userTextStyle = this.userValues?.style?.text;
+        const userMethodStyle = this.userValues?.style?.method;
+        return {
+            name: {
+                font: {
+                    family: userMethodStyle?.name?.font?.family ?? userTextStyle?.font?.family ?? "",
+                    size: userMethodStyle?.name?.font?.size ?? userTextStyle?.font?.size ?? 0,
+                    bold: userMethodStyle?.name?.font?.bold ?? userTextStyle?.font?.bold ?? false,
+                    italic: userMethodStyle?.name?.font?.italic ?? userTextStyle?.font?.italic ?? false,
+                    underline: userMethodStyle?.name?.font?.underline ?? userTextStyle?.font?.underline ?? false,
+                    strikeout: userMethodStyle?.name?.font?.strikeout ?? userTextStyle?.font?.strikeout ?? false,
+                },
+                color: userMethodStyle?.name?.color ?? userTextStyle?.color ?? "",
+                backgroundColor: userMethodStyle?.name?.backgroundColor ?? userTextStyle?.backgroundColor ?? "",
+            },
+            parameter: {
+                name: {
+                    font: {
+                        family: userMethodStyle?.parameter?.name?.font?.family ?? userTextStyle?.font?.family ?? "",
+                        size: userMethodStyle?.parameter?.name?.font?.size ?? userTextStyle?.font?.size ?? 0,
+                        bold: userMethodStyle?.parameter?.name?.font?.bold ?? userTextStyle?.font?.bold ?? false,
+                        italic: userMethodStyle?.parameter?.name?.font?.italic ?? userTextStyle?.font?.italic ?? false,
+                        underline:
+                            userMethodStyle?.parameter?.name?.font?.underline ??
+                            userTextStyle?.font?.underline ??
+                            false,
+                        strikeout:
+                            userMethodStyle?.parameter?.name?.font?.strikeout ??
+                            userTextStyle?.font?.strikeout ??
+                            false,
+                    },
+                    color: userMethodStyle?.parameter?.name?.color ?? userTextStyle?.color ?? "",
+                    backgroundColor:
+                        userMethodStyle?.parameter?.name?.backgroundColor ?? userTextStyle?.backgroundColor ?? "",
+                },
+                type: {
+                    font: {
+                        family: userMethodStyle?.parameter?.type?.font?.family ?? userTextStyle?.font?.family ?? "",
+                        size: userMethodStyle?.parameter?.type?.font?.size ?? userTextStyle?.font?.size ?? 0,
+                        bold: userMethodStyle?.parameter?.type?.font?.bold ?? userTextStyle?.font?.bold ?? false,
+                        italic: userMethodStyle?.parameter?.type?.font?.italic ?? userTextStyle?.font?.italic ?? false,
+                        underline:
+                            userMethodStyle?.parameter?.type?.font?.underline ??
+                            userTextStyle?.font?.underline ??
+                            false,
+                        strikeout:
+                            userMethodStyle?.parameter?.type?.font?.strikeout ??
+                            userTextStyle?.font?.strikeout ??
+                            false,
+                    },
+                    color: userMethodStyle?.parameter?.type?.color ?? userTextStyle?.color ?? "",
+                    backgroundColor:
+                        userMethodStyle?.parameter?.type?.backgroundColor ?? userTextStyle?.backgroundColor ?? "",
+                },
+            },
+            returnType: {
+                font: {
+                    family: userMethodStyle?.returnType?.font?.family ?? userTextStyle?.font?.family ?? "",
+                    size: userMethodStyle?.returnType?.font?.size ?? userTextStyle?.font?.size ?? 0,
+                    bold: userMethodStyle?.returnType?.font?.bold ?? userTextStyle?.font?.bold ?? false,
+                    italic: userMethodStyle?.returnType?.font?.italic ?? userTextStyle?.font?.italic ?? false,
+                    underline: userMethodStyle?.returnType?.font?.underline ?? userTextStyle?.font?.underline ?? false,
+                    strikeout: userMethodStyle?.returnType?.font?.strikeout ?? userTextStyle?.font?.strikeout ?? false,
+                },
+                color: userMethodStyle?.returnType?.color ?? userTextStyle?.color ?? "",
+                backgroundColor: userMethodStyle?.returnType?.backgroundColor ?? userTextStyle?.backgroundColor ?? "",
+            },
+        };
     }
 
     /**
