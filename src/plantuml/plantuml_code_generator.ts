@@ -326,7 +326,7 @@ export class PlantUmlCodeGenerator {
             plantUml += "+"; // public is default for JS/TS
         }
 
-        plantUml += signature.name;
+        plantUml += PlantUmlCodeGenerator.formatText(signature.name, this.options.methodName);
 
         // Type-parameters
         const localTypeParamsMap = new Map(typeParamsMap);
@@ -347,27 +347,40 @@ export class PlantUmlCodeGenerator {
 
         if (signature.parameters) {
             if (this.options.methodParameterOutput === "only-names") {
-                plantUml += signature.parameters.map((p: Readonly<ParameterReflection>) => p.name).join(", ");
+                plantUml += signature.parameters
+                    .map((p: Readonly<ParameterReflection>) =>
+                        PlantUmlCodeGenerator.formatText(p.name, this.options.methodParameterName),
+                    )
+                    .join(", ");
             } else if (this.options.methodParameterOutput === "only-types") {
                 plantUml += signature.parameters
                     .map((p: Readonly<ParameterReflection>) =>
-                        p.type
-                            ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(p.type, localTypeParamsMap)
-                            : "unknown",
+                        PlantUmlCodeGenerator.formatText(
+                            p.type
+                                ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(
+                                      p.type,
+                                      localTypeParamsMap,
+                                  )
+                                : "unknown",
+                            this.options.methodParameterType,
+                        ),
                     )
                     .join(", ");
             } else if (this.options.methodParameterOutput === "complete") {
                 plantUml += signature.parameters
                     .map(
                         (p: Readonly<ParameterReflection>) =>
-                            p.name +
+                            PlantUmlCodeGenerator.formatText(p.name, this.options.methodParameterName) +
                             ": " +
-                            (p.type
-                                ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(
-                                      p.type,
-                                      localTypeParamsMap,
-                                  )
-                                : "unknown"),
+                            PlantUmlCodeGenerator.formatText(
+                                p.type
+                                    ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(
+                                          p.type,
+                                          localTypeParamsMap,
+                                      )
+                                    : "unknown",
+                                this.options.methodParameterType,
+                            ),
                     )
                     .join(", ");
             }
@@ -376,9 +389,14 @@ export class PlantUmlCodeGenerator {
         plantUml += ")";
 
         // Return type
-        plantUml += signature.type
-            ? " : " + PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(signature.type, localTypeParamsMap)
-            : " : void";
+        plantUml +=
+            " : " +
+            PlantUmlCodeGenerator.formatText(
+                signature.type
+                    ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(signature.type, localTypeParamsMap)
+                    : "void",
+                this.options.methodReturnType,
+            );
 
         return plantUml;
     }
