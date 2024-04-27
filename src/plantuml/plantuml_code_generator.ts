@@ -168,53 +168,10 @@ export class PlantUmlCodeGenerator {
             ++siblingsBelow;
         }
 
-        if (this.options.hideEmptyMembers) {
-            plantUmlLines.unshift("hide empty fields");
-            plantUmlLines.unshift("hide empty methods");
-        }
-
-        if (this.options.hideCircledChar) {
-            plantUmlLines.unshift("hide circle");
-        }
-
-        if (
-            siblingsAbove > this.options.topDownLayoutMaxSiblings ||
-            siblingsBelow > this.options.topDownLayoutMaxSiblings
-        ) {
-            plantUmlLines.unshift("left to right direction");
-        }
-
-        if (this.options.visibilityStyle === "text") {
-            plantUmlLines.unshift("skinparam ClassAttributeIconSize 0");
-        }
-
-        if (this.options.hideShadow) {
-            plantUmlLines.unshift("skinparam Shadowing false");
-        }
-
-        if (this.options.diagramBackgroundColor) {
-            plantUmlLines.unshift("skinparam BackgroundColor " + this.options.diagramBackgroundColor);
-        }
-
-        if (this.options.boxBackgroundColor) {
-            plantUmlLines.unshift("skinparam ClassBackgroundColor " + this.options.boxBackgroundColor);
-        }
-
-        if (this.options.boxBorderColor) {
-            plantUmlLines.unshift("skinparam ClassBorderColor " + this.options.boxBorderColor);
-        }
-
-        if (this.options.boxBorderRadius) {
-            plantUmlLines.unshift(`skinparam RoundCorner ${this.options.boxBorderRadius}`);
-        }
-
-        if (this.options.boxBorderWidth >= 0) {
-            plantUmlLines.unshift(`skinparam ClassBorderThickness ${this.options.boxBorderWidth}`);
-        }
-
-        if (this.options.arrowColor) {
-            plantUmlLines.unshift("skinparam ClassArrowColor " + this.options.arrowColor);
-        }
+        plantUmlLines.unshift(...this.getDiagramFormatCommands(siblingsAbove, siblingsBelow));
+        plantUmlLines.unshift(...this.getBoxFormatCommands());
+        plantUmlLines.unshift(...this.getClassNameFormatCommands());
+        plantUmlLines.unshift(...this.getInterfaceNameFormatCommands());
 
         return ["@startuml", ...plantUmlLines, "@enduml"];
     }
@@ -274,6 +231,125 @@ export class PlantUmlCodeGenerator {
         plantUmlLines.push("}");
 
         return plantUmlLines;
+    }
+
+    /**
+     * Returns a list of PlantUML commands to format the diagram using the current options.
+     * @param siblingsAbove The number of siblings above the element the diagram is generated for.
+     * @param siblingsBelow The number of siblings below the element the diagram is generated for.
+     * @returns The PlantUML commands to format the diagram.
+     */
+    private getDiagramFormatCommands(siblingsAbove: number, siblingsBelow: number): string[] {
+        const commands = new Array<string>();
+
+        if (this.options.hideEmptyMembers) {
+            commands.push("hide empty fields");
+            commands.push("hide empty methods");
+        }
+
+        if (this.options.hideCircledChar) {
+            commands.push("hide circle");
+        }
+
+        if (
+            siblingsAbove > this.options.topDownLayoutMaxSiblings ||
+            siblingsBelow > this.options.topDownLayoutMaxSiblings
+        ) {
+            commands.push("left to right direction");
+        }
+
+        if (this.options.visibilityStyle === "text") {
+            commands.push("skinparam ClassAttributeIconSize 0");
+        }
+
+        if (this.options.hideShadow) {
+            commands.push("skinparam Shadowing false");
+        }
+
+        if (this.options.diagramBackgroundColor) {
+            commands.push("skinparam BackgroundColor " + this.options.diagramBackgroundColor);
+        }
+
+        if (this.options.arrowColor) {
+            commands.push("skinparam ClassArrowColor " + this.options.arrowColor);
+        }
+
+        return commands;
+    }
+
+    /**
+     * Returns a list of PlantUML commands to format the boxes using the current options.
+     * @returns The PlantUML commands to format the boxes.
+     */
+    private getBoxFormatCommands(): string[] {
+        const commands = new Array<string>();
+
+        if (this.options.boxBackgroundColor) {
+            commands.push("skinparam ClassBackgroundColor " + this.options.boxBackgroundColor);
+        }
+        if (this.options.boxBorderColor) {
+            commands.push("skinparam ClassBorderColor " + this.options.boxBorderColor);
+        }
+        if (this.options.boxBorderRadius) {
+            commands.push(`skinparam RoundCorner ${this.options.boxBorderRadius}`);
+        }
+        if (this.options.boxBorderWidth >= 0) {
+            commands.push(`skinparam ClassBorderThickness ${this.options.boxBorderWidth}`);
+        }
+
+        return commands;
+    }
+
+    /**
+     * Returns a list of PlantUML commands to format the class names using the current options.
+     * @returns The PlantUML commands to format the class names.
+     */
+    private getClassNameFormatCommands(): string[] {
+        const commands = new Array<string>();
+
+        if (this.options.className.color) {
+            commands.push("skinparam ClassFontColor " + this.options.className.color);
+        }
+        if (this.options.className.font.family) {
+            commands.push("skinparam ClassFontName " + this.options.className.font.family);
+        }
+        if (this.options.className.font.bold) {
+            commands.push("skinparam ClassFontStyle bold");
+        }
+        if (this.options.className.font.italic) {
+            commands.push("skinparam ClassFontStyle italic");
+        }
+        if (this.options.className.font.size > 0) {
+            commands.push("skinparam ClassFontSize " + this.options.className.font.size);
+        }
+
+        return commands;
+    }
+
+    /**
+     * Returns a list of PlantUML commands to format the interface names using the current options.
+     * @returns The PlantUML commands to format the interface names.
+     */
+    private getInterfaceNameFormatCommands(): string[] {
+        const commands = new Array<string>();
+
+        if (this.options.interfaceName.color) {
+            commands.push("skinparam InterfaceFontColor " + this.options.interfaceName.color);
+        }
+        if (this.options.interfaceName.font.family) {
+            commands.push("skinparam InterfaceFontName " + this.options.interfaceName.font.family);
+        }
+        if (this.options.interfaceName.font.bold) {
+            commands.push("skinparam InterfaceFontStyle bold");
+        }
+        if (this.options.interfaceName.font.italic) {
+            commands.push("skinparam InterfaceFontStyle italic");
+        }
+        if (this.options.interfaceName.font.size > 0) {
+            commands.push("skinparam InterfaceFontSize " + this.options.interfaceName.font.size);
+        }
+
+        return commands;
     }
 
     /**
