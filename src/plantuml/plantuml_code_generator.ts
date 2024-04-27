@@ -21,6 +21,20 @@ import {
     getImplementedTypesForReflection,
 } from "../typedoc/typedoc_utils";
 
+/** Type for specifying the style of a text. */
+type TextStyle = {
+    font: {
+        family: string;
+        size: number;
+        bold: boolean;
+        italic: boolean;
+        underline: boolean;
+        strikeout: boolean;
+    };
+    color: string;
+    backgroundColor: string;
+};
+
 /**
  * Options for the PlantUmlGenerator.
  */
@@ -39,70 +53,14 @@ export type PlantUmlCodeGeneratorOptions = {
     boxBorderColor: string;
     boxBorderRadius: number;
     arrowColor: string;
-    classNameFontFamily: string;
-    classNameFontSize: number;
-    classNameFontIsBold: boolean;
-    classNameFontIsItalic: boolean;
-    classNameFontIsUnderline: boolean;
-    classNameFontIsStrikeOut: boolean;
-    classNameColor: string;
-    classNamebackgroundColor: string;
-    interfaceNameFontFamily: string;
-    interfaceNameFontSize: number;
-    interfaceNameFontIsBold: boolean;
-    interfaceNameFontIsItalic: boolean;
-    interfaceNameFontIsUnderline: boolean;
-    interfaceNameFontIsStrikeOut: boolean;
-    interfaceNameColor: string;
-    interfaceNamebackgroundColor: string;
-    propertyNameFontFamily: string;
-    propertyNameFontSize: number;
-    propertyNameFontIsBold: boolean;
-    propertyNameFontIsItalic: boolean;
-    propertyNameFontIsUnderline: boolean;
-    propertyNameFontIsStrikeOut: boolean;
-    propertyNameColor: string;
-    propertyNamebackgroundColor: string;
-    propertyTypeFontFamily: string;
-    propertyTypeFontSize: number;
-    propertyTypeFontIsBold: boolean;
-    propertyTypeFontIsItalic: boolean;
-    propertyTypeFontIsUnderline: boolean;
-    propertyTypeFontIsStrikeOut: boolean;
-    propertyTypeColor: string;
-    propertyTypebackgroundColor: string;
-    methodNameFontFamily: string;
-    methodNameFontSize: number;
-    methodNameFontIsBold: boolean;
-    methodNameFontIsItalic: boolean;
-    methodNameFontIsUnderline: boolean;
-    methodNameFontIsStrikeOut: boolean;
-    methodNameColor: string;
-    methodNamebackgroundColor: string;
-    methodParameterNameFontFamily: string;
-    methodParameterNameFontSize: number;
-    methodParameterNameFontIsBold: boolean;
-    methodParameterNameFontIsItalic: boolean;
-    methodParameterNameFontIsUnderline: boolean;
-    methodParameterNameFontIsStrikeOut: boolean;
-    methodParameterNameColor: string;
-    methodParameterNamebackgroundColor: string;
-    methodParameterTypeFontFamily: string;
-    methodParameterTypeFontSize: number;
-    methodParameterTypeFontIsBold: boolean;
-    methodParameterTypeFontIsItalic: boolean;
-    methodParameterTypeFontIsUnderline: boolean;
-    methodParameterTypeFontIsStrikeOut: boolean;
-    methodParameterTypeColor: string;
-    methodParameterTypebackgroundColor: string;
-    methodReturnTypeFontFamily: string;
-    methodReturnTypeFontSize: number;
-    methodReturnTypeFontIsBold: boolean;
-    methodReturnTypeFontIsItalic: boolean;
-    methodReturnTypeFontIsUnderline: boolean;
-    methodReturnTypeFontIsStrikeOut: boolean;
-    methodReturnTypeColor: string;
-    methodReturnTypebackgroundColor: string;
+    className: TextStyle;
+    interfaceName: TextStyle;
+    propertyName: TextStyle;
+    propertyType: TextStyle;
+    methodName: TextStyle;
+    methodParameterName: TextStyle;
+    methodParameterType: TextStyle;
+    methodReturnType: TextStyle;
 };
 
 /**
