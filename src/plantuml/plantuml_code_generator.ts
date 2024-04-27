@@ -307,6 +307,8 @@ export class PlantUmlCodeGenerator {
     private getClassNameFormatCommands(): string[] {
         const commands = new Array<string>();
 
+        // Here we use skinparam commands because Creole and legacy HTML formating
+        // is not supported for class names by PlantUML.
         if (this.options.className.color) {
             commands.push("skinparam ClassFontColor " + this.options.className.color);
         }
@@ -333,6 +335,8 @@ export class PlantUmlCodeGenerator {
     private getInterfaceNameFormatCommands(): string[] {
         const commands = new Array<string>();
 
+        // Here we use skinparam commands because Creole and legacy HTML formating
+        // is not supported for interface names by PlantUML.
         if (this.options.interfaceName.color) {
             commands.push("skinparam InterfaceFontColor " + this.options.interfaceName.color);
         }
@@ -686,7 +690,7 @@ export class PlantUmlCodeGenerator {
             result += `<font:"${style.font.family}">`;
         }
         if (style.font.size > 0) {
-            result += `<size:"${style.font.size}">`;
+            result += `<size:${style.font.size}>`;
         }
         if (style.font.bold) {
             result += "<b>";
