@@ -2,9 +2,10 @@
 hide empty fields
 hide empty methods
 skinparam Shadowing true
-skinparam BackgroundColor fefefe
+skinparam BackgroundColor white
 skinparam ClassBorderColor 5a0000
 skinparam ClassBorderThickness 2
+skinparam ClassBackgroundColor fcf2cc
 skinparam RoundCorner 0
 skinparam ClassFontStyle bold
 
