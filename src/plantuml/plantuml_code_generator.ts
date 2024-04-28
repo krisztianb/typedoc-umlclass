@@ -52,6 +52,7 @@ export type PlantUmlCodeGeneratorOptions = {
     boxBorderWidth: number;
     boxBorderColor: string;
     boxBorderRadius: number;
+    arrowWidth: number;
     arrowColor: string;
     className: TextStyle;
     interfaceName: TextStyle;
@@ -270,6 +271,10 @@ export class PlantUmlCodeGenerator {
 
         if (this.options.diagramBackgroundColor) {
             commands.push("skinparam BackgroundColor " + this.options.diagramBackgroundColor);
+        }
+
+        if (this.options.arrowWidth >= 0) {
+            commands.push("skinparam ClassArrowThickness " + this.options.arrowWidth);
         }
 
         if (this.options.arrowColor) {

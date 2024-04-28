@@ -261,6 +261,7 @@ export class Plugin {
             boxBorderWidth: this.options.box.border.width,
             boxBorderColor: this.options.box.border.color,
             boxBorderRadius: this.options.box.border.radius,
+            arrowWidth: this.options.arrow.width,
             arrowColor: this.options.arrow.color,
             className: this.options.class.name,
             interfaceName: this.options.interface.name,

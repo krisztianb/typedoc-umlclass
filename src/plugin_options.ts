@@ -48,6 +48,7 @@ export type PluginConfig = {
             };
         };
         arrow?: {
+            width?: number;
             color?: string;
         };
         text?: TextStyle;
@@ -256,6 +257,7 @@ export class PluginOptions {
     public get arrow(): RequiredPluginConfig["style"]["arrow"] {
         const userArrowtyle = this.userValues?.style?.arrow;
         return {
+            width: userArrowtyle?.width ?? -1,
             color: userArrowtyle?.color ?? "",
         };
     }
