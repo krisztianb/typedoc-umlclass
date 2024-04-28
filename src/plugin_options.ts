@@ -220,7 +220,7 @@ export class PluginOptions {
      */
     @cache
     public get hideShadow(): RequiredPluginConfig["hideShadow"] {
-        return this.userValues?.hideShadow ?? false;
+        return this.userValues?.hideShadow ?? true;
     }
 
     /**

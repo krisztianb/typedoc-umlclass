@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2023-04-28
+### BREAKING CHANGES
+- Removed the following options in favor of the new "style" option: backgroundColor, boxBackgroundColor, boxBorderColor, boxBorderRadius, boxBorderWidth, arrowColor, classFontName, classFontSize, classFontStyle, classFontColor, attributeFontName, attributeFontSize, attributeFontStyle and attributeFontColor
+### Added
+- New option "style" which let's you specify individual font settings for specific parts (for example: class name, property type, method return type, etc.) of the diagram
+- Option "style.arrow.width" can now be used the specify the thickness of the arrows in the class diagrams
+### Fixed
+- Default value of option "hideShadow" adjusted to PlantUML's new default value: true
+
 ## [0.8.1] - 2024-04-25
 ### Fixed
 - Plugin was not inserting diagrams into the documentation when using TypeDoc version 0.25.5 or above.
@@ -134,7 +143,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.9.0
 [0.8.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.8.1
 [0.8.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.8.0
 [0.7.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.7.1
