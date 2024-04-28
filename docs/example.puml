@@ -1,0 +1,42 @@
+@startuml
+hide empty fields
+hide empty methods
+skinparam Shadowing true
+skinparam BackgroundColor fefefe
+skinparam ClassBorderColor 5a0000
+skinparam ClassBorderThickness 2
+skinparam RoundCorner 0
+skinparam ClassFontStyle bold
+
+class Animal {
+  +eat(<color:780000>food</color>: <color:26009966>unknown</color>) : <color:26009966>void</color>
+  +sleep() : <color:26009966>void</color>
+}
+
+interface IWorker {
+  +work() : <color:26009966>void</color>
+}
+
+class Human {
+  +<b>birthDay</b> : <color:26009966>Date</color>
+  -<b>name</b> : <color:26009966>string</color>
+  +eat(<color:780000>food</color>: <color:26009966>unknown</color>) : <color:26009966>void</color>
+  +sleep() : <color:26009966>void</color>
+  +work() : <color:26009966>void</color>
+}
+
+class Zombie {
+  +<b>birthDay</b> : <color:26009966>Date</color>
+  #<b>deathDay</b> : <color:26009966>Date</color>
+  -<b>name</b> : <color:26009966>string</color>
+  +eat(<color:780000>food</color>: <color:26009966>Human</color>) : <color:26009966>void</color>
+  +sleep() : <color:26009966>void</color>
+  +work() : <color:26009966>void</color>
+}
+
+Animal <|-- Human
+
+IWorker <|.. Human
+
+Human <|-- Zombie
+@enduml
