@@ -33,7 +33,7 @@ After this step TypeDoc can be used normally and you can configure the plugin as
 The option `umlClassDiagram` is added to TypeDoc when the plugin is installed. The option is an object whose properties
 can be used to configure the plugin within your [TypeDoc config file](https://typedoc.org/guides/options/).
 
-Here is an example using a strictly-typed JavaScript config file using the style settings for the diagram above:
+Here is an example using a strictly-typed JavaScript config file with the style settings for the diagram above:
 
 ```js
 /** @type { import('typedoc').TypeDocOptionMap & import('typedoc-umlclass').Config } */
