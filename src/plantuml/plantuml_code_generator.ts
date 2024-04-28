@@ -264,6 +264,8 @@ export class PlantUmlCodeGenerator {
 
         if (this.options.hideShadow) {
             commands.push("skinparam Shadowing false");
+        } else {
+            commands.push("skinparam Shadowing true");
         }
 
         if (this.options.diagramBackgroundColor) {
@@ -290,7 +292,7 @@ export class PlantUmlCodeGenerator {
         if (this.options.boxBorderColor) {
             commands.push("skinparam ClassBorderColor " + this.options.boxBorderColor);
         }
-        if (this.options.boxBorderRadius) {
+        if (this.options.boxBorderRadius >= 0) {
             commands.push(`skinparam RoundCorner ${this.options.boxBorderRadius}`);
         }
         if (this.options.boxBorderWidth >= 0) {
