@@ -1,27 +1,28 @@
+/* eslint-disable unicorn/no-abusive-eslint-disable */
 /// <reference types="cypress" />
-import { chaiImage } from "chai-image";
-import * as fs from "fs";
-import * as path from "path";
 import { diagramSelector } from "../cypress/support/constants";
-
-chai.use(chaiImage);
 
 describe("classes/super.Super.html", () => {
     beforeEach(() => {
-        cy.visit("./local-png-images/output/classes/super.Super.html");
+        const pageUrl = "/style-options/output/classes/super.Super.html";
+
+        // remove script tags from page because they modify the HTML view
+        cy.intercept(pageUrl, (req) => {
+            req.continue((res) => {
+                const scriptTags = /<script[^<]*<\/script>/gi;
+                /* eslint-disable -- Too many errors for one line */
+                res.body = res.body.replace(scriptTags, "");
+                /* eslint-enable */
+            });
+        });
+
+        cy.visit(pageUrl);
+
+        // hide stickily positioned page header because it messes up the cypress screenshot captures
+        cy.get("header").invoke("attr", "style", "display:none;");
     });
 
-    it("has a PNG image with the expected data", () => {
-        cy.get(diagramSelector)
-            .find("img")
-            .first()
-            .then((image) => {
-                // maybe use this package: https://www.npmjs.com/package/cypress-fs
-                const newImageFileName = path.basename(image.attr("src") ?? "");
-                const newImageFile = fs.readFileSync(path.join("./output/assets/", newImageFileName));
-                const expectedImageFile = fs.readFileSync("./fixtures/Super.png");
-
-                expect(newImageFile).to.matchImage(expectedImageFile);
-            });
+    it("has an image with the expected content", () => {
+        cy.get(diagramSelector).find("img").first().compareSnapshot("Super.HierarchyDiagram");
     });
 });
