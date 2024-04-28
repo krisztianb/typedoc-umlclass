@@ -1,6 +1,6 @@
 {
     "name": "typedoc-umlclass",
-    "version": "0.8.1",
+    "version": "0.9.0",
     "description": "Plugin for TypeDoc that generates UML class diagrams",
     "author": {
         "name": "Krisztián Balla",
@@ -13,6 +13,7 @@
         "typedocplugin"
     ],
     "dependencies": {
+        "decorator-cache-getter": "^1.0.0",
         "plantuml-encoder": "^1.4.0",
         "plantuml-pipe": "^1.6.0",
         "progress": "^2.0.3",
@@ -25,6 +26,7 @@
         "@typescript-eslint/eslint-plugin": "7.7.1",
         "@typescript-eslint/parser": "7.7.1",
         "cypress": "13.8.1",
+        "cypress-visual-regression": "5.0.0",
         "eslint": "8.57.0",
         "eslint-plugin-jsdoc": "48.2.3",
         "eslint-plugin-ordered-imports": "0.6.0",

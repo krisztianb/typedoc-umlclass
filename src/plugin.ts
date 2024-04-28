@@ -15,7 +15,7 @@ import { createDiagramLegendForPlantUml, DiagramLegend } from "./diagram_legend"
 import { createEmbeddedImageUrl, createLocalImageFileUrl, createRemoteImageUrl } from "./image_url_generator";
 import { Logger } from "./logger";
 import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
-import { PlantUmlCodeGenerator } from "./plantuml/plantuml_code_generator";
+import { PlantUmlCodeGenerator, PlantUmlCodeGeneratorOptions } from "./plantuml/plantuml_code_generator";
 import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator";
 import { PluginOptions } from "./plugin_options";
 import { PageProcessor } from "./typedoc/page_processor";
@@ -139,7 +139,9 @@ export class Plugin {
             this.log?.info("The result is: " + this.numberOfDiagramsToGenerate.toString());
 
             if (this.hasWork) {
-                this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(this.options);
+                this.plantUmlCodeGenerator = new CachingPlantUmlCodeGenerator(
+                    this.createPlantUmlCodeGeneratorOptions(),
+                );
 
                 if (this.isGeneratingImages) {
                     this.plantUmlDiagramGenerator = new PlantUmlDiagramGenerator(
@@ -238,6 +240,38 @@ export class Plugin {
         this.typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => this.onRendererBegin(e));
         this.typedoc.renderer.on(PageEvent.END, (e: PageEvent) => this.onRendererEndPage(e));
         this.typedoc.renderer.on(RendererEvent.END, (e: RendererEvent) => this.onRendererEnd(e));
+    }
+
+    /**
+     * Creates the PlantUML code generator options using the current plugin options.
+     * @returns The options for the PlantUML code generator.
+     */
+    private createPlantUmlCodeGeneratorOptions(): PlantUmlCodeGeneratorOptions {
+        return {
+            type: this.options.type,
+            methodParameterOutput: this.options.methodParameterOutput,
+            memberOrder: this.options.memberOrder,
+            topDownLayoutMaxSiblings: this.options.topDownLayoutMaxSiblings,
+            visibilityStyle: this.options.visibilityStyle,
+            hideEmptyMembers: this.options.hideEmptyMembers,
+            hideCircledChar: this.options.hideCircledChar,
+            hideShadow: this.options.hideShadow,
+            diagramBackgroundColor: this.options.backgroundColor,
+            boxBackgroundColor: this.options.box.backgroundColor,
+            boxBorderWidth: this.options.box.border.width,
+            boxBorderColor: this.options.box.border.color,
+            boxBorderRadius: this.options.box.border.radius,
+            arrowWidth: this.options.arrow.width,
+            arrowColor: this.options.arrow.color,
+            className: this.options.class.name,
+            interfaceName: this.options.interface.name,
+            propertyName: this.options.property.name,
+            propertyType: this.options.property.type,
+            methodName: this.options.method.name,
+            methodParameterName: this.options.method.parameter.name,
+            methodParameterType: this.options.method.parameter.type,
+            methodReturnType: this.options.method.returnType,
+        };
     }
 
     /**
@@ -402,7 +436,9 @@ export class Plugin {
             legend.hideTypeIcons();
         }
 
-        if (this.options.attributeFontStyle === "italic") {
+        if (this.options.isAnythingStyledItalic) {
+            // PlantUML uses an italic font for abstract members. If the user specified an italic font for anything
+            // then this is no longer reasonable and we hide this entry in the legend to avoid confusion.
             legend.hideAbstractMemberItem();
         }
 

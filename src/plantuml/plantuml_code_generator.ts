@@ -21,6 +21,20 @@ import {
     getImplementedTypesForReflection,
 } from "../typedoc/typedoc_utils";
 
+/** Type for specifying the style of a text. */
+type TextStyle = {
+    font: {
+        family: string;
+        size: number;
+        bold: boolean;
+        italic: boolean;
+        underline: boolean;
+        strikeout: boolean;
+    };
+    color: string;
+    backgroundColor: string;
+};
+
 /**
  * Options for the PlantUmlGenerator.
  */
@@ -28,25 +42,26 @@ export type PlantUmlCodeGeneratorOptions = {
     type: "none" | "simple" | "detailed";
     methodParameterOutput: "none" | "only-names" | "only-types" | "complete";
     memberOrder: "abc" | "public-to-private" | "private-to-public";
-    hideEmptyMembers: boolean;
     topDownLayoutMaxSiblings: number;
     visibilityStyle: "text" | "icon";
+    hideEmptyMembers: boolean;
     hideCircledChar: boolean;
     hideShadow: boolean;
-    backgroundColor: string;
+    diagramBackgroundColor: string;
     boxBackgroundColor: string;
+    boxBorderWidth: number;
     boxBorderColor: string;
     boxBorderRadius: number;
-    boxBorderWidth: number;
+    arrowWidth: number;
     arrowColor: string;
-    classFontName: string;
-    classFontSize: number;
-    classFontStyle: "normal" | "plain" | "italic" | "bold";
-    classFontColor: string;
-    attributeFontName: string;
-    attributeFontSize: number;
-    attributeFontStyle: "normal" | "plain" | "italic" | "bold";
-    attributeFontColor: string;
+    className: TextStyle;
+    interfaceName: TextStyle;
+    propertyName: TextStyle;
+    propertyType: TextStyle;
+    methodName: TextStyle;
+    methodParameterName: TextStyle;
+    methodParameterType: TextStyle;
+    methodReturnType: TextStyle;
 };
 
 /**
@@ -154,85 +169,10 @@ export class PlantUmlCodeGenerator {
             ++siblingsBelow;
         }
 
-        if (this.options.hideEmptyMembers) {
-            plantUmlLines.unshift("hide empty fields");
-            plantUmlLines.unshift("hide empty methods");
-        }
-
-        if (this.options.hideCircledChar) {
-            plantUmlLines.unshift("hide circle");
-        }
-
-        if (
-            siblingsAbove > this.options.topDownLayoutMaxSiblings ||
-            siblingsBelow > this.options.topDownLayoutMaxSiblings
-        ) {
-            plantUmlLines.unshift("left to right direction");
-        }
-
-        if (this.options.visibilityStyle === "text") {
-            plantUmlLines.unshift("skinparam ClassAttributeIconSize 0");
-        }
-
-        if (this.options.hideShadow) {
-            plantUmlLines.unshift("skinparam Shadowing false");
-        }
-
-        if (this.options.backgroundColor) {
-            plantUmlLines.unshift("skinparam BackgroundColor " + this.options.backgroundColor);
-        }
-
-        if (this.options.boxBackgroundColor) {
-            plantUmlLines.unshift("skinparam ClassBackgroundColor " + this.options.boxBackgroundColor);
-        }
-
-        if (this.options.boxBorderColor) {
-            plantUmlLines.unshift("skinparam ClassBorderColor " + this.options.boxBorderColor);
-        }
-
-        if (this.options.boxBorderRadius) {
-            plantUmlLines.unshift(`skinparam RoundCorner ${this.options.boxBorderRadius}`);
-        }
-
-        if (this.options.boxBorderWidth >= 0) {
-            plantUmlLines.unshift(`skinparam ClassBorderThickness ${this.options.boxBorderWidth}`);
-        }
-
-        if (this.options.arrowColor) {
-            plantUmlLines.unshift("skinparam ClassArrowColor " + this.options.arrowColor);
-        }
-
-        if (this.options.classFontName) {
-            plantUmlLines.unshift("skinparam ClassFontName " + this.options.classFontName);
-        }
-
-        if (this.options.classFontSize) {
-            plantUmlLines.unshift(`skinparam ClassFontSize ${this.options.classFontSize}`);
-        }
-
-        if (this.options.classFontStyle !== "normal") {
-            plantUmlLines.unshift("skinparam ClassFontStyle " + this.options.classFontStyle);
-        }
-
-        if (this.options.classFontColor) {
-            plantUmlLines.unshift("skinparam ClassFontColor " + this.options.classFontColor);
-        }
-
-        if (this.options.attributeFontName) {
-            plantUmlLines.unshift("skinparam ClassAttributeFontName " + this.options.attributeFontName);
-        }
-
-        if (this.options.attributeFontSize) {
-            plantUmlLines.unshift(`skinparam ClassAttributeFontSize ${this.options.attributeFontSize}`);
-        }
-
-        if (this.options.attributeFontStyle !== "normal") {
-            plantUmlLines.unshift("skinparam ClassAttributeFontStyle " + this.options.attributeFontStyle);
-        }
-
-        if (this.options.attributeFontColor) {
-            plantUmlLines.unshift("skinparam ClassAttributeFontColor " + this.options.attributeFontColor);
-        }
+        plantUmlLines.unshift(...this.getDiagramFormatCommands(siblingsAbove, siblingsBelow));
+        plantUmlLines.unshift(...this.getBoxFormatCommands());
+        plantUmlLines.unshift(...this.getClassNameFormatCommands());
+        plantUmlLines.unshift(...this.getInterfaceNameFormatCommands());
 
         return ["@startuml", ...plantUmlLines, "@enduml"];
     }
@@ -270,7 +210,7 @@ export class PlantUmlCodeGenerator {
                 .sort(this.classMemberCompareFunction);
 
             for (const prop of props) {
-                plantUmlLines.push(PlantUmlCodeGenerator.createPlantUmlForProperty(prop, typeParamsMap));
+                plantUmlLines.push(this.createPlantUmlForProperty(prop, typeParamsMap));
             }
 
             // Process method signatures
@@ -292,6 +232,135 @@ export class PlantUmlCodeGenerator {
         plantUmlLines.push("}");
 
         return plantUmlLines;
+    }
+
+    /**
+     * Returns a list of PlantUML commands to format the diagram using the current options.
+     * @param siblingsAbove The number of siblings above the element the diagram is generated for.
+     * @param siblingsBelow The number of siblings below the element the diagram is generated for.
+     * @returns The PlantUML commands to format the diagram.
+     */
+    private getDiagramFormatCommands(siblingsAbove: number, siblingsBelow: number): string[] {
+        const commands = new Array<string>();
+
+        if (this.options.hideEmptyMembers) {
+            commands.push("hide empty fields");
+            commands.push("hide empty methods");
+        }
+
+        if (this.options.hideCircledChar) {
+            commands.push("hide circle");
+        }
+
+        if (
+            siblingsAbove > this.options.topDownLayoutMaxSiblings ||
+            siblingsBelow > this.options.topDownLayoutMaxSiblings
+        ) {
+            commands.push("left to right direction");
+        }
+
+        if (this.options.visibilityStyle === "text") {
+            commands.push("skinparam ClassAttributeIconSize 0");
+        }
+
+        if (this.options.hideShadow) {
+            commands.push("skinparam Shadowing false");
+        } else {
+            commands.push("skinparam Shadowing true");
+        }
+
+        if (this.options.diagramBackgroundColor) {
+            commands.push("skinparam BackgroundColor " + this.options.diagramBackgroundColor);
+        }
+
+        if (this.options.arrowWidth >= 0) {
+            commands.push("skinparam ClassArrowThickness " + this.options.arrowWidth);
+        }
+
+        if (this.options.arrowColor) {
+            commands.push("skinparam ClassArrowColor " + this.options.arrowColor);
+        }
+
+        return commands;
+    }
+
+    /**
+     * Returns a list of PlantUML commands to format the boxes using the current options.
+     * @returns The PlantUML commands to format the boxes.
+     */
+    private getBoxFormatCommands(): string[] {
+        const commands = new Array<string>();
+
+        if (this.options.boxBackgroundColor) {
+            commands.push("skinparam ClassBackgroundColor " + this.options.boxBackgroundColor);
+        }
+        if (this.options.boxBorderColor) {
+            commands.push("skinparam ClassBorderColor " + this.options.boxBorderColor);
+        }
+        if (this.options.boxBorderRadius >= 0) {
+            commands.push(`skinparam RoundCorner ${this.options.boxBorderRadius}`);
+        }
+        if (this.options.boxBorderWidth >= 0) {
+            commands.push(`skinparam ClassBorderThickness ${this.options.boxBorderWidth}`);
+        }
+
+        return commands;
+    }
+
+    /**
+     * Returns a list of PlantUML commands to format the class names using the current options.
+     * @returns The PlantUML commands to format the class names.
+     */
+    private getClassNameFormatCommands(): string[] {
+        const commands = new Array<string>();
+
+        // Here we use skinparam commands because Creole and legacy HTML formating
+        // is not supported for class names by PlantUML.
+        if (this.options.className.color) {
+            commands.push("skinparam ClassFontColor " + this.options.className.color);
+        }
+        if (this.options.className.font.family) {
+            commands.push("skinparam ClassFontName " + this.options.className.font.family);
+        }
+        if (this.options.className.font.bold) {
+            commands.push("skinparam ClassFontStyle bold");
+        }
+        if (this.options.className.font.italic) {
+            commands.push("skinparam ClassFontStyle italic");
+        }
+        if (this.options.className.font.size > 0) {
+            commands.push("skinparam ClassFontSize " + this.options.className.font.size);
+        }
+
+        return commands;
+    }
+
+    /**
+     * Returns a list of PlantUML commands to format the interface names using the current options.
+     * @returns The PlantUML commands to format the interface names.
+     */
+    private getInterfaceNameFormatCommands(): string[] {
+        const commands = new Array<string>();
+
+        // Here we use skinparam commands because Creole and legacy HTML formating
+        // is not supported for interface names by PlantUML.
+        if (this.options.interfaceName.color) {
+            commands.push("skinparam InterfaceFontColor " + this.options.interfaceName.color);
+        }
+        if (this.options.interfaceName.font.family) {
+            commands.push("skinparam InterfaceFontName " + this.options.interfaceName.font.family);
+        }
+        if (this.options.interfaceName.font.bold) {
+            commands.push("skinparam InterfaceFontStyle bold");
+        }
+        if (this.options.interfaceName.font.italic) {
+            commands.push("skinparam InterfaceFontStyle italic");
+        }
+        if (this.options.interfaceName.font.size > 0) {
+            commands.push("skinparam InterfaceFontSize " + this.options.interfaceName.font.size);
+        }
+
+        return commands;
     }
 
     /**
@@ -344,7 +413,7 @@ export class PlantUmlCodeGenerator {
             plantUml += "+"; // public is default for JS/TS
         }
 
-        plantUml += signature.name;
+        plantUml += PlantUmlCodeGenerator.formatText(signature.name, this.options.methodName);
 
         // Type-parameters
         const localTypeParamsMap = new Map(typeParamsMap);
@@ -365,27 +434,40 @@ export class PlantUmlCodeGenerator {
 
         if (signature.parameters) {
             if (this.options.methodParameterOutput === "only-names") {
-                plantUml += signature.parameters.map((p: Readonly<ParameterReflection>) => p.name).join(", ");
+                plantUml += signature.parameters
+                    .map((p: Readonly<ParameterReflection>) =>
+                        PlantUmlCodeGenerator.formatText(p.name, this.options.methodParameterName),
+                    )
+                    .join(", ");
             } else if (this.options.methodParameterOutput === "only-types") {
                 plantUml += signature.parameters
                     .map((p: Readonly<ParameterReflection>) =>
-                        p.type
-                            ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(p.type, localTypeParamsMap)
-                            : "unknown",
+                        PlantUmlCodeGenerator.formatText(
+                            p.type
+                                ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(
+                                      p.type,
+                                      localTypeParamsMap,
+                                  )
+                                : "unknown",
+                            this.options.methodParameterType,
+                        ),
                     )
                     .join(", ");
             } else if (this.options.methodParameterOutput === "complete") {
                 plantUml += signature.parameters
                     .map(
                         (p: Readonly<ParameterReflection>) =>
-                            p.name +
+                            PlantUmlCodeGenerator.formatText(p.name, this.options.methodParameterName) +
                             ": " +
-                            (p.type
-                                ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(
-                                      p.type,
-                                      localTypeParamsMap,
-                                  )
-                                : "unknown"),
+                            PlantUmlCodeGenerator.formatText(
+                                p.type
+                                    ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(
+                                          p.type,
+                                          localTypeParamsMap,
+                                      )
+                                    : "unknown",
+                                this.options.methodParameterType,
+                            ),
                     )
                     .join(", ");
             }
@@ -394,9 +476,52 @@ export class PlantUmlCodeGenerator {
         plantUml += ")";
 
         // Return type
-        plantUml += signature.type
-            ? " : " + PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(signature.type, localTypeParamsMap)
-            : " : void";
+        plantUml +=
+            " : " +
+            PlantUmlCodeGenerator.formatText(
+                signature.type
+                    ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(signature.type, localTypeParamsMap)
+                    : "void",
+                this.options.methodReturnType,
+            );
+
+        return plantUml;
+    }
+
+    /**
+     * Returns the PlantUML line for generating the output for a given property.
+     * @param property The property for which the PlantUML should be generated.
+     * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
+     *                      the type parameters to their type arguments.
+     * @returns The PlantUML line for the given property.
+     */
+    private createPlantUmlForProperty(
+        property: Readonly<DeclarationReflection>,
+        typeParamsMap: ReadonlyMap<string, string>,
+    ): string {
+        let plantUml = "    "; // indent
+
+        if (property.flags.isStatic) {
+            plantUml += "{static} ";
+        }
+
+        if (property.flags.isPrivate) {
+            plantUml += "-";
+        } else if (property.flags.isProtected) {
+            plantUml += "#";
+        } else {
+            plantUml += "+"; // default is public for JS/TS
+        }
+
+        const propertyName = PlantUmlCodeGenerator.formatText(property.name, this.options.propertyName);
+        const propertyType = PlantUmlCodeGenerator.formatText(
+            property.type
+                ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(property.type, typeParamsMap)
+                : "unknown",
+            this.options.propertyType,
+        );
+
+        plantUml += propertyName + " : " + propertyType;
 
         return plantUml;
     }
@@ -456,41 +581,6 @@ export class PlantUmlCodeGenerator {
         }
 
         return name;
-    }
-
-    /**
-     * Returns the PlantUML line for generating the output for a given property.
-     * @param property The property for which the PlantUML should be generated.
-     * @param typeParamsMap If the property belongs to a class which has type arguments this map contains the mapping of
-     *                      the type parameters to their type arguments.
-     * @returns The PlantUML line for the given property.
-     */
-    private static createPlantUmlForProperty(
-        property: Readonly<DeclarationReflection>,
-        typeParamsMap: ReadonlyMap<string, string>,
-    ): string {
-        let plantUml = "    "; // indent
-
-        if (property.flags.isStatic) {
-            plantUml += "{static} ";
-        }
-
-        if (property.flags.isPrivate) {
-            plantUml += "-";
-        } else if (property.flags.isProtected) {
-            plantUml += "#";
-        } else {
-            plantUml += "+"; // default is public for JS/TS
-        }
-
-        plantUml +=
-            property.name +
-            " : " +
-            (property.type
-                ? PlantUmlCodeGenerator.getTypeNameWithReplacedTypeParameters(property.type, typeParamsMap)
-                : "unknown");
-
-        return plantUml;
     }
 
     /**
@@ -586,5 +676,69 @@ export class PlantUmlCodeGenerator {
         code.push("hide " + escapedName + " circle"); // hide the circle, because we don't know if it is really a class
 
         return code;
+    }
+
+    /**
+     * Adds legacy HTML to the given text to format it according to the given style.
+     * @param text The text that should be formatted.
+     * @param style The style that should be used when formating the text.
+     * @returns The text extended with legacy HTML to format it.
+     */
+    private static formatText(text: string, style: TextStyle): string {
+        let result = "";
+
+        if (style.backgroundColor) {
+            result += `<back:${style.backgroundColor}>`;
+        }
+        if (style.color) {
+            result += `<color:${style.color}>`;
+        }
+        if (style.font.family) {
+            result += `<font:"${style.font.family}">`;
+        }
+        if (style.font.size > 0) {
+            result += `<size:${style.font.size}>`;
+        }
+        if (style.font.bold) {
+            result += "<b>";
+        }
+        if (style.font.italic) {
+            result += "<i>";
+        }
+        if (style.font.underline) {
+            result += "<u>";
+        }
+        if (style.font.strikeout) {
+            result += "<s>";
+        }
+
+        result += text;
+
+        if (style.font.strikeout) {
+            result += "</s>";
+        }
+        if (style.font.underline) {
+            result += "</u>";
+        }
+        if (style.font.italic) {
+            result += "</i>";
+        }
+        if (style.font.bold) {
+            result += "</b>";
+        }
+        if (style.font.size > 0) {
+            result += "</size>";
+        }
+        if (style.font.family) {
+            result += "</font>";
+        }
+        if (style.color) {
+            result += "</color>";
+        }
+        if (style.backgroundColor) {
+            result += "</back>";
+        }
+
+        return result;
     }
 }

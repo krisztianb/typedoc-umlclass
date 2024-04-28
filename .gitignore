@@ -3,5 +3,7 @@ dist
 node_modules
 
 test/cypress/screenshots
+test/cypress/snapshots/actual
+test/cypress/snapshots/diff
 test/cypress/videos
 test/**/output/*
