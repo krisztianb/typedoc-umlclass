@@ -1,0 +1,11 @@
+{
+    "files": [],
+    "references": [
+        {
+            "path": "./input/project-1"
+        },
+        {
+            "path": "./input/project-2"
+        }
+    ]
+}

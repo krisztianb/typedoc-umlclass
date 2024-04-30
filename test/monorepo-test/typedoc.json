@@ -1,0 +1,13 @@
+{
+    "name": "Monorepo Test Project",
+    "entryPointStrategy": "packages",
+    "entryPoints": ["input/project-*"],
+    "out": "output",
+    "includeVersion": false,
+    "plugin": ["typedoc-umlclass"],
+    "umlClassDiagram": {
+        "type": "detailed",
+        "location": "local",
+        "format": "png"
+    }
+}
