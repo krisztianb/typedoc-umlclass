@@ -2,19 +2,11 @@
 
 # typedoc-umlclass
 
-This is a plugin for [TypeDoc](https://github.com/TypeStrong/typedoc) that automatically generates UML class diagrams from your code and inserts it into the doc page of your classes and interfaces.
+This is a plugin for [TypeDoc](https://github.com/TypeStrong/typedoc) that automatically generates UML class diagrams from your code and inserts them into the doc pages of your classes and interfaces.
 
-Example:
+The following example shows the output generated in the doc page of the class `Human` which extends one class `Animal`, implements one interface `IWorker` and from which one class `Zombie` is derived.
 
 ![Example with custom style](https://krisztianb.github.io/typedoc-umlclass/docs/example.png)
-
-## Installation
-
-This plugin should be installed as a dev dependency using [npm](https://www.npmjs.com/package/typedoc-umlclass):
-
-```sh
-$ npm install --save-dev typedoc-umlclass
-```
 
 ## Requirements
 
@@ -24,9 +16,15 @@ This plugin requires the following software to be installed on your system:
 * [Graphviz](https://graphviz.org/) (latest version)
 * [TypeDoc](https://typedoc.org/) (supported versions: 0.24.x and 0.25.x)
 
-You need to activate the plugin with a [TypeDoc command line argument](https://typedoc.org/options/configuration/#plugin) or the `plugin` option in your TypeDoc config file (see example below).
+## Installation
 
-After this step TypeDoc can be used normally and you can configure the plugin as described below.
+Like TypeDoc this plugin should be installed as a dev dependency using [npm](https://www.npmjs.com/package/typedoc-umlclass):
+
+```sh
+$ npm install --save-dev typedoc-umlclass
+```
+
+After installing the plugin you need to activate it with a [TypeDoc command line argument](https://typedoc.org/options/configuration/#plugin) or the `plugin` option in your TypeDoc config file (see example below).
 
 ## Options
 
@@ -40,8 +38,8 @@ Here is an example using a strictly-typed JavaScript config file with the style 
 module.exports = {
     entryPoints: ["./src/index.ts"],
     out: "doc",
-    plugin: ["typedoc-umlclass"],
-    umlClassDiagram: {
+    plugin: ["typedoc-umlclass"], // <===== Turn this plugin on for TypeDoc
+    umlClassDiagram: { // <=========== Use this object to configure this plugin
         type: "detailed",
         location: "local",
         format: "svg",
@@ -127,7 +125,7 @@ module.exports = {
 | **hideEmptyMembers** `<true\|false>` | If this option is set to true properties and methods are hidden if they are empty. | `true` |
 | **hideCircledChar** `<true\|false>` | If this option is set to true the circled char in front of class and interface names is omitted. | `false` |
 | **hideShadow** `<true\|false>` | If this option is set to true the shadowing in the class diagrams is disabled. | `true` |
-| **style** | See below. | |
+| **style** `object` | Enables you to use specific styling (fonts, colors, etc.) within your diagrams. See below. | If omitted the generated diagrams use PlantUML's standard settings for class diagrams. |
 
 ### Class diagram style
 
@@ -138,7 +136,7 @@ Since it is a nested object it is best described via a complete example.
 style: {
     backgroundColor: "white", // this is the background color for the entire diagram
     box: {
-        backgroundColor: "C0C0C0",
+        backgroundColor: "transparent",
         border: {
             width: 2,
             color: "A0A0A0",
