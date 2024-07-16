@@ -20,24 +20,24 @@
         "queue-fifo": "^0.2.6"
     },
     "devDependencies": {
-        "@types/node": "20.12.7",
+        "@types/node": "20.14.10",
         "@types/plantuml-encoder": "1.4.2",
         "@types/progress": "2.0.7",
-        "@typescript-eslint/eslint-plugin": "7.7.1",
-        "@typescript-eslint/parser": "7.7.1",
-        "cypress": "13.8.1",
-        "cypress-visual-regression": "5.0.0",
+        "@typescript-eslint/eslint-plugin": "7.16.1",
+        "@typescript-eslint/parser": "7.16.1",
+        "cypress": "13.13.0",
+        "cypress-visual-regression": "5.0.2",
         "eslint": "8.57.0",
-        "eslint-plugin-jsdoc": "48.2.3",
+        "eslint-plugin-jsdoc": "48.7.0",
         "eslint-plugin-ordered-imports": "0.6.0",
-        "eslint-plugin-unicorn": "52.0.0",
-        "prettier": "3.2.5",
-        "rimraf": "5.0.5",
-        "typedoc": "0.25.13",
-        "typescript": "5.4.5"
+        "eslint-plugin-unicorn": "54.0.0",
+        "prettier": "3.3.3",
+        "rimraf": "6.0.1",
+        "typedoc": "0.26.4",
+        "typescript": "5.5.3"
     },
     "peerDependencies": {
-        "typedoc": "0.24.x || 0.25.x"
+        "typedoc": "0.24.x || 0.25.x || 0.26.x"
     },
     "repository": {
         "type": "git",
