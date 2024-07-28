@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2024-07-28
+### Added
+- Added support for latest TypeDoc version 0.26.5 and above. (NOTE: older 0.26.x versions have a bug that breaks the plugin)
+
 ## [0.9.0] - 2023-04-28
 ### BREAKING CHANGES
 - Removed the following options in favor of the new "style" option: backgroundColor, boxBackgroundColor, boxBorderColor, boxBorderRadius, boxBorderWidth, arrowColor, classFontName, classFontSize, classFontStyle, classFontColor, attributeFontName, attributeFontSize, attributeFontStyle and attributeFontColor
@@ -143,7 +147,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First version
 
-[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/krisztianb/typedoc-umlclass/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.10.0
 [0.9.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.9.0
 [0.8.1]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.8.1
 [0.8.0]: https://github.com/krisztianb/typedoc-umlclass/releases/tag/v0.8.0
