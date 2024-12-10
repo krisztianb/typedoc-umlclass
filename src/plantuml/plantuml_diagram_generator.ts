@@ -1,5 +1,5 @@
 import { PlantUmlPipe } from "plantuml-pipe";
-import Queue = require("queue-fifo");
+import Queue from "queue-fifo";
 
 /** Type that holds a reference to a function which resolves a promise that a diagram has been generated. */
 type DiagramResolver = { resolve: (imageData: Readonly<Buffer>) => void };
