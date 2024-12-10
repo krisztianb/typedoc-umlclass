@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-var-requires, @typescript-eslint/unbound-method */
-const { defineConfig } = require("cypress");
-const { configureVisualRegression } = require("cypress-visual-regression/dist/plugin");
+import { defineConfig } from "cypress";
+import { configureVisualRegression } from "cypress-visual-regression/dist/plugin";
 
-module.exports = defineConfig({
+const config = defineConfig({
     e2e: {
         specPattern: "**/*.cy.ts",
         video: false,
@@ -25,3 +24,5 @@ module.exports = defineConfig({
         },
     },
 });
+
+export default config;

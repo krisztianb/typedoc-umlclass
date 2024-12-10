@@ -1,6 +1,7 @@
 {
     "name": "typedoc-umlclass",
-    "version": "0.10.0",
+    "type": "module",
+    "version": "0.10.1",
     "description": "Plugin for TypeDoc that generates UML class diagrams",
     "author": {
         "name": "Krisztián Balla",
@@ -23,21 +24,21 @@
         "@types/node": "20.14.10",
         "@types/plantuml-encoder": "1.4.2",
         "@types/progress": "2.0.7",
-        "@typescript-eslint/eslint-plugin": "7.16.1",
-        "@typescript-eslint/parser": "7.16.1",
-        "cypress": "13.13.0",
-        "cypress-visual-regression": "5.0.2",
-        "eslint": "8.57.0",
-        "eslint-plugin-jsdoc": "48.7.0",
+        "@typescript-eslint/eslint-plugin": "8.18.0",
+        "@typescript-eslint/parser": "8.18.0",
+        "cypress": "13.16.1",
+        "cypress-visual-regression": "5.2.2",
+        "eslint": "8.57.1",
+        "eslint-plugin-jsdoc": "50.6.0",
         "eslint-plugin-ordered-imports": "0.6.0",
-        "eslint-plugin-unicorn": "54.0.0",
-        "prettier": "3.3.3",
+        "eslint-plugin-unicorn": "56.0.1",
+        "prettier": "3.4.2",
         "rimraf": "6.0.1",
-        "typedoc": "0.26.5",
-        "typescript": "5.5.4"
+        "typedoc": "0.27.4",
+        "typescript": "5.6.3"
     },
     "peerDependencies": {
-        "typedoc": "0.24.x || 0.25.x || ^0.26.5"
+        "typedoc": "0.24.x || 0.25.x || ^0.26.5 || 0.27.x"
     },
     "repository": {
         "type": "git",
@@ -52,6 +53,6 @@
         "lint": "eslint ./src ./test",
         "format": "prettier --check ./src ./test",
         "build": "rimraf dist && tsc",
-        "test": "cd test && node test.js"
+        "test": "cd test && node prepare_test.js && node test.js"
     }
 }

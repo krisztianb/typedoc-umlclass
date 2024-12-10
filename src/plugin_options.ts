@@ -1,6 +1,6 @@
 import { cache } from "decorator-cache-getter";
 import * as os from "os";
-import { Application, ParameterType } from "typedoc";
+import { type Application, ParameterType } from "typedoc";
 
 // Custom utility type for nested required. Taken from: https://stackoverflow.com/a/67833840
 type DeepRequired<T> = { [K in keyof T]: DeepRequired<T[K]> } & Required<T>;

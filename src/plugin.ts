@@ -2,26 +2,26 @@ import * as fs from "fs";
 import * as path from "path";
 import ProgressBar from "progress";
 import {
-    Application,
-    Context,
+    type Application,
+    type Context,
     Converter,
     DeclarationReflection,
     PageEvent,
-    ProjectReflection,
+    type ProjectReflection,
     ReflectionKind,
     RendererEvent,
 } from "typedoc";
-import { createDiagramLegendForPlantUml, DiagramLegend } from "./diagram_legend";
-import { createEmbeddedImageUrl, createLocalImageFileUrl, createRemoteImageUrl } from "./image_url_generator";
-import { Logger } from "./logger";
-import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator";
-import { PlantUmlCodeGenerator, PlantUmlCodeGeneratorOptions } from "./plantuml/plantuml_code_generator";
-import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator";
-import { PluginOptions } from "./plugin_options";
-import { PageProcessor } from "./typedoc/page_processor";
-import { createHierarchyDiagramSection, PageSections } from "./typedoc/page_section";
-import { PageSectionFinder } from "./typedoc/page_section_finder";
-import { reflectionIsPartOfClassHierarchy } from "./typedoc/typedoc_utils";
+import { createDiagramLegendForPlantUml, DiagramLegend } from "./diagram_legend.js";
+import { createEmbeddedImageUrl, createLocalImageFileUrl, createRemoteImageUrl } from "./image_url_generator.js";
+import { Logger } from "./logger.js";
+import { CachingPlantUmlCodeGenerator } from "./plantuml/caching_plantuml_code_generator.js";
+import { type PlantUmlCodeGenerator, type PlantUmlCodeGeneratorOptions } from "./plantuml/plantuml_code_generator.js";
+import { PlantUmlDiagramGenerator } from "./plantuml/plantuml_diagram_generator.js";
+import { PluginOptions } from "./plugin_options.js";
+import { PageProcessor } from "./typedoc/page_processor.js";
+import { createHierarchyDiagramSection, PageSections } from "./typedoc/page_section.js";
+import { PageSectionFinder } from "./typedoc/page_section_finder.js";
+import { reflectionIsPartOfClassHierarchy } from "./typedoc/typedoc_utils.js";
 
 /**
  * The UML class diagram generator plugin.

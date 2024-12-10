@@ -23,6 +23,7 @@ describe("classes/super.Super.html", () => {
     });
 
     it("has an image with the expected content", () => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Missing type information for compareSnapshot
         cy.get(diagramSelector).find("img").first().compareSnapshot("Super.HierarchyDiagram");
     });
 });

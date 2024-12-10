@@ -1,4 +1,4 @@
-import { PageSections } from "./page_section";
+import { type PageSections } from "./page_section.js";
 
 /**
  * Helper class for finding sections on a TypeDoc page.
@@ -57,6 +57,6 @@ export class PageSectionFinder {
      * @returns The regular expression to match the section.
      */
     private static createLookUpRegexpForSection(sectionName: string): RegExp {
-        return new RegExp('<section class="tsd-panel[^"<>]*?">\\s*<h(\\d)>' + sectionName + ".*</h\\1>.*?</section>");
+        return new RegExp('<section class="tsd-panel[^<>]*?">\\s*<h(\\d)>' + sectionName + ".*</h\\1>.*?</section>");
     }
 }

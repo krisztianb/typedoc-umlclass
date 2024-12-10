@@ -1,4 +1,4 @@
-import { DeclarationReflection } from "typedoc";
+import { type DeclarationReflection } from "typedoc";
 
 /** Type for a reflection compare function for sorting reflections. */
 export type TypeDocMemberCompareFunction = (
