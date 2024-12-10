@@ -1,5 +1,5 @@
-import { PageSections } from "./page_section";
-import { PageSectionFinder } from "./page_section_finder";
+import { type PageSections } from "./page_section.js";
+import { PageSectionFinder } from "./page_section_finder.js";
 
 /**
  * Helper class for modifying TypeDoc page content.

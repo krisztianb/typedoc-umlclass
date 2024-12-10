@@ -1,25 +1,25 @@
 import {
     DeclarationReflection,
-    ParameterReflection,
-    ReferenceType,
-    ReflectionFlags,
+    type ParameterReflection,
+    type ReferenceType,
+    type ReflectionFlags,
     ReflectionKind,
-    SignatureReflection,
-    Type,
-    TypeParameterReflection,
+    type SignatureReflection,
+    type Type,
+    type TypeParameterReflection,
 } from "typedoc";
 import {
     nameAbc,
     privateToPublic,
     publicToPrivate,
-    TypeDocMemberCompareFunction,
-} from "../typedoc/typedoc_member_sorter";
+    type TypeDocMemberCompareFunction,
+} from "../typedoc/typedoc_member_sorter.js";
 import {
     getExtendedBysForReflection,
     getExtendedTypesForReflection,
     getImplementedBysForReflection,
     getImplementedTypesForReflection,
-} from "../typedoc/typedoc_utils";
+} from "../typedoc/typedoc_utils.js";
 
 /** Type for specifying the style of a text. */
 type TextStyle = {

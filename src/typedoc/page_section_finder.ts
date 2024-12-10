@@ -1,4 +1,4 @@
-import { PageSections } from "./page_section";
+import { type PageSections } from "./page_section.js";
 
 /**
  * Helper class for finding sections on a TypeDoc page.

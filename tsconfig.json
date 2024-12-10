@@ -4,13 +4,15 @@
         "outDir": "dist",
         "target": "es2015",
         "lib": ["ES2015", "DOM"],
-        "module": "commonjs",
+        "module": "NodeNext",
         "declaration": true,
         "baseUrl": "./",
         "strict": true,
         "noImplicitOverride": true,
         "exactOptionalPropertyTypes": true,
+        "experimentalDecorators": true,
         "esModuleInterop": true,
-        "experimentalDecorators": true
+        "isolatedModules": true,
+        "verbatimModuleSyntax": true
     }
 }

@@ -1,5 +1,6 @@
 {
     "name": "typedoc-umlclass",
+    "type": "module",
     "version": "0.10.0",
     "description": "Plugin for TypeDoc that generates UML class diagrams",
     "author": {
@@ -37,7 +38,7 @@
         "typescript": "5.5.4"
     },
     "peerDependencies": {
-        "typedoc": "0.24.x || 0.25.x || ^0.26.5"
+        "typedoc": "0.24.x || 0.25.x || ^0.26.5 || 0.27.x"
     },
     "repository": {
         "type": "git",
@@ -52,6 +53,6 @@
         "lint": "eslint ./src ./test",
         "format": "prettier --check ./src ./test",
         "build": "rimraf dist && tsc",
-        "test": "cd test && node test.js"
+        "test": "cd test && node prepare_test.js && node test.js"
     }
 }
