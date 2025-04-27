@@ -1,5 +1,5 @@
-import { cache } from "decorator-cache-getter";
 import * as os from "os";
+import { cache } from "decorator-cache-getter";
 import { type Application, ParameterType } from "typedoc";
 
 // Custom utility type for nested required. Taken from: https://stackoverflow.com/a/67833840
@@ -86,7 +86,7 @@ type RequiredPluginConfig = DeepRequired<PluginConfig>;
 declare module "typedoc" {
     // eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- This is not a separate type.
     export interface TypeDocOptionMap {
-        umlClassDiagram?: PluginConfig;
+        umlClassDiagram: PluginConfig;
     }
 }
 
@@ -494,7 +494,8 @@ export class PluginOptions {
      * Reads the values of the plugin options from the application options.
      * @param typedoc The TypeDoc application.
      */
-    public readValuesFromApplication(typedoc: Application): void {
-        this.userValues = typedoc.options.getValue("umlClassDiagram");
+    public readValuesFromApplication(typedoc: Readonly<Application>): void {
+        // Yes, this type assertion sucks, but there's something wrong with the Type Definitions of TypeDoc
+        this.userValues = typedoc.options.getValue("umlClassDiagram") as PluginConfig | undefined;
     }
 }

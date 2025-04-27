@@ -152,6 +152,7 @@ export class Plugin {
                     if (!this.options.hideProgressBar) {
                         this.log?.info("Setting up progress bar ...");
                         this.progressBar = new ProgressBar(
+                            // eslint-disable-next-line max-len
                             `Using ${this.options.generatorProcessCount} process(es) to add ${this.numberOfDiagramsToGenerate} class diagrams [:bar] :percent`,
                             {
                                 total: this.numberOfDiagramsToGenerate,
@@ -206,6 +207,7 @@ export class Plugin {
 
             let data =
                 fs.readFileSync(filename, "utf8") +
+                // eslint-disable-next-line max-len
                 "\n.tsd-hierarchy-diagram .diagram { max-width: 100%; display: block; margin: 0 auto; text-align: center; }\n";
 
             if (this.shouldGenerateLegends) {
@@ -234,12 +236,22 @@ export class Plugin {
      * in the particular doc generation phases.
      */
     private subscribeToApplicationEvents(): void {
-        this.typedoc.converter.on(Converter.EVENT_RESOLVE_BEGIN, (c: Context) => this.onConverterResolveBegin(c));
-        this.typedoc.converter.on(Converter.EVENT_RESOLVE_END, (c: Context) => this.onConverterResolveEnd(c));
+        this.typedoc.converter.on(Converter.EVENT_RESOLVE_BEGIN, (c: Context) => {
+            this.onConverterResolveBegin(c);
+        });
+        this.typedoc.converter.on(Converter.EVENT_RESOLVE_END, (c: Context) => {
+            this.onConverterResolveEnd(c);
+        });
 
-        this.typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => this.onRendererBegin(e));
-        this.typedoc.renderer.on(PageEvent.END, (e: PageEvent) => this.onRendererEndPage(e));
-        this.typedoc.renderer.on(RendererEvent.END, (e: RendererEvent) => this.onRendererEnd(e));
+        this.typedoc.renderer.on(RendererEvent.BEGIN, (e: RendererEvent) => {
+            this.onRendererBegin(e);
+        });
+        this.typedoc.renderer.on(PageEvent.END, (e: PageEvent) => {
+            this.onRendererEndPage(e);
+        });
+        this.typedoc.renderer.on(RendererEvent.END, (e: RendererEvent) => {
+            this.onRendererEnd(e);
+        });
     }
 
     /**

@@ -2,7 +2,7 @@
 
 # typedoc-umlclass
 
-This is a plugin for [TypeDoc](https://github.com/TypeStrong/typedoc) that automatically generates UML class diagrams from your code and inserts them into the doc pages of your classes and interfaces.
+This is a plugin for [TypeDoc](https://typedoc.org/) that automatically generates UML class diagrams from your code and inserts them into the doc pages of your classes and interfaces.
 
 The following example shows the output generated in the doc page of the class `Human` which extends one class `Animal`, implements one interface `IWorker` and from which one class `Zombie` is derived.
 
@@ -14,7 +14,7 @@ This plugin requires the following software to be installed on your system:
 
 * [JAVA](https://www.java.com/) (latest version)
 * [Graphviz](https://graphviz.org/) (latest version)
-* [TypeDoc](https://typedoc.org/) (supported versions: 0.24.x, 0.25.x and 0.26.5 or above)
+* [TypeDoc](https://typedoc.org/) (supported versions: 0.24.x, 0.25.x, 0.26.5 and above)
 
 ## Installation
 
@@ -24,12 +24,12 @@ Like TypeDoc this plugin should be installed as a dev dependency using [npm](htt
 $ npm install --save-dev typedoc-umlclass
 ```
 
-After installing the plugin you need to activate it with a [TypeDoc command line argument](https://typedoc.org/options/configuration/#plugin) or the `plugin` option in your TypeDoc config file (see example below).
+After installing the plugin you need to activate it with a [TypeDoc command line argument](https://typedoc.org/documents/Options.Configuration.html#plugin) or the `plugin` option in your TypeDoc config file (see example below).
 
 ## Options
 
 The option `umlClassDiagram` is added to TypeDoc when the plugin is installed. The option is an object whose properties
-can be used to configure the plugin within your [TypeDoc config file](https://typedoc.org/guides/options/).
+can be used to configure the plugin within your [TypeDoc config file](https://typedoc.org/documents/Options.Configuration.html).
 
 Here is an example using a strictly-typed JavaScript config file with the style settings for the diagram above:
 
