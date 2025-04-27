@@ -18,8 +18,19 @@ describe("classes/super.Super.html", () => {
 
         cy.visit(pageUrl);
 
-        // hide stickily positioned page header because it messes up the cypress screenshot captures
-        cy.get("header").invoke("attr", "style", "display:none;");
+        // Inject CSS to hide elements that interfere with the screenshot capture
+        cy.document().then((doc) => {
+            const style = doc.createElement("style");
+            style.innerHTML = `
+                header, section, aside, details {
+                  display: none !important;
+                }
+                section.tsd-hierarchy-diagram {
+                  display: block !important;
+                }
+            `;
+            doc.head.appendChild(style);
+        });
     });
 
     it("has an image with the expected content", () => {
