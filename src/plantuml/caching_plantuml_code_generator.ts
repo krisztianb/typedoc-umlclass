@@ -54,6 +54,6 @@ export class CachingPlantUmlCodeGenerator extends PlantUmlCodeGenerator {
             );
         }
 
-        return this.reflectionPlantUmlCache.get(cacheKey)!;
+        return this.reflectionPlantUmlCache.get(cacheKey) ?? [];
     }
 }

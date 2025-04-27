@@ -274,7 +274,7 @@ export class PlantUmlCodeGenerator {
         }
 
         if (this.options.arrowWidth >= 0) {
-            commands.push("skinparam ClassArrowThickness " + this.options.arrowWidth);
+            commands.push("skinparam ClassArrowThickness " + this.options.arrowWidth.toString());
         }
 
         if (this.options.arrowColor) {
@@ -298,10 +298,10 @@ export class PlantUmlCodeGenerator {
             commands.push("skinparam ClassBorderColor " + this.options.boxBorderColor);
         }
         if (this.options.boxBorderRadius >= 0) {
-            commands.push(`skinparam RoundCorner ${this.options.boxBorderRadius}`);
+            commands.push("skinparam RoundCorner " + this.options.boxBorderRadius.toString());
         }
         if (this.options.boxBorderWidth >= 0) {
-            commands.push(`skinparam ClassBorderThickness ${this.options.boxBorderWidth}`);
+            commands.push("skinparam ClassBorderThickness " + this.options.boxBorderWidth.toString());
         }
 
         return commands;
@@ -329,7 +329,7 @@ export class PlantUmlCodeGenerator {
             commands.push("skinparam ClassFontStyle italic");
         }
         if (this.options.className.font.size > 0) {
-            commands.push("skinparam ClassFontSize " + this.options.className.font.size);
+            commands.push("skinparam ClassFontSize " + this.options.className.font.size.toString());
         }
 
         return commands;
@@ -357,7 +357,7 @@ export class PlantUmlCodeGenerator {
             commands.push("skinparam InterfaceFontStyle italic");
         }
         if (this.options.interfaceName.font.size > 0) {
-            commands.push("skinparam InterfaceFontSize " + this.options.interfaceName.font.size);
+            commands.push("skinparam InterfaceFontSize " + this.options.interfaceName.font.size.toString());
         }
 
         return commands;

@@ -3,6 +3,7 @@ import { type PageSections } from "./page_section.js";
 /**
  * Helper class for finding sections on a TypeDoc page.
  */
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class -- TODO: Turn this into a singleton class.
 export class PageSectionFinder {
     /** Map for caching regular expressions to find a section on a page. */
     private static readonly pageSectionLookUpCache = new Map<PageSections, RegExp>();
@@ -41,14 +42,14 @@ export class PageSectionFinder {
      * @returns The regular expression to match the section.
      */
     private static getLookUpRegexpForSection(section: PageSections): RegExp {
-        if (!PageSectionFinder.pageSectionLookUpCache.has(section)) {
-            PageSectionFinder.pageSectionLookUpCache.set(
-                section,
-                PageSectionFinder.createLookUpRegexpForSection(section),
-            );
+        let regex = PageSectionFinder.pageSectionLookUpCache.get(section);
+
+        if (!regex) {
+            regex = PageSectionFinder.createLookUpRegexpForSection(section);
+            PageSectionFinder.pageSectionLookUpCache.set(section, regex);
         }
 
-        return PageSectionFinder.pageSectionLookUpCache.get(section)!;
+        return regex;
     }
 
     /**
